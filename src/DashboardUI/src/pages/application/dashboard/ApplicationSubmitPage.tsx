@@ -90,7 +90,7 @@ export function ApplicationSubmitPage() {
         <div className="container">
           <ApplicationReviewHeader />
           <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
-          <ApplicationDocumentSection readOnly={true} />
+          <ApplicationDocumentSection readOnly={true} perspective={'applicant'} />
 
           {state.isCreatingApplication && (
             <>

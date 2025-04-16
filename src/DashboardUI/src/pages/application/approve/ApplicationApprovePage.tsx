@@ -139,7 +139,7 @@ export function ApplicationApprovePage() {
             <div className="container">
               <ApplicationReviewHeader />
               <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
-              <ApplicationDocumentSection readOnly={true} />
+              <ApplicationDocumentSection readOnly={true} perspective={'reviewer'} />
               <ApplicationReviewPipelineSection />
               <ApplicationReviewersNotesSection />
               <ApplicationFormSectionRule width={1} />

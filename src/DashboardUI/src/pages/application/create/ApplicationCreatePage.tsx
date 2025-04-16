@@ -53,7 +53,7 @@ export function ApplicationCreatePage() {
         <div className="container">
           <ApplicationReviewHeader additionalText={pageHeaderInstructions} />
           <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
-          <ApplicationDocumentSection readOnly={false} />
+          <ApplicationDocumentSection perspective={perspective} readOnly={false} />
           <ApplicantButtonRow handleSubmitClicked={handleSubmitClicked} />
         </div>
       </div>

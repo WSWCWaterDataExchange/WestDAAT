@@ -25,9 +25,6 @@ export function ApplicationReviewFormPage() {
   const { applicationId } = useParams();
   const { state, dispatch } = useConservationApplicationContext();
 
-  const isApplicationLoading = state.isLoadingApplication;
-  const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
-
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
@@ -100,7 +97,7 @@ export function ApplicationReviewFormPage() {
   return (
     <div className="container">
       <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
-      <ApplicationDocumentSection readOnly={false} />
+      <ApplicationDocumentSection perspective={perspective} readOnly={false} />
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
       <ApplicationReviewButtonRow
