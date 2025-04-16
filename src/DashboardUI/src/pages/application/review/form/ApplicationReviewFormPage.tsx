@@ -7,7 +7,6 @@ import { updateApplicationSubmission } from '../../../../accessors/applicationAc
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
-import useDirtyFormCheck from '../../../../hooks/useDirtyFormCheck';
 import ApplicationDocumentSection from '../../components/ApplicationDocumentSection';
 import ApplicationReviewersNotesSection from '../../components/ApplicationReviewersNotesSection';
 import ApplicationReviewPipelineSection from '../../components/ApplicationReviewPipelineSection';
@@ -41,15 +40,8 @@ export function ApplicationReviewFormPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [formValidated, setFormValidated] = useState(false);
 
-  const [isFormDirty, reinitializeDirtyFormCheck] = useDirtyFormCheck(
-    state.conservationApplication.applicationSubmissionForm,
-    {
-      isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
-    },
-  );
-
   const handleCancelClicked = () => {
-    if (isFormDirty) {
+    if (state.conservationApplication.isDirty) {
       setShowCancelConfirmationModal(true);
     } else {
       handleCancelConfirmed();
@@ -71,7 +63,7 @@ export function ApplicationReviewFormPage() {
   };
 
   const handleSubmitClicked = () => {
-    if (isFormDirty) {
+    if (state.conservationApplication.isDirty) {
       setShowUnsavedChangesModal(true);
     } else {
       setShowSubmitRecommendationModal(true);
@@ -96,8 +88,8 @@ export function ApplicationReviewFormPage() {
     onSuccess: (note: ApplicationReviewNote) => {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
-      reinitializeDirtyFormCheck(state.conservationApplication.applicationSubmissionForm);
       dispatch({ type: 'APPLICATION_NOTE_ADDED', payload: { note } });
+      dispatch({ type: 'APPLICATION_SUBMISSION_UPDATES_SAVED' });
     },
     onError: () => {
       toast.error('Error saving application changes.');
@@ -112,7 +104,7 @@ export function ApplicationReviewFormPage() {
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
       <ApplicationReviewButtonRow
-        isFormDirty={isFormDirty}
+        isFormDirty={state.conservationApplication.isDirty}
         isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
         handleSaveClicked={handleSaveClicked}
