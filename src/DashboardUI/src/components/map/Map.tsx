@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -11,6 +11,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
 import {
   defaultMapLocationData,
+  MapExportOptions,
   MapSettings,
   MapStyle,
   RenderedFeatureType,
@@ -23,22 +24,20 @@ import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
-import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
-import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
-
-import './map.scss';
 import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
-interface mapProps {
+import './map.scss';
+
+interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
@@ -56,7 +55,7 @@ function Map({
   polygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
-}: mapProps) {
+}: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -84,6 +83,7 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setExportToPngFn,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -604,6 +604,53 @@ function Map({
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (!isMapRendering && map) {
+      map.once('idle', () => {
+        setExportToPngFn(() => (options: MapExportOptions) => {
+          console.log('Export to PNG function called', options);
+
+          const mapContainer = document.getElementById('map');
+          if (!mapContainer) {
+            throw new Error('Map container not found');
+          }
+
+          const originalSize = {
+            width: mapContainer.style.width,
+            height: mapContainer.style.height,
+          };
+
+          console.log('Original size:', originalSize);
+
+          mapContainer!.style.width = options.width + 'px';
+          mapContainer!.style.height = options.height + 'px';
+          mapContainer?.classList.remove('h-100');
+
+          map.resize();
+
+          map.once('idle', async () => {
+            const canvas = map.getCanvas();
+            canvas.toBlob((blob: Blob | null) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'map.png';
+                a.click();
+              }
+
+              // Restore the original size
+              mapContainer.style.width = originalSize.width;
+              mapContainer.style.height = originalSize.height;
+              mapContainer?.classList.add('h-100');
+              map.resize();
+            });
+          });
+        });
+      });
+    }
+  }, [isMapRendering]);
 
   return (
     <div className="position-relative h-100">
