@@ -10,35 +10,36 @@ function useNldiMapPopup() {
   const { updatePopup, nldiData } = useNldiClickedOnMap();
   const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 
-  const { data: siteData, isFetching } = useSiteDigest(
-    nldiData && (nldiData as NldiSiteData).isTimeSeries ? nldiData.identifier : '',
-  );
+  const isTimeSeries = (nldiData as NldiSiteData)?.isTimeSeries;
+  const identifier = (nldiData as NldiSiteData)?.identifier;
+
+  const { data: siteData, isFetching } = useSiteDigest(identifier);
 
   const result = useMemo(() => {
     if (!nldiData) return undefined;
 
-    if ((nldiData as NldiSiteData).isTimeSeries) {
+    if (isTimeSeries) {
       if (isFetching) {
         return (
           <LoadingCard
             onClosePopup={handleClosePopup}
-            loadingText={`Retrieving site data for ${(nldiData as NldiSiteData).identifier}`}
+            loadingText={`Retrieving site data for ${identifier}`}
           />
         );
       }
+
       if (!siteData) {
         return (
           <ErrorCard
             onClosePopup={handleClosePopup}
-            errorText={`Unable to find site data for ${(nldiData as NldiSiteData).identifier}`}
+            errorText={`Unable to find site data for ${identifier}`}
           />
         );
       }
+
       return (
         <SiteDigestCard
           site={siteData}
-          currentIndex={0}
-          onSelectedIndexChanged={() => {}}
           onClosePopup={handleClosePopup}
         />
       );
@@ -47,13 +48,13 @@ function useNldiMapPopup() {
     return (
       <NldiSiteCard
         sourceName={(nldiData as NldiSiteData).sourceName}
-        identifier={(nldiData as NldiSiteData).identifier}
+        identifier={identifier}
         uri={(nldiData as NldiSiteData).uri}
         name={(nldiData as NldiSiteData).name}
         onClosePopup={handleClosePopup}
       />
     );
-  }, [nldiData, siteData, isFetching, handleClosePopup]);
+  }, [nldiData, isTimeSeries, siteData, isFetching, identifier, handleClosePopup]);
 
   useEffect(() => {
     if (result) {
@@ -63,4 +64,5 @@ function useNldiMapPopup() {
 
   return null;
 }
+
 export default useNldiMapPopup;
