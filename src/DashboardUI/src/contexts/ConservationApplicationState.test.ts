@@ -814,6 +814,18 @@ describe('ConservationApplicationState reducer', () => {
         'location-guid',
       );
 
+      // verify control location exists in state
+      expect(newState.conservationApplication.controlLocation).toBeDefined();
+      expect(
+        newState.conservationApplication.controlLocation?.waterConservationApplicationEstimateControlLocationId,
+      ).toBe('control-location-guid');
+      expect(newState.conservationApplication.controlLocation?.pointWkt).toBeTruthy();
+
+      // verify consumptive use data is defined in state
+      expect(newState.conservationApplication.cumulativeTotalEtInAcreFeet).toBeDefined();
+      expect(newState.conservationApplication.cumulativeNetEtInAcreFeet).toBeDefined();
+      expect(newState.conservationApplication.conservationPayment).toBeDefined();
+
       // Act 1 - update existing polygon
       const movePolygonAction: ReviewerMapDataUpdatedAction = {
         type: 'REVIEWER_MAP_DATA_UPDATED',
@@ -837,6 +849,7 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(state, movePolygonAction);
 
       // Assert 1
+      // polygon should be updated
       expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
       const location = newState.conservationApplication.estimateLocations[0];
       const payloadLocation = movePolygonAction.payload.polygons[0];
@@ -848,6 +861,15 @@ describe('ConservationApplicationState reducer', () => {
       expect(location.drawToolType).toEqual(payloadLocation.drawToolType);
       expect(location.acreage).toEqual(payloadLocation.acreage);
       expect(newState.conservationApplication.doPolygonsOverlap).toEqual(false);
+
+      // side effect - consumptive use data should be reset for the estimate, the location(s), and the control location
+      expect(newState.conservationApplication.cumulativeTotalEtInAcreFeet).toBe(undefined);
+      expect(newState.conservationApplication.cumulativeNetEtInAcreFeet).toBe(undefined);
+      expect(newState.conservationApplication.conservationPayment).toBe(undefined);
+      expect(location.averageYearlyTotalEtInInches).toBe(undefined);
+      expect(location.datapoints).toEqual([]);
+      expect(newState.conservationApplication.controlLocation?.datapoints).toEqual([]);
+      expect(newState.conservationApplication.controlLocation?.averageYearlyTotalEtInInches).toBe(undefined);
 
       // Act 2 - add new polygon
       const addPolygonAction: ReviewerMapDataUpdatedAction = {
