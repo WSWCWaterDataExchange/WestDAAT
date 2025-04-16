@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiStar, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -27,7 +27,7 @@ import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
@@ -149,9 +149,6 @@ function Map({
       props: {
         displayControlsDefault: false,
         controls: {
-          // These controls must be enabled to allow the custom draw modes to work.
-          // Enabling this functionality also has the side effect of adding the corresponding buttons to the draw bar
-          polygon: true,
           trash: true,
         },
         modes: {
@@ -163,6 +160,14 @@ function Map({
       },
       // these buttons are rendered in reverse order
       buttons: [
+        {
+          on: 'click',
+          title: 'Polygon tool',
+          buttonIconPath: mdiStar,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_polygon');
+          },
+        },
         {
           on: 'click',
           title: 'Control Location tool',
