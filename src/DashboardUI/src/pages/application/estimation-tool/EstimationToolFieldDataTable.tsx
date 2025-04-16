@@ -9,10 +9,14 @@ interface EstimationToolFieldDataTableProps {
 }
 
 function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) {
+  const emptyDataPlaceholder = '-';
+
   const renderCard = (value: number | undefined, title: string, units: string) => (
     <Card className="flex-grow-1 rounded-3 shadow-sm col-xxl-2 col-lg-3 col-4">
       <Card.Body>
-        <Card.Title className="mt-3 fs-3 text-center fw-bold">{formatNumber(value, 2)}</Card.Title>
+        <Card.Title className="mt-3 fs-3 text-center fw-bold">
+          {value ? formatNumber(value, 2) : emptyDataPlaceholder}
+        </Card.Title>
         <Card.Text className="text-center fw-bold fs-6">
           {title} ({units})
         </Card.Text>
@@ -41,7 +45,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
             <tr key={item.year}>
               <td>{item.year}</td>
               <td>{formatNumber(item.totalEtInInches, 2)}</td>
-              <td>{formatNumber(item.netEtInInches, 2)}</td>
+              <td>{item.netEtInInches ? formatNumber(item.netEtInInches, 2) : emptyDataPlaceholder}</td>
             </tr>
           ))}
         </tbody>
