@@ -964,18 +964,11 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
     }
 
     draftState.conservationApplication.estimateLocations[i] = {
+      // carry over existing data
+      ...polygon,
       // incorporate computed/derived data
       additionalDetails: additionalDetailsTrackedFormValue,
       centerPoint,
-      // carry over existing data
-      waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
-      polygonWkt: polygon.polygonWkt,
-      drawToolType: polygon.drawToolType,
-      acreage: polygon.acreage,
-      averageYearlyTotalEtInInches: polygon.averageYearlyTotalEtInInches,
-      averageYearlyTotalEtInAcreFeet: polygon.averageYearlyTotalEtInAcreFeet,
-      fieldName: polygon.fieldName,
-      datapoints: polygon.datapoints,
     };
 
     // compute data concerning all the polygons
