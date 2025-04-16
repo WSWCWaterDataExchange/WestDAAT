@@ -4,12 +4,14 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import {
+  ApplicationLoadedAction,
   ConservationApplicationState,
   defaultState,
   reducer,
+  ReviewerConsumptiveUseEstimatedAction,
   ReviewerMapDataUpdatedAction,
 } from './ConservationApplicationState';
-import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
+import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
@@ -969,6 +971,128 @@ describe('ConservationApplicationState reducer', () => {
       expect(controlLocation?.averageYearlyTotalEtInInches).toBe(undefined);
       expect(controlLocation?.datapoints).toEqual([]);
     });
+  });
+
+  it('reviewer estimating consumptive use should update state', () => {
+    // Arrange
+    const applicationLoadedAction: ApplicationLoadedAction = {
+      type: 'APPLICATION_LOADED',
+      payload: {
+        application: applicationDetailsMock(),
+        notes: [],
+        reviewPipeline: {
+          reviewSteps: [],
+        },
+      },
+    };
+    let newState = reducer(state, applicationLoadedAction);
+
+    // user selects valid control location
+    const polygon = newState.conservationApplication.estimateLocations[0];
+    const addControlLocationAction: ReviewerMapDataUpdatedAction = {
+      type: 'REVIEWER_MAP_DATA_UPDATED',
+      payload: {
+        polygons: [
+          // polygons remain as-is
+          ...[polygon].map(
+            (polygon): MapSelectionPolygonData => ({
+              waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
+              polygonWkt: polygon.polygonWkt!,
+              acreage: polygon.acreage!,
+              drawToolType: polygon.drawToolType!,
+            }),
+          ),
+        ],
+        doPolygonsOverlap: false,
+        controlLocation: {
+          pointWkt: 'POINT (5 5)',
+        },
+        doesControlLocationOverlapWithPolygons: false,
+      },
+    };
+    newState = reducer(newState, addControlLocationAction);
+
+    expect(newState.conservationApplication.controlLocation).toBeDefined();
+
+    // Act
+    const estimateConsumptiveUseAction: ReviewerConsumptiveUseEstimatedAction = {
+      type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
+      payload: {
+        cumulativeTotalEtInAcreFeet: 200,
+        cumulativeNetEtInAcreFeet: 100,
+        conservationPayment: 50_000,
+        dataCollections: [
+          {
+            waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId!,
+            polygonWkt: polygon.polygonWkt!,
+            averageYearlyTotalEtInInches: 12,
+            averageYearlyTotalEtInAcreFeet: 120,
+            averageYearlyNetEtInInches: 10,
+            averageYearlyNetEtInAcreFeet: 100,
+            datapoints: [
+              {
+                totalEtInInches: 12,
+                effectivePrecipitationInInches: 2,
+                netEtInInches: 10,
+                year: 2025,
+              },
+            ],
+          },
+        ],
+        controlDataCollection: {
+          waterConservationApplicationEstimateControlLocationId: 'control-location-guid',
+          pointWkt: addControlLocationAction.payload.controlLocation!.pointWkt,
+          averageYearlyTotalEtInInches: 2,
+          datapoints: [
+            {
+              totalEtInInches: 2,
+              year: 2025,
+              effectivePrecipitationInInches: null,
+              netEtInInches: null,
+            },
+          ],
+        },
+      },
+    };
+    newState = reducer(newState, estimateConsumptiveUseAction);
+
+    // Assert
+    // application should be updated
+    const application = newState.conservationApplication;
+    const payload = estimateConsumptiveUseAction.payload;
+
+    expect(application.cumulativeTotalEtInAcreFeet).toEqual(payload.cumulativeTotalEtInAcreFeet);
+    expect(application.cumulativeNetEtInAcreFeet).toEqual(payload.cumulativeNetEtInAcreFeet);
+    expect(application.conservationPayment).toEqual(payload.conservationPayment);
+
+    // locations should be updated:
+    // * existing details should be preserved
+    // * consumptive use data should be added
+    expect(application.estimateLocations.length).toEqual(1);
+    const location = application.estimateLocations[0];
+    const locationPayload = payload.dataCollections[0];
+
+    expect(location.waterConservationApplicationEstimateLocationId).toEqual(
+      locationPayload.waterConservationApplicationEstimateLocationId,
+    );
+    expect(location.polygonWkt).toEqual(locationPayload.polygonWkt);
+
+    expect(location.averageYearlyTotalEtInInches).toEqual(locationPayload.averageYearlyTotalEtInInches);
+    expect(location.averageYearlyTotalEtInAcreFeet).toEqual(locationPayload.averageYearlyTotalEtInAcreFeet);
+    expect(location.averageYearlyNetEtInInches).toEqual(locationPayload.averageYearlyNetEtInInches);
+    expect(location.averageYearlyNetEtInAcreFeet).toEqual(locationPayload.averageYearlyNetEtInAcreFeet);
+    expect(location.datapoints).toEqual(locationPayload.datapoints);
+
+    // control location should be updated
+    const controlLocation = application.controlLocation;
+    const controlLocationPayload = payload.controlDataCollection;
+
+    expect(controlLocation?.waterConservationApplicationEstimateControlLocationId).toEqual(
+      controlLocationPayload.waterConservationApplicationEstimateControlLocationId,
+    );
+    expect(controlLocation?.pointWkt).toEqual(controlLocationPayload.pointWkt);
+    expect(controlLocation?.averageYearlyTotalEtInInches).toEqual(controlLocationPayload.averageYearlyTotalEtInInches);
+    expect(controlLocation?.datapoints).toEqual(controlLocationPayload.datapoints);
   });
 
   describe('Additional Use Cases', () => {
