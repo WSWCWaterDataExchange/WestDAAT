@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker, mdiStar, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorPolygon, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -163,7 +163,7 @@ function Map({
         {
           on: 'click',
           title: 'Polygon tool',
-          buttonIconPath: mdiStar,
+          buttonIconPath: mdiVectorPolygon,
           action: () => {
             drawControlStateRef.current?.changeMode('draw_polygon');
           },
