@@ -36,13 +36,15 @@ function ApplicationReviewPage() {
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
 
   const navigateBack = () => {
-    if (state.conservationApplication.isDirty) {
-      setShowCancelConfirmationModal(true);
-      isOnMapPage
-        ? setCancelModalNavigateTo(upOneLevelPath)
-        : setCancelModalNavigateTo(applicationOrganizationDashboardPath);
+    if (isOnMapPage) {
+      navigate(upOneLevelPath);
     } else {
-      isOnMapPage ? navigate(upOneLevelPath) : navigate(applicationOrganizationDashboardPath);
+      if (!state.conservationApplication.isDirty) {
+        navigate(applicationOrganizationDashboardPath);
+      } else {
+        setShowCancelConfirmationModal(true);
+        setCancelModalNavigateTo(applicationOrganizationDashboardPath);
+      }
     }
   };
 
