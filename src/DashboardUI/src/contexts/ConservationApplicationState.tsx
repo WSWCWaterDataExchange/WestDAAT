@@ -464,6 +464,7 @@ const onMapPolygonsUpdated = (
 
   resetConsumptiveUseEstimation(draftState);
   checkCanApplicantEstimateConsumptiveUse(draftState);
+  updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
   resetApplicationFormLocationDetails(draftState);
 
@@ -576,8 +577,8 @@ const onReviewerMapPolygonsUpdated = (
   handleControlLocationChanges();
 
   // side effects
-  // todo: do any other methods need to be called here?
   resetConsumptiveUseEstimation(draftState);
+  updatePolygonAcreageSum(draftState);
   checkCanReviewerEstimateConsumptiveUse(draftState);
 
   return draftState;
@@ -621,6 +622,7 @@ const onApplicantConsumptiveUseEstimated = (
   }
 
   checkCanContinueToApplication(draftState);
+  updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
 
   return draftState;
@@ -660,6 +662,7 @@ const onReviewerConsumptiveUseEstimated = (
     datapoints: payload.controlDataCollection.datapoints,
   };
 
+  updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
 
   return draftState;
@@ -674,6 +677,7 @@ const onApplicationFormUpdated = (
     ...payload.formValues,
   };
 
+  updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
 
   return draftState;
@@ -955,7 +959,6 @@ const resetApplicationFormLocationDetails = (draftState: ConservationApplication
 };
 
 const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
-  let polygonAcreageSum = 0;
   for (let i = 0; i < draftState.conservationApplication.estimateLocations.length; i++) {
     // compute data on the polygon object
     const polygon = draftState.conservationApplication.estimateLocations[i];
@@ -983,13 +986,14 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       additionalDetails: additionalDetailsTrackedFormValue,
       centerPoint,
     };
-
-    // compute data concerning all the polygons
-    // these calculations assume that none of the polygons intersect with each other
-    polygonAcreageSum += polygon.acreage!;
   }
+};
 
-  draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
+const updatePolygonAcreageSum = (draftState: ConservationApplicationState): void => {
+  draftState.conservationApplication.polygonAcreageSum = draftState.conservationApplication.estimateLocations.reduce(
+    (sum, location) => sum + location.acreage!,
+    0,
+  );
 };
 
 const onApplicationReviewerNoteAdded = (
