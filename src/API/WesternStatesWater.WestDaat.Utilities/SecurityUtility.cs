@@ -92,6 +92,7 @@ internal class SecurityUtility : ISecurityUtility
             [
                 Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,
+                Permissions.ApplicationNoteCreate,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
@@ -101,6 +102,7 @@ internal class SecurityUtility : ISecurityUtility
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
                 Permissions.ApplicationRecommendation,
+                Permissions.ApplicationNoteCreate,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
@@ -111,6 +113,7 @@ internal class SecurityUtility : ISecurityUtility
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
                 Permissions.ApplicationRecommendation,
+                Permissions.ApplicationNoteCreate,
                 Permissions.OrganizationApplicationDashboardLoad,
                 Permissions.OrganizationMemberAdd,
                 Permissions.OrganizationMemberRemove,

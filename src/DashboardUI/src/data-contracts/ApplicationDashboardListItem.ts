@@ -18,8 +18,8 @@ export interface ApplicationDashboardListItem {
 
 export interface ApplicationDashboardStatistics {
   submittedApplications: number | null;
-  acceptedApplications: number | null;
-  rejectedApplications: number | null;
+  approvedApplications: number | null;
+  deniedApplications: number | null;
   inReviewApplications: number | null;
   cumulativeEstimatedSavingsAcreFeet: number | null;
   totalObligationDollars: number | null;

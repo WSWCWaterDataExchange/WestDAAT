@@ -165,8 +165,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardListItem>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
                     src.RecommendedByUserId,
-                    src.AcceptedDate,
-                    src.RejectedDate
+                    src.ApprovedDate,
+                    src.DeniedDate
                 )))
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.CumulativeTotalEtInAcreFeet));
@@ -341,22 +341,30 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendedEvent, CommonContracts.WaterConservationApplicationRecommendedEvent>();
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovedEvent, CommonContracts.WaterConservationApplicationApprovedEvent>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
+            
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CommonContracts.WaterConservationApplicationNoteCreateRequest>()
+                .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore());
+            
+            CreateMap<CommonContracts.WaterConservationApplicationNoteCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
-        public static DTO.ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommenedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        // duplicated in other ApiProfile.cs
+        public static DTO.ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? approvedDate, DateTimeOffset? deniedDate)
         {
-            return (recommenedByUserId, acceptedDate, rejectedDate) switch
+            return (recommendedByUserId, approvedDate, deniedDate) switch
             {
                 (null, null, null) => DTO.ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => DTO.ConservationApplicationStatus.InFinalReview,
-                (_, not null, null) => DTO.ConservationApplicationStatus.Accepted,
-                (_, null, not null) => DTO.ConservationApplicationStatus.Rejected,
+                (_, not null, null) => DTO.ConservationApplicationStatus.Approved,
+                (_, null, not null) => DTO.ConservationApplicationStatus.Denied,
                 _ => DTO.ConservationApplicationStatus.Unknown
             };
         }

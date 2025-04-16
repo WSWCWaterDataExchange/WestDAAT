@@ -28,10 +28,14 @@ import { MapPolygon } from '../data-contracts/MapPolygon';
 import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
 import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
 import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
+import { ApprovalDecision } from '../data-contracts/ApprovalDecision';
+import { WaterConservationApplicationApprovalRequest } from '../data-contracts/WaterConservationApplicationApprovalRequest';
 import { MapPoint } from '../data-contracts/MapPoint';
 import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
+import { WaterConservationApplicationNoteCreateResponse } from '../data-contracts/WaterConservationApplicationNoteCreateResponse';
+import { WaterConservationApplicationNoteCreateRequest } from '../data-contracts/WaterConservationApplicationNoteCreateRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -274,6 +278,26 @@ export const submitApplicationRecommendation = async (
   await api.post<void>('Applications/Submit', request);
 };
 
+export const submitApplicationApproval = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    approvalDecision: ApprovalDecision;
+    approvalNotes: string;
+  }
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationApprovalRequest = {
+    $type: 'WaterConservationApplicationApprovalRequest',
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    approvalDecision: data.approvalDecision,
+    approvalNotes: data.approvalNotes
+  }
+
+  await api.post<void>('Applications/Submit', request);
+}
+
 export const getApplication = async (
   context: IMsalContext,
   data: {
@@ -321,3 +345,26 @@ export const getApplication = async (
     }
   }
 };
+
+export const createApplicationReviewerNote = async (
+  context: IMsalContext,
+  data: {
+    applicationId: string;
+    note: string;
+  },
+): Promise<WaterConservationApplicationNoteCreateResponse> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationNoteCreateRequest = {
+    $type: 'WaterConservationApplicationNoteCreateRequest',
+    waterConservationApplicationId: data.applicationId,
+    note: data.note,
+  };
+
+  const { data: response } = await api.post<WaterConservationApplicationNoteCreateResponse>(
+    'Applications/Notes',
+    request,
+  );
+
+  return response;
+}

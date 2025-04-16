@@ -73,7 +73,7 @@ export function ApplicationSubmitPage() {
   };
 
   const handleModalConfirm = async () => {
-    await submitApplicationMutation.mutateAsync();
+    await submitApplicationMutation.mutate();
   };
 
   return (

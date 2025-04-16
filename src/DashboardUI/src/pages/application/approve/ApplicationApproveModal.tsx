@@ -3,14 +3,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/esm/Form';
 import Modal from 'react-bootstrap/Modal';
 
-export interface ApplicationDenyModalProps {
+export interface ApplicationApproveModalProps {
   show: boolean;
   onCancel: () => void;
-  onDeny: (notes: string) => void;
+  onApprove: (notes: string) => void;
   disableButtons: boolean;
 }
 
-export function ApplicationDenyModal(props: ApplicationDenyModalProps) {
+export function ApplicationApproveModal(props: ApplicationApproveModalProps) {
   const [approvalNotes, setApprovalNotes] = useState<string | undefined>(undefined);
 
   const handleCancelClicked = () => {
@@ -18,29 +18,29 @@ export function ApplicationDenyModal(props: ApplicationDenyModalProps) {
     setApprovalNotes(undefined);
   };
 
-  const handleDenyClicked = () => {
+  const handleApproveClicked = () => {
     if (!approvalNotes || approvalNotes.trim().length === 0) {
       throw new Error('Application approval notes are required.');
     }
-    props.onDeny(approvalNotes);
+    props.onApprove(approvalNotes);
     setApprovalNotes(undefined);
   };
 
   return (
     <Modal show={props.show} centered>
       <Modal.Header closeButton onClick={props.onCancel}>
-        <Modal.Title>Deny this application?</Modal.Title>
+        <Modal.Title>Approve this application?</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want to deny this application? If so, leave a note for the applicant below, then, click DENY.
-        The applicant will receive notice of your decision via email with any notes included below.
+        Are you sure you want to approve this application? If so, leave a note for the applicant below, then, click
+        APPROVE. The applicant will receive notice of your decision via email with any notes included below.
         <Form>
           <Form.Group>
             <Form.Control
               required
-              id="application-approval-deny-notes"
+              id="application-approval-notes"
               placeholder="Type a note for the applicant (required)"
-              aria-label="Application Denial Notes"
+              aria-label="Application Approval Notes"
               className="mt-3"
               as="textarea"
               type="text"
@@ -55,11 +55,11 @@ export function ApplicationDenyModal(props: ApplicationDenyModalProps) {
           Cancel
         </Button>
         <Button
-          variant="danger"
-          onClick={handleDenyClicked}
-          disabled={!approvalNotes || approvalNotes.trim().length === 0 || props.disableButtons}
+          variant="primary"
+          onClick={handleApproveClicked}
+          disabled={!approvalNotes || approvalNotes?.trim().length === 0 || props.disableButtons}
         >
-          Deny
+          Approve
         </Button>
       </Modal.Footer>
     </Modal>

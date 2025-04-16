@@ -1,3 +1,4 @@
+using Ganss.Xss;
 using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Engines;
@@ -20,6 +21,8 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                     group.Cast<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta>().ToArray()),
                 DTO.WaterConservationApplicationRecommendedNotificationMeta => ApplicationRecommendedNotifications(
                     group.Cast<DTO.WaterConservationApplicationRecommendedNotificationMeta>().ToArray()),
+                DTO.WaterConservationApplicationApprovedApplicantNotificationMeta => ApplicationApprovedApplicantNotifications(
+                    group.Cast<DTO.WaterConservationApplicationApprovedApplicantNotificationMeta>().ToArray()),
                 _ => throw new NotImplementedException(
                     $"Formatting notifications for type {group.Key.Name} has not been implemented."
                 )
@@ -138,7 +141,7 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
             }
         };
     }
-    
+
     private DTO.NotificationBase[] ApplicationRecommendedNotifications(
         DTO.WaterConservationApplicationRecommendedNotificationMeta[] metas)
     {
@@ -152,7 +155,7 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
 
         return notifications;
     }
-    
+
     private DTO.EmailNotification FormatApplicationRecommendedEmailNotification(
         DTO.WaterConservationApplicationRecommendedNotificationMeta meta)
     {
@@ -169,6 +172,59 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                 TextContent = "A water conservation application has a new recommendation.",
                 Body = "A recommendation has been made on a water conservation application. "
                        + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
+            }
+        };
+    }
+
+    private DTO.NotificationBase[] ApplicationApprovedApplicantNotifications(
+        DTO.WaterConservationApplicationApprovedApplicantNotificationMeta[] metas)
+    {
+        var notifications = metas.Select(
+            meta => meta.Type switch
+            {
+                DTO.NotificationType.Email => FormatApplicationApprovedApplicantEmailNotification(meta),
+                _ => throw new NotImplementedException("Formatting notifications of type " +
+                                                       $"'{meta.Type}' has not been implemented.")
+            }).ToArray();
+
+        return notifications;
+    }
+
+    private DTO.EmailNotification FormatApplicationApprovedApplicantEmailNotification(
+        DTO.WaterConservationApplicationApprovedApplicantNotificationMeta meta)
+    {
+        var applicationUrl = $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/submit";
+
+        var decisionVerb = meta.ApplicationStatus switch
+        {
+            DTO.ConservationApplicationStatus.Approved => "Approved",
+            DTO.ConservationApplicationStatus.Denied => "Denied",
+            _ => "Reviewed" // Fallback for any other status
+        };
+
+        // Prevent user submitted HTML from being executed in email body.
+        // This prevents XSS attacks.
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedTags.Remove("a");
+        sanitizer.Sanitize(applicationUrl);
+        var sanitizedNote = sanitizer.Sanitize(meta.ApprovalNote);
+
+        var bodyContent = $"Your water conservation application has been {decisionVerb.ToLower()} with the following note:"
+                          + "<br/><br/>"
+                          + sanitizedNote
+                          + "<br/><br/>"
+                          + $"Click <a href=\"{applicationUrl}\">here</a> to view the application.";
+
+        return new DTO.EmailNotification
+        {
+            EmailRequest = new DTO.EmailRequest
+            {
+                To = [meta.ToUser.EmailAddress],
+                From = _emailServiceConfiguration.NotificationFrom,
+                FromName = _emailServiceConfiguration.NotificationFromName,
+                Subject = $"Water Conservation Application {decisionVerb}",
+                TextContent = $"Your water conservation application has been {decisionVerb.ToLower()}.",
+                Body = bodyContent
             }
         };
     }

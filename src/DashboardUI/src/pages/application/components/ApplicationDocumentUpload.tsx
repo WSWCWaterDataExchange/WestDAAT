@@ -1,5 +1,5 @@
 import { useMsal } from '@azure/msal-react';
-import { mdiFileDocument, mdiTrashCanOutline } from '@mdi/js';
+import { mdiDownload, mdiFileDocument, mdiTrashCanOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
@@ -13,7 +13,11 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
 import './application-document.scss';
 
-export function ApplicationDocumentUpload() {
+interface ApplicationDocumentUploadProps {
+  onDownloadClicked: (fileName: string, fileId?: string) => void;
+}
+
+export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps) {
   const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
   const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
 
@@ -132,6 +136,7 @@ export function ApplicationDocumentUpload() {
                     <Form.Control
                       as="textarea"
                       maxLength={4000}
+                      rows={1}
                       value={file.description}
                       aria-label="Document description"
                       onChange={(e) => handleDocumentDescriptionChanged(file.blobName, e.target.value)}
@@ -139,6 +144,13 @@ export function ApplicationDocumentUpload() {
                   </Form.Group>
                 </td>
                 <td className="col-1 align-content-center text-center">
+                  <Button
+                    variant="link"
+                    className={`px-1 py-1 text-primary ${file.id ? 'visible' : 'invisible'}`}
+                    onClick={() => props.onDownloadClicked(file.fileName, file.id)}
+                  >
+                    <Icon path={mdiDownload} size="1.5em" aria-label="Download document" />
+                  </Button>
                   <Button
                     variant="link"
                     className="px-1 py-1 text-danger"

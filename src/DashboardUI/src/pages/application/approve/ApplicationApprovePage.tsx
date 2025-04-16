@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
+import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApprovalDecision } from '../../../data-contracts/ApprovalDecision';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
@@ -10,15 +13,18 @@ import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
-import { ApplicationAcceptModal } from './ApplicationAcceptModal';
+import { ApplicationApproveModal } from './ApplicationApproveModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
+import { submitApplicationApproval } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
+import { ConservationApplicationStatus } from '../../../data-contracts/ConservationApplicationStatus';
 import { hasPermission } from '../../../utilities/securityHelpers';
 import { Permission } from '../../../roleConfig';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
-import { ConservationApplicationStatus } from '../../../data-contracts/ConservationApplicationStatus';
 
 export function ApplicationApprovePage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
@@ -33,17 +39,74 @@ export function ApplicationApprovePage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
 
-  const handleAcceptClicked = () => {
-    setShowAcceptModal(true);
+  const isPageLoading = isApplicationLoading || isFundingOrganizationLoading;
+  const isModalOpen = showApproveModal || showDenyModal;
+
+  const handleApproveClicked = () => {
+    setShowApproveModal(true);
   };
 
   const handleDenyClicked = () => {
     setShowDenyModal(true);
   };
 
+  const handleApplicationApproved = (approvalNotes: string) => {
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Approved, notes: approvalNotes });
+  };
+
+  const handleApplicationDenied = (approvalNotes: string) => {
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Denied, notes: approvalNotes });
+  };
+
+  const submitApplicationApprovalMutation = useMutation({
+    mutationFn: async (approval: { decision: ApprovalDecision; notes: string }) => {
+      await submitApplicationApproval(context, {
+        waterConservationApplicationId: applicationId!,
+        approvalDecision: approval.decision,
+        approvalNotes: approval.notes,
+      });
+      return approval.decision;
+    },
+    onSuccess: (decision: ApprovalDecision) => {
+      let toastMessage = '';
+
+      if (decision === ApprovalDecision.Approved) {
+        toastMessage = 'Application approved successfully.';
+      }
+
+      if (decision === ApprovalDecision.Denied) {
+        toastMessage = 'Application denied successfully.';
+      }
+
+      toast.success(toastMessage, {
+        autoClose: 1000,
+      });
+
+      setShowApproveModal(false);
+      setShowDenyModal(false);
+      navigateBack();
+    },
+    onError: (decision: ApprovalDecision) => {
+      let toastMessage = '';
+
+      if (decision === ApprovalDecision.Approved) {
+        toastMessage = 'Error submitting application approval.';
+      }
+
+      if (decision === ApprovalDecision.Denied) {
+        toastMessage = 'Error submitting application denial.';
+      }
+
+      toast.error(toastMessage, {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
+    },
+  });
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
 
   const navigateToReviewPage = () => {
@@ -55,8 +118,8 @@ export function ApplicationApprovePage() {
 
   const isApplicationFinalized =
     state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
-    state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
-    state.conservationApplication.status === ConservationApplicationStatus.Rejected;
+    state.conservationApplication.status === ConservationApplicationStatus.Approved ||
+    state.conservationApplication.status === ConservationApplicationStatus.Denied;
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -82,8 +145,8 @@ export function ApplicationApprovePage() {
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
                 isHidden={!canApproveApplication || isApplicationFinalized}
-                isFormSubmitting={showAcceptModal || showDenyModal}
-                handleAcceptClicked={handleAcceptClicked}
+                disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
+                handleApproveClicked={handleApproveClicked}
                 handleDenyClicked={handleDenyClicked}
               />
             </div>
@@ -98,8 +161,18 @@ export function ApplicationApprovePage() {
           </div>
         )}
 
-        <ApplicationAcceptModal show={showAcceptModal} onCancel={() => setShowAcceptModal(false)} />
-        <ApplicationDenyModal show={showDenyModal} onCancel={() => setShowDenyModal(false)} />
+        <ApplicationApproveModal
+          show={showApproveModal}
+          onCancel={() => setShowApproveModal(false)}
+          onApprove={handleApplicationApproved}
+          disableButtons={submitApplicationApprovalMutation.isLoading}
+        />
+        <ApplicationDenyModal
+          show={showDenyModal}
+          onCancel={() => setShowDenyModal(false)}
+          onDeny={handleApplicationDenied}
+          disableButtons={submitApplicationApprovalMutation.isLoading}
+        />
       </div>
     </div>
   );

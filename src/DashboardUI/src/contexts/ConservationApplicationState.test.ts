@@ -45,18 +45,18 @@ describe('ConservationApplicationState reducer', () => {
   it('filtering dashboard applications should update state', () => {
     // Arrange
     state.dashboardApplications = [
-      { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Accepted },
-      { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Rejected },
+      { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Approved },
+      { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Denied },
       {
         ...mockApplication,
         applicationId: 'application-guid-3',
         status: ConservationApplicationStatus.InTechnicalReview,
       },
-      { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Accepted },
+      { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Approved },
       {
         ...mockApplication,
         applicationId: 'application-guid-5',
-        status: ConservationApplicationStatus.Accepted,
+        status: ConservationApplicationStatus.Approved,
         compensationRateUnits: CompensationRateUnits.Acres,
       },
     ];
@@ -72,8 +72,8 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 4,
-      acceptedApplications: 2,
-      rejectedApplications: 1,
+      approvedApplications: 2,
+      deniedApplications: 1,
       inReviewApplications: 1,
       cumulativeEstimatedSavingsAcreFeet: 300,
       totalObligationDollars: 400,
@@ -94,8 +94,8 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.dashboardApplications).toEqual([]);
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 0,
-      acceptedApplications: 0,
-      rejectedApplications: 0,
+      approvedApplications: 0,
+      deniedApplications: 0,
       inReviewApplications: 0,
       cumulativeEstimatedSavingsAcreFeet: 0,
       totalObligationDollars: 0,
@@ -109,7 +109,7 @@ describe('ConservationApplicationState reducer', () => {
     compensationRateDollars: 100,
     compensationRateUnits: 1,
     organizationName: 'Mock Funding Organization',
-    status: ConservationApplicationStatus.Accepted,
+    status: ConservationApplicationStatus.Approved,
     submittedDate: new Date('2025-01-01T00:00:00.0000000 +00:00'),
     totalObligationDollars: 200,
     totalWaterVolumeSavingsAcreFeet: 300,

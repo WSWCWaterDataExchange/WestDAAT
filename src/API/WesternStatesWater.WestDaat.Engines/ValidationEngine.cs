@@ -175,6 +175,7 @@ internal class ValidationEngine : IValidationEngine
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             WaterConservationApplicationRecommendationRequest req => await ValidateWaterConservationApplicationRecommendationRequest(req, context),
             WaterConservationApplicationApprovalRequest req => await ValidateWaterConservationApplicationApprovalRequest(req, context),
+            WaterConservationApplicationNoteCreateRequest req => await ValidateApplicationNoteCreateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -190,6 +191,7 @@ internal class ValidationEngine : IValidationEngine
         {
             WaterConservationApplicationSubmittedEvent => null,
             WaterConservationApplicationRecommendedEvent => null,
+            WaterConservationApplicationApprovedEvent => null,
             _ => throw new NotImplementedException(
                 $"Validation for event type '{request.GetType().Name}' is not implemented."
             )
@@ -285,7 +287,8 @@ internal class ValidationEngine : IValidationEngine
         // control location must not intersect with any polygons
         // polygons must not intersect with each other
         var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
-        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon).ToArray();
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon)
+            .ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
         {
@@ -432,7 +435,7 @@ internal class ValidationEngine : IValidationEngine
             HasSubmission = true,
             ApplicationId = request.WaterConservationApplicationId
         };
-        
+
         var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
 
         if (!submittedApplicationExistsResponse.ApplicationExists)
@@ -444,7 +447,7 @@ internal class ValidationEngine : IValidationEngine
         if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
         {
             return CreateValidationError(request, nameof(WaterConservationApplicationApprovalRequest.WaterConservationApplicationId),
-                "Application must be in final review status to be accepted or denied by a funding organization member.");
+                "Application must be in final review status to be approved or denied by a funding organization member.");
         }
 
         // verify the user has permissions to approve/deny an application
@@ -461,7 +464,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
     {
         return request switch
@@ -798,6 +801,39 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicationNoteCreateRequest(WaterConservationApplicationNoteCreateRequest request, ContextBase context)
+    {
+        // verify user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+        
+        // verify user belongs to the funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationNoteCreate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,

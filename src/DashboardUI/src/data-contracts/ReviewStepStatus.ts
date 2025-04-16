@@ -14,7 +14,7 @@ export const getApplicationReviewStepIconClass = (status: ReviewStepStatus): str
       return 'application-status-icon-approved';
     case ReviewStepStatus.RecommendedAgainstApproval:
     case ReviewStepStatus.Denied:
-      return 'application-status-icon-rejected';
+      return 'application-status-icon-denied';
     case ReviewStepStatus.Submitted:
       return 'application-status-icon-submitted';
     case ReviewStepStatus.Unknown:

@@ -137,7 +137,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         // Approval step (if exists)
         if (reviewPipelineSrc.Submission.ApprovedByUserId.HasValue)
         {
-            var status = (submission.AcceptedDate.HasValue, submission.RejectedDate.HasValue) switch
+            var status = (submission.ApprovedDate.HasValue, submission.DeniedDate.HasValue) switch
             {
                 (true, false) => ReviewStepStatus.Approved,
                 (false, true) => ReviewStepStatus.Denied,
@@ -146,8 +146,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
             var approveDate = status switch
             {
-                ReviewStepStatus.Approved => submission.AcceptedDate,
-                ReviewStepStatus.Denied => submission.RejectedDate,
+                ReviewStepStatus.Approved => submission.ApprovedDate,
+                ReviewStepStatus.Denied => submission.DeniedDate,
                 _ => throw new WestDaatException("Invalid approval status."),
             };
 
@@ -288,6 +288,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
             WaterConservationApplicationRecommendationRequest req => await SubmitApplicationRecommendation(req),
             WaterConservationApplicationApprovalRequest req => await SubmitApplicationApproval(req),
+            WaterConservationApplicationNoteCreateRequest req => await CreateApplicationNote(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -570,5 +571,32 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<WaterConservationApplicationNoteCreateResponse> CreateApplicationNote(WaterConservationApplicationNoteCreateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+        
+        var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
+        
+        var applicationSubmission = await db.WaterConservationApplicationSubmissions
+            .Include(sub => sub.SubmissionNotes)
+            .Where(s => s.WaterConservationApplicationId == request.WaterConservationApplicationId)
+            .SingleAsync();
+        
+        applicationSubmission.SubmissionNotes.Add(note);
+        
+        await db.SaveChangesAsync();
+        
+        var savedNote = await db.WaterConservationApplicationSubmissionNotes
+            .Include(n => n.User).ThenInclude(user => user.UserProfile)
+            .Where(n => n.Id == note.Id)
+            .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
+            .SingleAsync();
+        
+        return new WaterConservationApplicationNoteCreateResponse
+        {
+            Note = savedNote
+        };
     }
 }

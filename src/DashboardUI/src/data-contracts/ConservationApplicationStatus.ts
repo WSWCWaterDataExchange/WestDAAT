@@ -2,24 +2,24 @@ export enum ConservationApplicationStatus {
   Unknown = 0,
   InTechnicalReview = 1,
   InFinalReview = 2,
-  Accepted = 3,
-  Rejected = 4,
+  Approved = 3,
+  Denied = 4,
 }
 
 export const ConservationApplicationStatusDisplayNames: { [key in ConservationApplicationStatus]: string } = {
   [ConservationApplicationStatus.Unknown]: 'Unknown',
   [ConservationApplicationStatus.InTechnicalReview]: 'In Technical Review',
   [ConservationApplicationStatus.InFinalReview]: 'In Final Review',
-  [ConservationApplicationStatus.Accepted]: 'Approved',
-  [ConservationApplicationStatus.Rejected]: 'Rejected',
+  [ConservationApplicationStatus.Approved]: 'Approved',
+  [ConservationApplicationStatus.Denied]: 'Denied',
 };
 
 export const getApplicationStatusIconClass = (status: ConservationApplicationStatus): string => {
   switch (status) {
-    case ConservationApplicationStatus.Accepted:
+    case ConservationApplicationStatus.Approved:
       return 'application-status-icon-approved';
-    case ConservationApplicationStatus.Rejected:
-      return 'application-status-icon-rejected';
+    case ConservationApplicationStatus.Denied:
+      return 'application-status-icon-denied';
     case ConservationApplicationStatus.InTechnicalReview:
     case ConservationApplicationStatus.InFinalReview:
       return 'application-status-icon-inReview';
