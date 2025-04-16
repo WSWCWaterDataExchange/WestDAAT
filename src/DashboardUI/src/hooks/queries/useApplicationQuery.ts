@@ -178,5 +178,6 @@ export function useReviewerEstimateConsumptiveUseMutation() {
     onError: (error: Error) => {
       toast.error('Failed to estimate consumptive use. Please try again later.');
     },
+    mutationKey: ['reviewer-estimate-consumptive-use'],
   });
 }
