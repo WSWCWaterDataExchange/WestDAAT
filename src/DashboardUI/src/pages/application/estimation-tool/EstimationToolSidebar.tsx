@@ -14,8 +14,10 @@ import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
 import Button from 'react-bootstrap/esm/Button';
 import { useNavigate } from 'react-router-dom';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface EstimationToolSidebarProps {
+  perspective: ApplicationReviewPerspective;
   isLoading: boolean;
   loadFailed: boolean;
 }

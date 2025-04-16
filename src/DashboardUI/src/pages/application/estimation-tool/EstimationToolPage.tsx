@@ -113,6 +113,7 @@ export function EstimationToolPage() {
         <div className="h-100 d-flex overflow-y-auto align-items-stretch">
           <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
             <EstimationToolSidebar
+              perspective="applicant"
               isLoading={isLoadingFundingOrganization || isLoadingApplication}
               loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
             />
