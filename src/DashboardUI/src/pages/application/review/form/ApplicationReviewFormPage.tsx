@@ -4,7 +4,6 @@ import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
 import ApplicationDocumentSection from '../../components/ApplicationDocumentSection';
@@ -17,6 +16,7 @@ import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecomme
 import { UnsavedChangesModal } from './UnsavedChangesModal';
 import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationReviewNote';
 import GenericLoadingForm from '../../../../components/GenericLoadingForm';
+import { CancelChangesModal } from './CancelChangesModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -119,18 +119,11 @@ export function ApplicationReviewFormPage() {
         handleSaveClicked={handleSaveClicked}
         handleSubmitForFinalReviewClicked={handleSubmitClicked}
       />
-
-      <ConfirmationModal
+      <CancelChangesModal
         show={showCancelConfirmationModal}
-        onCancel={() => setShowCancelConfirmationModal(false)}
-        onConfirm={handleCancelConfirmed}
-        titleText="Are you sure you want to leave?"
-        cancelText="Cancel"
-        confirmText="Okay"
-      >
-        Any changes to this application will not be saved.
-      </ConfirmationModal>
-
+        onCancel={handleCancelConfirmed}
+        onConfirm={() => setShowCancelConfirmationModal(false)}
+      />
       <SaveChangesModal
         show={showSaveChangesModal}
         onCancel={() => setShowSaveChangesModal(false)}
