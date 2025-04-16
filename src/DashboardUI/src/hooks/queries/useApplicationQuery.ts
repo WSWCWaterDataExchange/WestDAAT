@@ -1,10 +1,11 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import {
   applicationSearch,
   createWaterConservationApplication,
   getApplication,
+  reviewerEstimateConsumptiveUse,
 } from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
@@ -12,6 +13,8 @@ import { getOrganizationFundingDetails } from '../../accessors/organizationAcces
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
 import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
+import { MapPolygon } from '../../data-contracts/MapPolygon';
+import { ReviewerEstimateConsumptiveUseResponse } from '../../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
@@ -132,4 +135,48 @@ export function useGetApplicationQuery(
       },
     },
   );
+}
+
+export function useReviewerEstimateConsumptiveUseMutation() {
+  const msalContext = useMsal();
+  const { state, dispatch } = useConservationApplicationContext();
+
+  return useMutation({
+    mutationFn: async (options: { updateEstimate: boolean }) => {
+      const apiCallFields: Parameters<typeof reviewerEstimateConsumptiveUse>[1] = {
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
+        polygons: state.conservationApplication.estimateLocations.map(
+          (polygon): MapPolygon => ({
+            waterConservationApplicationEstimateLocationId:
+              polygon.waterConservationApplicationEstimateLocationId ?? null,
+            polygonWkt: polygon.polygonWkt!,
+            drawToolType: polygon.drawToolType!,
+          }),
+        ),
+        controlLocation: {
+          pointWkt: state.conservationApplication.controlLocation!.pointWkt!,
+        },
+        updateEstimate: options.updateEstimate,
+      };
+
+      return await reviewerEstimateConsumptiveUse(msalContext, apiCallFields);
+    },
+    onSuccess: (result: ReviewerEstimateConsumptiveUseResponse) => {
+      if (result) {
+        dispatch({
+          type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
+          payload: {
+            cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
+            cumulativeNetEtInAcreFeet: result.cumulativeNetEtInAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+            controlDataCollection: result.controlDataCollection,
+          },
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to estimate consumptive use. Please try again later.');
+    },
+  });
 }
