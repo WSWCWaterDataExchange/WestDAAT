@@ -620,17 +620,9 @@ function Map({
             throw new Error('Map container not found');
           }
 
-          const originalSize = {
-            width: mapContainer.style.width,
-            height: mapContainer.style.height,
-          };
-
-          console.log('Original size:', originalSize);
-
           mapContainer!.style.width = options.width + 'px';
           mapContainer!.style.height = options.height + 'px';
           mapContainer?.classList.remove('h-100');
-
           map.resize();
 
           map.once('idle', async () => {
@@ -644,11 +636,8 @@ function Map({
                 a.click();
               }
 
-              // Restore the original size
-              mapContainer.style.width = originalSize.width;
-              mapContainer.style.height = originalSize.height;
-              mapContainer?.classList.add('h-100');
-              map.resize();
+              // Remove from dom
+              mapContainer.remove();
             });
           });
         });
