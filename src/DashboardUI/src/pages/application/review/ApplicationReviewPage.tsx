@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -9,6 +9,7 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { hasPermission } from '../../../utilities/securityHelpers';
 import { Permission } from '../../../roleConfig';
 import { mdiArrowRight } from '@mdi/js';
+import { CancelChangesModal } from './form/CancelChangesModal';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
@@ -16,30 +17,49 @@ function ApplicationReviewPage() {
   const location = useLocation();
   const { state } = useConservationApplicationContext();
   const { user } = useAuthenticationContext();
+  const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
+  const [cancelModalNavigateTo, setCancelModalNavigateTo] = useState<string | undefined>();
+
+  useGetApplicationQuery(applicationId, 'reviewer', true);
+  useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
+
+  const upOneLevelPath = '.';
+  const applicationOrganizationDashboardPath = '/application/organization/dashboard';
+  const applicationApprovePath = `/application/${state.conservationApplication.waterConservationApplicationId}/approve`;
 
   const isOnMapPage = location.pathname.includes('map');
-
-  const navigateBack = () => {
-    if (isOnMapPage) {
-      navigate('.'); // navigate up one level
-    } else {
-      navigate(`/application/organization/dashboard`);
-    }
-  };
 
   const backButtonText: string = useMemo(() => {
     return isOnMapPage ? 'Back to Application' : 'Back to Dashboard';
   }, [isOnMapPage]);
 
-  useGetApplicationQuery(applicationId, 'reviewer', true);
-  useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
-
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
 
+  const navigateBack = () => {
+    if (state.conservationApplication.isDirty) {
+      setShowCancelConfirmationModal(true);
+      isOnMapPage
+        ? setCancelModalNavigateTo(upOneLevelPath)
+        : setCancelModalNavigateTo(applicationOrganizationDashboardPath);
+    } else {
+      isOnMapPage ? navigate(upOneLevelPath) : navigate(applicationOrganizationDashboardPath);
+    }
+  };
+
   const navigateToApprovalPage = () => {
-    const id = state.conservationApplication.waterConservationApplicationId;
-    if (id) {
-      navigate(`/application/${id}/approve`);
+    if (state.conservationApplication.isDirty) {
+      setShowCancelConfirmationModal(true);
+      setCancelModalNavigateTo(applicationApprovePath);
+    } else {
+      navigate(applicationApprovePath);
+    }
+  };
+
+  const handleCancelConfirmed = () => {
+    setShowCancelConfirmationModal(false);
+
+    if (cancelModalNavigateTo) {
+      navigate(cancelModalNavigateTo);
     }
   };
 
@@ -65,6 +85,11 @@ function ApplicationReviewPage() {
             </div>
 
             <Outlet />
+            <CancelChangesModal
+              show={showCancelConfirmationModal}
+              onConfirm={handleCancelConfirmed}
+              onCancel={() => setShowCancelConfirmationModal(false)}
+            />
           </>
         )}
 
