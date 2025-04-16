@@ -13,6 +13,7 @@ import ApplicationDocumentSection from '../components/ApplicationDocumentSection
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
+import GenericLoadingForm from '../../../components/GenericLoadingForm';
 
 export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
@@ -89,18 +90,25 @@ export function ApplicationSubmitPage() {
       <div className="overflow-y-auto">
         <div className="container">
           <ApplicationReviewHeader />
-          <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
-          <ApplicationDocumentSection readOnly={true} perspective={'applicant'} />
 
-          {state.isCreatingApplication && (
+          {isApplicationLoading || isFundingOrganizationLoading ? (
+            <GenericLoadingForm />
+          ) : (
             <>
-              <ApplicationFormSectionRule width={2} />
+              <ApplicationSubmissionFormDisplay />
+              <ApplicationDocumentSection readOnly={true} perspective={'applicant'} />
 
-              <div className="d-flex justify-content-end p-3">
-                <Button variant="success" type="button" onClick={presentConfirmationModal}>
-                  Submit
-                </Button>
-              </div>
+              {state.isCreatingApplication && (
+                <>
+                  <ApplicationFormSectionRule width={2} />
+
+                  <div className="d-flex justify-content-end p-3">
+                    <Button variant="success" type="button" onClick={presentConfirmationModal}>
+                      Submit
+                    </Button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>

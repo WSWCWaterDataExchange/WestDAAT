@@ -58,18 +58,15 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        {!state.isLoadingApplication &&
-          !state.isLoadingFundingOrganization &&
-          !state.loadApplicationErrored &&
-          !state.loadFundingOrganizationErrored && (
-            <>
-              <div className="container">
-                <ApplicationReviewHeader />
-              </div>
+        {!state.loadApplicationErrored && !state.loadFundingOrganizationErrored && (
+          <>
+            <div className="container">
+              <ApplicationReviewHeader />
+            </div>
 
-              <Outlet />
-            </>
-          )}
+            <Outlet />
+          </>
+        )}
 
         {(state.loadApplicationErrored || state.loadFundingOrganizationErrored) && (
           <div className="container mt-3">

@@ -22,6 +22,7 @@ import { ConservationApplicationStatus } from '../../../data-contracts/Conservat
 import { hasPermission } from '../../../utilities/securityHelpers';
 import { Permission } from '../../../roleConfig';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
+import GenericLoadingForm from '../../../components/GenericLoadingForm';
 
 export function ApplicationApprovePage() {
   const context = useMsal();
@@ -138,17 +139,23 @@ export function ApplicationApprovePage() {
           <>
             <div className="container">
               <ApplicationReviewHeader />
-              <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
-              <ApplicationDocumentSection readOnly={true} perspective={'reviewer'} />
-              <ApplicationReviewPipelineSection />
-              <ApplicationReviewersNotesSection />
-              <ApplicationFormSectionRule width={1} />
-              <ApplicationApproveButtonRow
-                isHidden={!canApproveApplication || isApplicationFinalized}
-                disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
-                handleApproveClicked={handleApproveClicked}
-                handleDenyClicked={handleDenyClicked}
-              />
+              {isApplicationLoading || isFundingOrganizationLoading ? (
+                <GenericLoadingForm />
+              ) : (
+                <>
+                  <ApplicationSubmissionFormDisplay />
+                  <ApplicationDocumentSection readOnly={true} perspective={'reviewer'} />
+                  <ApplicationReviewPipelineSection />
+                  <ApplicationReviewersNotesSection />
+                  <ApplicationFormSectionRule width={1} />
+                  <ApplicationApproveButtonRow
+                    isHidden={!canApproveApplication || isApplicationFinalized}
+                    disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
+                    handleApproveClicked={handleApproveClicked}
+                    handleDenyClicked={handleDenyClicked}
+                  />
+                </>
+              )}
             </div>
           </>
         )}
