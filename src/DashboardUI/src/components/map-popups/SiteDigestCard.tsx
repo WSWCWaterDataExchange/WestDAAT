@@ -1,9 +1,9 @@
 import React from 'react';
 import MapPopupCard from './MapPopupCard';
-import { mdiOpenInNew, mdiChevronLeftBox, mdiChevronRightBox } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
 import SiteDigest from '../../data-contracts/SiteDigest';
-import { FormattedDate } from "../FormattedDate";
+import { FormattedDate } from '../FormattedDate';
 
 interface SiteDigestCardProps {
   site: SiteDigest;
@@ -32,16 +32,29 @@ function SiteDigestCard({
         header: (
           <div className="flex justify-between items-center">
             <div>
-              Site ID:{' '}
+              <strong>Site ID:</strong>{' '}
               <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
-                {siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon"/>
+                {siteUuid}{' '}
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
               </a>
             </div>
             {showNavigation && (
-              <div className="flex items-center gap-2">
-                <button onClick={goToPrevious} className="nav-prev-feature"><Icon path={mdiChevronLeftBox} /></button>
-                <span>{(currentIndex ?? 0) + 1} of {total}</span>
-                <button onClick={goToNext} className="nav-next-feature"><Icon path={mdiChevronRightBox} /></button>
+              <div className="flex items-center gap-1 text-xs text-gray-700">
+                <button
+                  onClick={goToPrevious}
+                  className="p-0.5 hover:bg-gray-100 rounded transition"
+                  aria-label="Previous"
+                >
+                  <Icon path={mdiChevronLeft} size={0.8} />
+                </button>
+                <span className="px-1">{(currentIndex ?? 0) + 1} of {total}</span>
+                <button
+                  onClick={goToNext}
+                  className="p-0.5 hover:bg-gray-100 rounded transition"
+                  aria-label="Next"
+                >
+                  <Icon path={mdiChevronRight} size={0.8} />
+                </button>
               </div>
             )}
           </div>
@@ -52,7 +65,6 @@ function SiteDigestCard({
               <strong>Site Type:</strong>
               <div>{siteType}</div>
             </div>
-
             <div className="mb-2">
               <strong>Water Right Digests:</strong>
               {waterRightsDigests.length === 0 ? (
@@ -62,8 +74,13 @@ function SiteDigestCard({
                   <div key={i} className="mb-2 border-b pb-2">
                     <div>{right.nativeId}</div>
                     <div>
-                      <a href={`/details/right/${right.allocationUuid}`} target="_blank" rel="noopener noreferrer">
-                        View Water Right Landing Page <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                      <a
+                        href={`/details/right/${right.allocationUuid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Water Right Landing Page{' '}
+                        <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
                       </a>
                     </div>
                     <div>
@@ -80,20 +97,23 @@ function SiteDigestCard({
                 ))
               )}
             </div>
-
             <div className="mb-2">
               <strong>Has Time Series Data:</strong>
               <div>
                 {hasTimeSeriesData ? (
-                  <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
-                    View Time Series Landing Page <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon"/>
+                  <a
+                    href={`/details/site/${siteUuid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Time Series Landing Page{' '}
+                    <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
                   </a>
                 ) : (
                   '(no time series data)'
                 )}
               </div>
             </div>
-
             <div className="mb-0">
               <strong>Time Series Variable Types:</strong>
               <div>

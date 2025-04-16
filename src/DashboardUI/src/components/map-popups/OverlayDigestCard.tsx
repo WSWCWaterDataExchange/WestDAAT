@@ -1,6 +1,6 @@
 import React from 'react';
 import MapPopupCard from './MapPopupCard';
-import { mdiOpenInNew, mdiChevronLeftBox, mdiChevronRightBox } from '@mdi/js';
+import { mdiOpenInNew, mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 import Icon from '@mdi/react';
 import { OverlayDigest } from '@data-contracts';
 
@@ -38,19 +38,31 @@ function OverlayDigestCard({
           <div className="flex justify-between items-center">
             <div>
               <strong>Overlay ID:</strong>{' '}
-              <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
+              <a
+                href={`/details/overlay/${waDeAreaReportingUuid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {waDeAreaReportingUuid}
                 <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
               </a>
             </div>
             {showNavigation && (
-              <div className="flex items-center gap-2">
-                <button onClick={goToPrevious} className="nav-prev-feature">
-                  <Icon path={mdiChevronLeftBox} />
+              <div className="flex items-center gap-1 text-xs text-gray-700">
+                <button
+                  onClick={goToPrevious}
+                  className="p-0.5 hover:bg-gray-100 rounded transition"
+                  aria-label="Previous"
+                >
+                  <Icon path={mdiChevronLeft} size={0.8} />
                 </button>
-                <span>{(currentIndex ?? 0) + 1} of {total}</span>
-                <button onClick={goToNext} className="nav-next-feature">
-                  <Icon path={mdiChevronRightBox} />
+                <span className="px-1">{(currentIndex ?? 0) + 1} of {total}</span>
+                <button
+                  onClick={goToNext}
+                  className="p-0.5 hover:bg-gray-100 rounded transition"
+                  aria-label="Next"
+                >
+                  <Icon path={mdiChevronRight} size={0.8} />
                 </button>
               </div>
             )}
