@@ -17,6 +17,7 @@ import { SaveChangesModal } from './SaveChangesModal';
 import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
 import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationReviewNote';
+import GenericLoadingForm from '../../../../components/GenericLoadingForm';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -104,6 +105,14 @@ export function ApplicationReviewFormPage() {
       setShowSaveChangesModal(false);
     },
   });
+
+  if (isApplicationLoading || isFundingOrganizationLoading) {
+    return (
+      <div className="container">
+        <GenericLoadingForm />
+      </div>
+    );
+  }
 
   return (
     <div className="container">
