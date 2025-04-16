@@ -125,7 +125,7 @@ export type ApplicationAction =
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
-  | ApplicationSubmissionUpdatesSavedAction
+  | ApplicationSavedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
@@ -209,10 +209,6 @@ export interface ApplicantConsumptiveUseEstimatedAction {
   };
 }
 
-/**
- * This action is dispatched when a user updates any application
- * values, but hasn't yet saved them.
- */
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
   payload: {
@@ -220,13 +216,8 @@ export interface ApplicationSubmissionFormUpdatedAction {
   };
 }
 
-/**
- * This action is dispatched when the updates to the application
- * have been successfully saved.
- * This is used to reset the isDirty flag.
- */
-export interface ApplicationSubmissionUpdatesSavedAction {
-  type: 'APPLICATION_SUBMISSION_UPDATES_SAVED';
+export interface ApplicationSavedAction {
+  type: 'APPLICATION_SAVED';
 }
 
 export interface ApplicationDocumentUpdatedAction {
@@ -318,7 +309,7 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
-    case 'APPLICATION_SUBMISSION_UPDATES_SAVED':
+    case 'APPLICATION_SAVED':
       return onApplicationUpdatesSaved(draftState);
     case 'APPLICATION_DOCUMENT_UPDATED':
       return onApplicationDocumentUpdated(draftState, action);

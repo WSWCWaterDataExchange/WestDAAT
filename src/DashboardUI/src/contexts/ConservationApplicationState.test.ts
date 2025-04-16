@@ -313,7 +313,7 @@ describe('ConservationApplicationState reducer', () => {
 
     // Act
     const newState = reducer(state, {
-      type: 'APPLICATION_SUBMISSION_UPDATES_SAVED'
+      type: 'APPLICATION_SAVED'
     });
 
     // Assert

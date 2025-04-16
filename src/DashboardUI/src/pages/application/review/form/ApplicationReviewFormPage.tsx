@@ -89,7 +89,7 @@ export function ApplicationReviewFormPage() {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
       dispatch({ type: 'APPLICATION_NOTE_ADDED', payload: { note } });
-      dispatch({ type: 'APPLICATION_SUBMISSION_UPDATES_SAVED' });
+      dispatch({ type: 'APPLICATION_SAVED' });
     },
     onError: () => {
       toast.error('Error saving application changes.');
