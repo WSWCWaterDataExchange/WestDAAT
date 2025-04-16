@@ -228,25 +228,27 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           )}
         </SidebarElement>
 
-        <SidebarElement>
-          <div className="mb-3">
-            <Button
-              variant="primary"
-              className="w-100"
-              disabled={!state.canContinueToApplication}
-              onClick={navigateToCreateApplicationPage}
-            >
-              Continue to Application
-            </Button>
-          </div>
-          <div>
-            <span className="text-muted">
-              If you own this water right or have legal authority over the use of its water, you may apply to a water
-              conservation program for compensated, temporary, and voluntary measure. Pending verification and approval
-              by appropriate parties.
-            </span>
-          </div>
-        </SidebarElement>
+        {props.perspective === 'applicant' && (
+          <SidebarElement>
+            <div className="mb-3">
+              <Button
+                variant="primary"
+                className="w-100"
+                disabled={!state.canContinueToApplication}
+                onClick={navigateToCreateApplicationPage}
+              >
+                Continue to Application
+              </Button>
+            </div>
+            <div>
+              <span className="text-muted">
+                If you own this water right or have legal authority over the use of its water, you may apply to a water
+                conservation program for compensated, temporary, and voluntary measure. Pending verification and
+                approval by appropriate parties.
+              </span>
+            </div>
+          </SidebarElement>
+        )}
       </div>
     </div>
   );
