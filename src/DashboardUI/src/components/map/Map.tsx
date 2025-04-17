@@ -44,7 +44,7 @@ interface mapProps {
   polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
-  isControlLocationSelectionToolDisplayed: boolean;
+  isControlLocationSelectionToolDisplayed?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {

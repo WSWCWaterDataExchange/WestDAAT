@@ -11,7 +11,6 @@ import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPoly
 import { convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
-import Button from 'react-bootstrap/esm/Button';
 import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
@@ -22,10 +21,16 @@ import {
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
 import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
+import Dropdown from 'react-bootstrap/esm/Dropdown';
+import {
+  conservationApplicationMaxPolygonAcreage,
+  conservationApplicationMaxPolygonCount,
+} from '../../../../config/constants';
+import { formatNumber } from '../../../../utilities/valueFormatters';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
-  handleEstimateConsumptiveUseClicked: () => void;
+  handleEstimateConsumptiveUseClicked: (updateEstimate: boolean) => void;
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
@@ -138,9 +143,9 @@ function ReviewMap(props: ReviewMapProps) {
       .map((feature) => feature as Feature<Polygon, GeoJsonProperties>);
 
     // validate irrigated field locations
-    if (polygonFeatures.length > 20) {
+    if (polygonFeatures.length > conservationApplicationMaxPolygonCount) {
       toast.error(
-        'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
+        `You may only select up to ${conservationApplicationMaxPolygonCount} fields at a time. Please redraw the polygons so there are ${conservationApplicationMaxPolygonCount} or fewer.`,
       );
     }
 
@@ -150,8 +155,8 @@ function ReviewMap(props: ReviewMapProps) {
     }
 
     const polygonData: MapSelectionPolygonData[] = polygonFeatures.map(fromGeometryFeatureToMapSelectionPolygonData);
-    if (polygonData.some((p) => p.acreage > 50000)) {
-      toast.error('Polygons may not exceed 50,000 acres.');
+    if (polygonData.some((p) => p.acreage > conservationApplicationMaxPolygonAcreage)) {
+      toast.error(`Polygons may not exceed ${formatNumber(conservationApplicationMaxPolygonAcreage, 0)} acres.`);
     }
 
     // control location (non-irrigated field location)
@@ -198,17 +203,29 @@ function ReviewMap(props: ReviewMapProps) {
 
   return (
     <div className="flex-grow-1 position-relative">
-      <div className="w-100 position-absolute d-flex justify-content-center p-1 d-print-none">
+      <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
-        <Button
-          variant="success"
-          style={{ zIndex: 1000 }}
-          onClick={props.handleEstimateConsumptiveUseClicked}
-          disabled={!estimateButtonEnabled}
-        >
-          {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
-          Estimate Consumptive Use for the Drawn Polygon(s)
-        </Button>
+        <Dropdown style={{ zIndex: 1000 }}>
+          <Dropdown.Toggle variant="success" disabled={!estimateButtonEnabled}>
+            {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
+            Estimate Consumptive Use
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => props.handleEstimateConsumptiveUseClicked(false)}
+              disabled={!estimateButtonEnabled}
+            >
+              Only Retrieve Estimate
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => props.handleEstimateConsumptiveUseClicked(true)}
+              disabled={!estimateButtonEnabled}
+            >
+              Retrieve Estimate and Save Changes
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}

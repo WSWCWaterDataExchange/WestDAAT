@@ -3,7 +3,6 @@ import Icon from '@mdi/react';
 import Nav from 'react-bootstrap/esm/Nav';
 import Navbar from 'react-bootstrap/esm/Navbar';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
-import Spinner from 'react-bootstrap/esm/Spinner';
 
 import './application-navbar.scss';
 
@@ -14,8 +13,6 @@ interface ApplicationNavbarProps {
   centerTextIsLoading: boolean;
   displayWaterIcon: boolean;
   rightButtonDisplayed?: boolean;
-  rightButtonDisabled?: boolean;
-  rightButtonIsLoading?: boolean;
   rightButtonText?: string;
   rightButtonIcon?: string;
   onRightButtonClick?: () => void;
@@ -56,9 +53,8 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
         <Nav className="right d-flex justify-content-end">
           {props.rightButtonDisplayed && (
             <Nav.Item onClick={props.onRightButtonClick}>
-              <Nav.Link as="button" className="text-dark d-print-none" disabled={props.rightButtonDisabled}>
+              <Nav.Link as="button" className="text-dark d-print-none">
                 <div className="d-flex align-items-center gap-2">
-                  {props.rightButtonIsLoading && <Spinner animation="border" size="sm" className="me-2" />}
                   <span>{props.rightButtonText}</span>
                   {props.rightButtonIcon && <Icon path={props.rightButtonIcon} size="1em" />}
                 </div>

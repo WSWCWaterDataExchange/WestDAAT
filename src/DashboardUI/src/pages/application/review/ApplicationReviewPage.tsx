@@ -2,11 +2,7 @@ import { useMemo, useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import {
-  useFundingOrganizationQuery,
-  useGetApplicationQuery,
-  useReviewerEstimateConsumptiveUseMutation,
-} from '../../../hooks/queries/useApplicationQuery';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
@@ -37,15 +33,7 @@ function ApplicationReviewPage() {
     return isOnMapPage ? 'Back to Application' : 'Back to Dashboard';
   }, [isOnMapPage]);
 
-  const rightButtonText: string = useMemo(() => {
-    return isOnMapPage ? 'Save Updated Estimate' : 'Continue to Final Approval';
-  }, [isOnMapPage]);
-
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
-
-  const rightButtonDisplayed = useMemo(() => {
-    return isOnMapPage ? true : canApproveApplication;
-  }, [isOnMapPage, canApproveApplication]);
 
   const navigateBack = () => {
     if (isOnMapPage) {
@@ -77,32 +65,6 @@ function ApplicationReviewPage() {
     }
   };
 
-  const reviewerEstimateConsumptiveUseMutation = useReviewerEstimateConsumptiveUseMutation();
-
-  const onRightButtonClick = async () => {
-    if (isOnMapPage) {
-      return await reviewerEstimateConsumptiveUse();
-    } else {
-      return navigateToApprovalPage();
-    }
-  };
-
-  const reviewerEstimateConsumptiveUse = async () => {
-    return await reviewerEstimateConsumptiveUseMutation.mutateAsync({
-      updateEstimate: false,
-    });
-  };
-
-  const rightButtonDisabled = useMemo(() => {
-    return isOnMapPage
-      ? !state.canEstimateConsumptiveUse || state.reviewerEstimateConsumptiveUseMutationStatus.isLoading
-      : false;
-  }, [isOnMapPage, state.canEstimateConsumptiveUse, state.reviewerEstimateConsumptiveUseMutationStatus.isLoading]);
-
-  const rightButtonIsLoading = useMemo(() => {
-    return isOnMapPage ? state.reviewerEstimateConsumptiveUseMutationStatus.isLoading : false;
-  }, [isOnMapPage, state.reviewerEstimateConsumptiveUseMutationStatus.isLoading]);
-
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -111,12 +73,10 @@ function ApplicationReviewPage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={rightButtonDisplayed}
-        rightButtonDisabled={rightButtonDisabled}
-        rightButtonIsLoading={rightButtonIsLoading}
-        rightButtonText={rightButtonText}
+        rightButtonDisplayed={canApproveApplication}
+        rightButtonText="Continue to Final Approval"
         rightButtonIcon={mdiArrowRight}
-        onRightButtonClick={onRightButtonClick}
+        onRightButtonClick={navigateToApprovalPage}
       />
 
       <div className="overflow-y-auto">

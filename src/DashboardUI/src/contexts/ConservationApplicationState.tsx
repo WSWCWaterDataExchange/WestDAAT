@@ -21,6 +21,7 @@ import { MapSelectionPointData, PartialPointData } from '../data-contracts/Combi
 import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
+import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -60,10 +61,8 @@ export interface ConservationApplicationState {
   loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
   loadFundingOrganizationErrored: boolean;
-  reviewerEstimateConsumptiveUseMutationStatus: {
-    isLoading: boolean;
-    hasErrored: boolean;
-  };
+  isLoadingReviewerConsumptiveUseEstimate: boolean;
+  reviewerConsumptiveUseEstimateHasErrored: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -114,10 +113,8 @@ export const defaultState = (): ConservationApplicationState => ({
   loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
   loadFundingOrganizationErrored: false,
-  reviewerEstimateConsumptiveUseMutationStatus: {
-    isLoading: false,
-    hasErrored: false,
-  },
+  isLoadingReviewerConsumptiveUseEstimate: false,
+  reviewerConsumptiveUseEstimateHasErrored: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -509,7 +506,7 @@ const onReviewerMapPolygonsUpdated = (
   // important: this method assumes that only one polygon or point can change at a time,
   // because this method is fired every time the user adjusts a feature on the map
 
-  const handlePolygonChanges = () => {
+  const mergePolygonChanges = () => {
     const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
     const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
 
@@ -556,14 +553,17 @@ const onReviewerMapPolygonsUpdated = (
       )!;
       const modifiedPolygon = payload.polygons.find((p) => !existingPolygonWkts.has(p.polygonWkt!))!;
 
-      // sanity check (is this needed?)
+      // sanity check - if the polygon in state has an id, and if the polygon in the payload has an id, then they must match.
+      // if they do not match, then we have encountered an issue where a polygon's geometry has become decoupled from its properties.
       if (
         !!estimateLocation.waterConservationApplicationEstimateLocationId &&
         !!modifiedPolygon.waterConservationApplicationEstimateLocationId &&
         estimateLocation.waterConservationApplicationEstimateLocationId !==
           modifiedPolygon.waterConservationApplicationEstimateLocationId
       ) {
-        throw new Error('Polygon ID mismatch. This should not happen.');
+        throw new Error(
+          'Polygon ID mismatch - a polygon was moved but its ID has not been properly tracked. Please report this error.',
+        );
       }
 
       // update the state data
@@ -571,12 +571,9 @@ const onReviewerMapPolygonsUpdated = (
     }
 
     draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
-
-    // todo: is this necessary?
-    // resetApplicationFormLocationDetails(draftState);
   };
 
-  const handleControlLocationChanges = () => {
+  const mergeControlLocationChanges = () => {
     const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
     const newControlLocationWkt = payload.controlLocation?.pointWkt;
 
@@ -600,8 +597,8 @@ const onReviewerMapPolygonsUpdated = (
   };
 
   // perform the updates
-  handlePolygonChanges();
-  handleControlLocationChanges();
+  mergePolygonChanges();
+  mergeControlLocationChanges();
 
   // side effects
   resetConsumptiveUseEstimation(draftState);
@@ -659,9 +656,8 @@ const onReviewerConsumptiveUseEstimateMutationStatusUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction,
 ): ConservationApplicationState => {
-  draftState.reviewerEstimateConsumptiveUseMutationStatus = {
-    ...payload,
-  };
+  draftState.isLoadingReviewerConsumptiveUseEstimate = payload.isLoading;
+  draftState.reviewerConsumptiveUseEstimateHasErrored = payload.hasErrored;
   return draftState;
 };
 
@@ -681,9 +677,11 @@ const onReviewerConsumptiveUseEstimated = (
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
     application.estimateLocations[i] = {
+      // preserve existing entry's data
       ...application.estimateLocations[i],
+      // merge consumptive use data into entry
       ...matchingConsumptiveUseData,
-      // preserve Id if possible
+      // ensure that the Id is preserved, assuming it exists
       waterConservationApplicationEstimateLocationId:
         matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ??
         application.estimateLocations[i].waterConservationApplicationEstimateLocationId,
@@ -901,28 +899,20 @@ const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplica
     // cannot estimate consumptive use if the user has provided *only one* of dollars or units
     ((dollarsHasValue && unitsHasValue) || (!dollarsHasValue && !unitsHasValue)) &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.length <= 20 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap;
 };
 
 const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
-  // a few differences between applicant and reviewer estimates:
-  // * reviewers do not need sidebar inputs (dollars, units)
-  // * reviewers must have a control location
-
-  // and then this isn't really a business requirement, but we can skip checking:
-  // * water right native id
-  // * funding org details (OpenET model name, date range start/end, compensation rate model)
-  // --- because these are already set in the application
   draftState.canEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.length <= 20 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap &&
     !!app.controlLocation &&
     !app.doesControlLocationOverlapWithPolygons;
@@ -944,7 +934,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.conservationPayment &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap;
 };
 

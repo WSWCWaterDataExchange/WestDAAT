@@ -9,9 +9,9 @@ export function ApplicationReviewMapPage() {
 
   const estimateConsumptiveUseMutation = useReviewerEstimateConsumptiveUseMutation();
 
-  const handleEstimateConsumptiveUseClicked = async () => {
+  const handleEstimateConsumptiveUseClicked = async (updateEstimate: boolean) => {
     await estimateConsumptiveUseMutation.mutateAsync({
-      updateEstimate: false,
+      updateEstimate,
     });
   };
 
@@ -32,7 +32,7 @@ export function ApplicationReviewMapPage() {
           <ReviewMap
             waterRightNativeId={state.conservationApplication.waterRightNativeId}
             handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
-            isLoadingConsumptiveUseEstimate={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
+            isLoadingConsumptiveUseEstimate={state.isLoadingReviewerConsumptiveUseEstimate}
           />
         </div>
       </div>

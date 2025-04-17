@@ -17,6 +17,11 @@ import {
   fromPartialPolygonDataToPolygonFeature,
   fromGeometryFeatureToMapSelectionPolygonData,
 } from '../../../utilities/mapUtility';
+import {
+  conservationApplicationMaxPolygonAcreage,
+  conservationApplicationMaxPolygonCount,
+} from '../../../config/constants';
+import { formatNumber } from '../../../utilities/valueFormatters';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
@@ -103,9 +108,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [state.conservationApplication.estimateLocations]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
-    if (polygons.length > 20) {
+    if (polygons.length > conservationApplicationMaxPolygonCount) {
       toast.error(
-        'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
+        `You may only select up to ${conservationApplicationMaxPolygonCount} fields at a time. Please redraw the polygons so there are ${conservationApplicationMaxPolygonCount} or fewer.`,
       );
     }
 
@@ -116,8 +121,8 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
 
-    if (polygonData.some((p) => p.acreage > 50000)) {
-      toast.error('Polygons may not exceed 50,000 acres.');
+    if (polygonData.some((p) => p.acreage > conservationApplicationMaxPolygonAcreage)) {
+      toast.error(`Polygons may not exceed ${formatNumber(conservationApplicationMaxPolygonAcreage, 0)} acres.`);
     }
 
     dispatch({
@@ -152,7 +157,6 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         polygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
-        isControlLocationSelectionToolDisplayed={false}
       />
       <EstimationToolTableView perspective="applicant" />
     </div>
