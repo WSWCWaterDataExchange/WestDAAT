@@ -1,19 +1,31 @@
-import 'video.js/dist/video-js.css';
+// import 'video.js/dist/video-js.css';
+import './estimation-tool-helper-video.css';
 
-export function EstimationToolHelperVideo() {
+export interface EstimationToolHelperVideoProps {
+  onVideoEnd: () => void;
+}
+
+export function EstimationToolHelperVideo(props: EstimationToolHelperVideoProps) {
   return (
     <>
       <video
         id="my-video"
         className="video-js"
-        controls
+        // controls
         preload="auto"
-        width="640"
-        height="264"
+        // leave video dimensions alone
+        // width="200"
+        // height="264"
         poster="MY_VIDEO_POSTER.jpg"
         data-setup="{}"
+        // autoplay on load
+        autoPlay
+        muted
+        onEnded={props.onVideoEnd}
+        // hide all playback controls
+        // close on finish
       >
-        <source src="https://shattereddisk.github.io/rickroll/rickroll.mp4" />
+        <source src="https://westdaatqa.blob.core.windows.net/$web/static/video/estimation-tool-tip.mp4" />
       </video>
     </>
   );
