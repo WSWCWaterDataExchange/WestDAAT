@@ -11,7 +11,6 @@ import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPoly
 import { convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
-import Button from 'react-bootstrap/esm/Button';
 import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
@@ -22,9 +21,7 @@ import {
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
 import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
-import SplitButton from 'react-bootstrap/esm/SplitButton';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
-import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
