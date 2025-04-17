@@ -121,8 +121,8 @@ export function ApplicationReviewFormPage() {
       />
       <CancelChangesModal
         show={showCancelConfirmationModal}
-        onCancel={handleCancelConfirmed}
-        onConfirm={() => setShowCancelConfirmationModal(false)}
+        onConfirm={handleCancelConfirmed}
+        onClose={() => setShowCancelConfirmationModal(false)}
       />
       <SaveChangesModal
         show={showSaveChangesModal}
