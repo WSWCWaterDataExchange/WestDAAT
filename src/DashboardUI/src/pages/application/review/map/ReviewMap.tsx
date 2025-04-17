@@ -199,6 +199,7 @@ function ReviewMap(props: ReviewMapProps) {
         polygonLabelFeatures={userDrawnPolygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
+        isControlLocationSelectionToolDisplayed={true}
       />
       <EstimationToolTableView />
     </div>

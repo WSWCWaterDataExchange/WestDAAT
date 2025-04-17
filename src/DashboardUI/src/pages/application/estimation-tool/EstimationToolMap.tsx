@@ -152,6 +152,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         polygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
+        isControlLocationSelectionToolDisplayed={false}
       />
       <EstimationToolTableView />
     </div>

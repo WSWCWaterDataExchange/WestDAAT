@@ -34,7 +34,7 @@ import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
-import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
+import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 import './map.scss';
 
@@ -44,6 +44,7 @@ interface mapProps {
   polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
+  isControlLocationSelectionToolDisplayed: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -56,6 +57,7 @@ function Map({
   polygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
+  isControlLocationSelectionToolDisplayed,
 }: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -145,6 +147,21 @@ function Map({
       return;
     }
 
+    const controlLocationSelectionToolDrawBarButton: DrawBarButton = {
+      on: 'click',
+      title: 'Control Location tool',
+      buttonIconPath: mdiMapMarker,
+      action: () => {
+        // cannot reference the state variable directly inside of an inline function
+        const isEnabled: boolean = isControlLocationSelectionToolEnabledRef.current;
+        if (isEnabled) {
+          drawControlStateRef.current?.changeMode('draw_point');
+        } else {
+          toast.error('Only one Control Location is allowed.');
+        }
+      },
+    };
+
     const dc = new ExtendedMapboxDraw({
       props: {
         displayControlsDefault: false,
@@ -168,20 +185,7 @@ function Map({
             drawControlStateRef.current?.changeMode('draw_polygon');
           },
         },
-        {
-          on: 'click',
-          title: 'Control Location tool',
-          buttonIconPath: mdiMapMarker,
-          action: () => {
-            // cannot reference the state variable directly inside of an inline function
-            const isEnabled: boolean = isControlLocationSelectionToolEnabledRef.current;
-            if (isEnabled) {
-              drawControlStateRef.current?.changeMode('draw_point');
-            } else {
-              toast.error('Only one Control Location is allowed.');
-            }
-          },
-        },
+        ...(isControlLocationSelectionToolDisplayed ? [controlLocationSelectionToolDrawBarButton] : []),
         {
           on: 'click',
           title: 'Rectangle tool',
