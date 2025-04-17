@@ -96,7 +96,7 @@ export function ApplicationSubmitPage() {
           ) : (
             <>
               <ApplicationSubmissionFormDisplay />
-              <ApplicationDocumentSection readOnly={true} />
+              <ApplicationDocumentSection readOnly={true} perspective={'applicant'} />
 
               {state.isCreatingApplication && (
                 <>

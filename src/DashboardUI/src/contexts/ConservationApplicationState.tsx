@@ -45,6 +45,7 @@ export interface ConservationApplicationState {
     doPolygonsOverlap: boolean;
     doesControlLocationOverlapWithPolygons: boolean;
     // derived/computed state
+    isDirty: boolean;
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
     supportingDocuments: ApplicationDocument[];
@@ -92,6 +93,7 @@ export const defaultState = (): ConservationApplicationState => ({
     controlLocation: undefined,
     doPolygonsOverlap: false,
     doesControlLocationOverlapWithPolygons: false,
+    isDirty: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
     supportingDocuments: [],
@@ -123,6 +125,7 @@ export type ApplicationAction =
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
+  | ApplicationSavedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
@@ -211,6 +214,10 @@ export interface ApplicationSubmissionFormUpdatedAction {
   payload: {
     formValues: ApplicationSubmissionFormData;
   };
+}
+
+export interface ApplicationSavedAction {
+  type: 'APPLICATION_SAVED';
 }
 
 export interface ApplicationDocumentUpdatedAction {
@@ -302,6 +309,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
+    case 'APPLICATION_SAVED':
+      return onApplicationUpdatesSaved(draftState);
     case 'APPLICATION_DOCUMENT_UPDATED':
       return onApplicationDocumentUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPLOADING':
@@ -496,6 +505,13 @@ const onApplicationFormUpdated = (
 
   computeCombinedPolygonData(draftState);
 
+  draftState.conservationApplication.isDirty = true;
+
+  return draftState;
+};
+
+const onApplicationUpdatesSaved = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.isDirty = false;
   return draftState;
 };
 
@@ -506,9 +522,12 @@ const onApplicationDocumentUpdated = (
   const document = draftState.conservationApplication.supportingDocuments.find(
     (doc) => doc.blobName === payload.blobName,
   );
+
   if (document) {
     document.description = payload.description;
   }
+
+  draftState.conservationApplication.isDirty = true;
 
   return draftState;
 };
@@ -529,6 +548,7 @@ const onApplicationDocumentUploaded = (
     ...draftState.conservationApplication.supportingDocuments,
     ...payload.uploadedDocuments,
   ];
+  draftState.conservationApplication.isDirty = true;
   return draftState;
 };
 
@@ -540,6 +560,7 @@ const onApplicationDocumentRemoved = (
     (doc) => doc.blobName !== payload.removedBlobName,
   );
   draftState.conservationApplication.supportingDocuments = filteredDocuments;
+  draftState.conservationApplication.isDirty = true;
   return draftState;
 };
 
@@ -641,6 +662,7 @@ const onApplicationLoaded = (
 
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
+  draftState.conservationApplication.isDirty = false;
 
   return draftState;
 };

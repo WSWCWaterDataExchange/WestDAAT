@@ -144,7 +144,7 @@ export function ApplicationApprovePage() {
               ) : (
                 <>
                   <ApplicationSubmissionFormDisplay />
-                  <ApplicationDocumentSection readOnly={true} />
+                  <ApplicationDocumentSection readOnly={true} perspective={'reviewer'} />
                   <ApplicationReviewPipelineSection />
                   <ApplicationReviewersNotesSection />
                   <ApplicationFormSectionRule width={1} />

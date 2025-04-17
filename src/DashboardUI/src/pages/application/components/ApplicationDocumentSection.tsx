@@ -5,14 +5,16 @@ import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
 import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface ApplicationDocumentSectionProps {
   readOnly: boolean;
+  perspective: ApplicationReviewPerspective;
 }
 
 function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
   const msalContext = useMsal();
-  const { readOnly } = props;
+  const { readOnly, perspective } = props;
 
   const handleDownload = async (fileName: string, fileId?: string) => {
     if (!fileId) {
@@ -32,10 +34,10 @@ function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
     <>
       {readOnly && <ApplicationFormSectionRule width={2} />}
       <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-        {readOnly ? ( //
+        {readOnly ? (
           <ApplicationDocumentDownload onDownloadClicked={handleDownload} />
         ) : (
-          <ApplicationDocumentUpload onDownloadClicked={handleDownload} />
+          <ApplicationDocumentUpload onDownloadClicked={handleDownload} perspective={perspective} />
         )}
       </ApplicationFormSection>
     </>
