@@ -22,6 +22,11 @@ import {
 } from '../../../../utilities/mapUtility';
 import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
+import {
+  conservationApplicationMaxPolygonAcreage,
+  conservationApplicationMaxPolygonCount,
+} from '../../../../config/constants';
+import { formatNumber } from '../../../../utilities/valueFormatters';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -124,9 +129,9 @@ function ReviewMap(props: ReviewMapProps) {
       .map((feature) => feature as Feature<Polygon, GeoJsonProperties>);
 
     // validate irrigated field locations
-    if (polygonFeatures.length > 20) {
+    if (polygonFeatures.length > conservationApplicationMaxPolygonCount) {
       toast.error(
-        'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
+        `You may only select up to ${conservationApplicationMaxPolygonCount} fields at a time. Please redraw the polygons so there are ${conservationApplicationMaxPolygonCount} or fewer.`,
       );
     }
 
@@ -136,8 +141,8 @@ function ReviewMap(props: ReviewMapProps) {
     }
 
     const polygonData: MapSelectionPolygonData[] = polygonFeatures.map(fromGeometryFeatureToMapSelectionPolygonData);
-    if (polygonData.some((p) => p.acreage > 50000)) {
-      toast.error('Polygons may not exceed 50,000 acres.');
+    if (polygonData.some((p) => p.acreage > conservationApplicationMaxPolygonAcreage)) {
+      toast.error(`Polygons may not exceed ${formatNumber(conservationApplicationMaxPolygonAcreage, 0)} acres.`);
     }
 
     // control location (non-irrigated field location)

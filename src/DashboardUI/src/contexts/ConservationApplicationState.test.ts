@@ -320,12 +320,12 @@ describe('ConservationApplicationState reducer', () => {
 
     // Act
     const newState = reducer(state, {
-      type: 'APPLICATION_SAVED'
+      type: 'APPLICATION_SAVED',
     });
 
     // Assert
     expect(newState.conservationApplication.isDirty).toBe(false);
-  })
+  });
 
   it('uploading documents should update state', () => {
     // Arrange
@@ -403,7 +403,7 @@ describe('ConservationApplicationState reducer', () => {
       shouldBeAbleToPerformConsumptiveUseEstimate(state, false);
     });
 
-    it('estimate consumptive use should be disabled when more than 20 polygons have been selected', () => {
+    it('estimate consumptive use should be disabled when more than the maximum number of polygons have been selected', () => {
       // Arrange
       // Act
       let newState = reducer(state, {

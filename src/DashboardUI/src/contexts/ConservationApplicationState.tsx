@@ -21,6 +21,7 @@ import { MapSelectionPointData, PartialPointData } from '../data-contracts/Combi
 import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
+import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -898,8 +899,8 @@ const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplica
     // cannot estimate consumptive use if the user has provided *only one* of dollars or units
     ((dollarsHasValue && unitsHasValue) || (!dollarsHasValue && !unitsHasValue)) &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.length <= 20 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap;
 };
 
@@ -910,8 +911,8 @@ const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicat
     !!app.waterConservationApplicationId &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.length <= 20 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap &&
     !!app.controlLocation &&
     !app.doesControlLocationOverlapWithPolygons;
@@ -933,7 +934,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.conservationPayment &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
-    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap;
 };
 
