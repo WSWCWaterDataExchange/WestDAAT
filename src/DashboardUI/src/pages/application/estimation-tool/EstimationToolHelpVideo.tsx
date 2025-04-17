@@ -1,4 +1,3 @@
-// import 'video.js/dist/video-js.css';
 import './estimation-tool-helper-video.css';
 
 export interface EstimationToolHelpVideoProps {
