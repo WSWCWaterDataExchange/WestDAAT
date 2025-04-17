@@ -201,7 +201,7 @@ function ReviewMap(props: ReviewMapProps) {
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
       />
-      <EstimationToolTableView />
+      <EstimationToolTableView perspective="reviewer" />
     </div>
   );
 }

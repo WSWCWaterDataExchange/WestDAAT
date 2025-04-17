@@ -8,8 +8,13 @@ import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 import './estimation-tool-table-view.scss';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
-function EstimationToolTableView() {
+interface EstimationToolTableViewProps {
+  perspective: ApplicationReviewPerspective;
+}
+
+function EstimationToolTableView(props: EstimationToolTableViewProps) {
   const { state } = useConservationApplicationContext();
   const polygons = state.conservationApplication.estimateLocations;
 
@@ -60,6 +65,7 @@ function EstimationToolTableView() {
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
                   {show && activeTab === field.fieldName && (
                     <EstimationToolFieldDataTable
+                      perspective={props.perspective}
                       data={{
                         waterConservationApplicationEstimateLocationId:
                           field.waterConservationApplicationEstimateLocationId!,

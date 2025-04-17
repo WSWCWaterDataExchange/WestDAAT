@@ -2,8 +2,10 @@ import Table from 'react-bootstrap/esm/Table';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
 import Card from 'react-bootstrap/esm/Card';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface EstimationToolFieldDataTableProps {
+  perspective: ApplicationReviewPerspective;
   data: Partial<PolygonEtDataCollection>;
   fieldAcreage: number;
 }
@@ -37,7 +39,13 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
           <tr>
             <th>Year</th>
             <th>Total ET (inches)</th>
-            <th>Net ET (inches)</th>
+
+            {props.perspective === 'reviewer' && (
+              <>
+                <th>Effective Precipitation (inches)</th>
+                <th>Net ET (inches)</th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -45,7 +53,16 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
             <tr key={item.year}>
               <td>{item.year}</td>
               <td>{formatNumber(item.totalEtInInches, 2)}</td>
-              <td>{item.netEtInInches ? formatNumber(item.netEtInInches, 2) : emptyDataPlaceholder}</td>
+              {props.perspective === 'reviewer' && (
+                <>
+                  <td>
+                    {item.effectivePrecipitationInInches
+                      ? formatNumber(item.effectivePrecipitationInInches, 2)
+                      : emptyDataPlaceholder}
+                  </td>
+                  <td>{item.netEtInInches ? formatNumber(item.netEtInInches, 2) : emptyDataPlaceholder}</td>
+                </>
+              )}
             </tr>
           ))}
         </tbody>

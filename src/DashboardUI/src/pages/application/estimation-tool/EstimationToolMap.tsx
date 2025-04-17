@@ -154,7 +154,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={false}
       />
-      <EstimationToolTableView />
+      <EstimationToolTableView perspective="applicant" />
     </div>
   );
 }
