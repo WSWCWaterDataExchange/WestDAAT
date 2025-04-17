@@ -6,6 +6,9 @@ export interface EstimationToolHelperVideoProps {
 }
 
 export function EstimationToolHelperVideo(props: EstimationToolHelperVideoProps) {
+  // Use relative path in Azure. Locally use config value
+  const videoUrl = process.env.REACT_APP_ESTIMATION_TOOL_HELP_VIDEO_URL ?? '/static/video/estimation-tool-tip.mp4';
+
   return (
     <>
       <video
@@ -25,7 +28,7 @@ export function EstimationToolHelperVideo(props: EstimationToolHelperVideoProps)
         // hide all playback controls
         // close on finish
       >
-        <source src="https://westdaatqa.blob.core.windows.net/$web/static/video/estimation-tool-tip.mp4" />
+        <source src={videoUrl} />
       </video>
     </>
   );
