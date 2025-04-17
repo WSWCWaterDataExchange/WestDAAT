@@ -22,6 +22,9 @@ import {
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
 import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
+import SplitButton from 'react-bootstrap/esm/SplitButton';
+import Dropdown from 'react-bootstrap/esm/Dropdown';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -184,24 +187,27 @@ function ReviewMap(props: ReviewMapProps) {
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
-        <Button
-          variant="success"
-          style={{ zIndex: 1000 }}
-          onClick={() => props.handleEstimateConsumptiveUseClicked(false)}
-          disabled={!estimateButtonEnabled}
-        >
-          {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
-          Estimate Consumptive Use for the Drawn Polygon(s)
-        </Button>
+        <Dropdown style={{ zIndex: 1000 }}>
+          <Dropdown.Toggle variant="success" disabled={!estimateButtonEnabled}>
+            {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
+            Estimate Consumptive Use
+          </Dropdown.Toggle>
 
-        <Button
-          variant="success"
-          style={{ zIndex: 1000 }}
-          onClick={() => props.handleEstimateConsumptiveUseClicked(true)}
-          disabled={!estimateButtonEnabled}
-        >
-          Save Changes
-        </Button>
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => props.handleEstimateConsumptiveUseClicked(false)}
+              disabled={!estimateButtonEnabled}
+            >
+              Only Retrieve Estimate
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => props.handleEstimateConsumptiveUseClicked(true)}
+              disabled={!estimateButtonEnabled}
+            >
+              Retrieve Estimate and Save Changes
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
