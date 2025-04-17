@@ -567,9 +567,6 @@ const onReviewerMapPolygonsUpdated = (
     }
 
     draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
-
-    // todo: is this necessary?
-    // resetApplicationFormLocationDetails(draftState);
   };
 
   const handleControlLocationChanges = () => {
