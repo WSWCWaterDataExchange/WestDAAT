@@ -80,6 +80,8 @@ function ApplicationReviewPage() {
         centerTextIsLoading={false}
         displayWaterIcon={false}
         rightButtonDisplayed={rightButtonDisplayed}
+        rightButtonDisabled={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
+        rightButtonIsLoading={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
         rightButtonText={rightButtonText}
         rightButtonIcon={mdiArrowRight}
         onRightButtonClick={onRightButtonClick}

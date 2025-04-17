@@ -5,6 +5,7 @@ import Navbar from 'react-bootstrap/esm/Navbar';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 import './application-navbar.scss';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 interface ApplicationNavbarProps {
   navigateBack: () => void;
@@ -13,6 +14,8 @@ interface ApplicationNavbarProps {
   centerTextIsLoading: boolean;
   displayWaterIcon: boolean;
   rightButtonDisplayed?: boolean;
+  rightButtonDisabled?: boolean;
+  rightButtonIsLoading?: boolean;
   rightButtonText?: string;
   rightButtonIcon?: string;
   onRightButtonClick?: () => void;
@@ -53,8 +56,9 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
         <Nav className="right d-flex justify-content-end">
           {props.rightButtonDisplayed && (
             <Nav.Item onClick={props.onRightButtonClick}>
-              <Nav.Link as="button" className="text-dark d-print-none">
+              <Nav.Link as="button" className="text-dark d-print-none" disabled={props.rightButtonDisabled}>
                 <div className="d-flex align-items-center gap-2">
+                  {props.rightButtonIsLoading && <Spinner animation="border" size="sm" className="me-2" />}
                   <span>{props.rightButtonText}</span>
                   {props.rightButtonIcon && <Icon path={props.rightButtonIcon} size="1em" />}
                 </div>
