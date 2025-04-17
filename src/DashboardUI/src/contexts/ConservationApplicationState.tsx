@@ -906,14 +906,6 @@ const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplica
 const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
-  // a few differences between applicant and reviewer estimates:
-  // * reviewers do not need sidebar inputs (dollars, units)
-  // * reviewers must have a control location
-
-  // and then this isn't really a business requirement, but we can skip checking:
-  // * water right native id
-  // * funding org details (OpenET model name, date range start/end, compensation rate model)
-  // --- because these are already set in the application
   draftState.canEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
     !!app.estimateLocations &&
