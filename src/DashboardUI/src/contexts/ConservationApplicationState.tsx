@@ -505,7 +505,7 @@ const onReviewerMapPolygonsUpdated = (
   // important: this method assumes that only one polygon or point can change at a time,
   // because this method is fired every time the user adjusts a feature on the map
 
-  const handlePolygonChanges = () => {
+  const mergePolygonChanges = () => {
     const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
     const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
 
@@ -552,14 +552,17 @@ const onReviewerMapPolygonsUpdated = (
       )!;
       const modifiedPolygon = payload.polygons.find((p) => !existingPolygonWkts.has(p.polygonWkt!))!;
 
-      // sanity check (is this needed?)
+      // sanity check - if the polygon in state has an id, and if the polygon in the payload has an id, then they must match.
+      // if they do not match, then we have encountered an issue where a polygon's geometry has become decoupled from its properties.
       if (
         !!estimateLocation.waterConservationApplicationEstimateLocationId &&
         !!modifiedPolygon.waterConservationApplicationEstimateLocationId &&
         estimateLocation.waterConservationApplicationEstimateLocationId !==
           modifiedPolygon.waterConservationApplicationEstimateLocationId
       ) {
-        throw new Error('Polygon ID mismatch. This should not happen.');
+        throw new Error(
+          'Polygon ID mismatch - a polygon was moved but its ID has not been properly tracked. Please report this error.',
+        );
       }
 
       // update the state data
@@ -569,7 +572,7 @@ const onReviewerMapPolygonsUpdated = (
     draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
   };
 
-  const handleControlLocationChanges = () => {
+  const mergeControlLocationChanges = () => {
     const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
     const newControlLocationWkt = payload.controlLocation?.pointWkt;
 
@@ -593,8 +596,8 @@ const onReviewerMapPolygonsUpdated = (
   };
 
   // perform the updates
-  handlePolygonChanges();
-  handleControlLocationChanges();
+  mergePolygonChanges();
+  mergeControlLocationChanges();
 
   // side effects
   resetConsumptiveUseEstimation(draftState);
