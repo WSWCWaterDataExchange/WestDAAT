@@ -12,8 +12,11 @@ import { uploadApplicationDocuments } from '../../../accessors/applicationAccess
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
 import './application-document.scss';
+import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface ApplicationDocumentUploadProps {
+  perspective: ApplicationReviewPerspective;
   onDownloadClicked: (fileName: string, fileId?: string) => void;
 }
 
@@ -22,6 +25,7 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
   const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
 
   const msalContext = useMsal();
+  const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
 
@@ -115,6 +119,14 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
     });
   };
 
+  const isDocumentUploadedByCurrentUser = (blobName: string): boolean => {
+    if (!user || !user.userId) {
+      return false;
+    }
+
+    return blobName.includes(user.userId);
+  };
+
   return (
     <div className="col">
       {uploadDocumentErrorMessage !== null && (
@@ -153,7 +165,7 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
                   </Button>
                   <Button
                     variant="link"
-                    className="px-1 py-1 text-danger"
+                    className={`px-1 py-1 text-danger ${isDocumentUploadedByCurrentUser(file.blobName) ? 'visible' : 'invisible'}`}
                     onClick={() => handleRemoveDocument(file.blobName)}
                   >
                     <Icon path={mdiTrashCanOutline} size="1.5em" aria-label="Remove document" />
@@ -176,16 +188,20 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
         )}
       </Fade>
 
-      <div className="col-4">
+      <div className="col d-flex align-items-center mt-3">
         <Button
           variant="outline-primary"
-          className="mt-3"
           onClick={handleUploadDocument}
           disabled={uploadDocumentMutation.isLoading}
           aria-label="Upload supporting document"
         >
           Upload
         </Button>
+        {props.perspective === 'reviewer' && (
+          <span className="text-secondary fst-italic mx-2">
+            Please note: any documents you upload will be visible to the applicant.
+          </span>
+        )}
       </div>
     </div>
   );
