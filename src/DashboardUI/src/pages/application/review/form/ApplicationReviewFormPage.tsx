@@ -4,10 +4,8 @@ import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
-import useDirtyFormCheck from '../../../../hooks/useDirtyFormCheck';
 import ApplicationDocumentSection from '../../components/ApplicationDocumentSection';
 import ApplicationReviewersNotesSection from '../../components/ApplicationReviewersNotesSection';
 import ApplicationReviewPipelineSection from '../../components/ApplicationReviewPipelineSection';
@@ -17,6 +15,8 @@ import { SaveChangesModal } from './SaveChangesModal';
 import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
 import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationReviewNote';
+import GenericLoadingForm from '../../../../components/GenericLoadingForm';
+import { CancelChangesModal } from './CancelChangesModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -41,15 +41,8 @@ export function ApplicationReviewFormPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [formValidated, setFormValidated] = useState(false);
 
-  const [isFormDirty, reinitializeDirtyFormCheck] = useDirtyFormCheck(
-    state.conservationApplication.applicationSubmissionForm,
-    {
-      isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
-    },
-  );
-
   const handleCancelClicked = () => {
-    if (isFormDirty) {
+    if (state.conservationApplication.isDirty) {
       setShowCancelConfirmationModal(true);
     } else {
       handleCancelConfirmed();
@@ -71,7 +64,7 @@ export function ApplicationReviewFormPage() {
   };
 
   const handleSubmitClicked = () => {
-    if (isFormDirty) {
+    if (state.conservationApplication.isDirty) {
       setShowUnsavedChangesModal(true);
     } else {
       setShowSubmitRecommendationModal(true);
@@ -96,8 +89,8 @@ export function ApplicationReviewFormPage() {
     onSuccess: (note: ApplicationReviewNote) => {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
-      reinitializeDirtyFormCheck(state.conservationApplication.applicationSubmissionForm);
       dispatch({ type: 'APPLICATION_NOTE_ADDED', payload: { note } });
+      dispatch({ type: 'APPLICATION_SAVED' });
     },
     onError: () => {
       toast.error('Error saving application changes.');
@@ -105,31 +98,32 @@ export function ApplicationReviewFormPage() {
     },
   });
 
+  if (isApplicationLoading || isFundingOrganizationLoading) {
+    return (
+      <div className="container">
+        <GenericLoadingForm />
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
-      <ApplicationDocumentSection readOnly={false} />
+      <ApplicationDocumentSection perspective={perspective} readOnly={false} />
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
       <ApplicationReviewButtonRow
-        isFormDirty={isFormDirty}
+        isFormDirty={state.conservationApplication.isDirty}
         isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
         handleSaveClicked={handleSaveClicked}
         handleSubmitForFinalReviewClicked={handleSubmitClicked}
       />
-
-      <ConfirmationModal
+      <CancelChangesModal
         show={showCancelConfirmationModal}
-        onCancel={() => setShowCancelConfirmationModal(false)}
         onConfirm={handleCancelConfirmed}
-        titleText="Are you sure you want to leave?"
-        cancelText="Cancel"
-        confirmText="Okay"
-      >
-        Any changes to this application will not be saved.
-      </ConfirmationModal>
-
+        onClose={() => setShowCancelConfirmationModal(false)}
+      />
       <SaveChangesModal
         show={showSaveChangesModal}
         onCancel={() => setShowSaveChangesModal(false)}

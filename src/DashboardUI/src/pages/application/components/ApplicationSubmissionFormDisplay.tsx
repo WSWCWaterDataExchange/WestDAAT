@@ -13,12 +13,8 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-interface ApplicationSubmissionFormDisplayProps {
-  isLoading: boolean;
-}
-
 // readonly / display-only version of the `ApplicationSubmissionForm` component
-function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDisplayProps) {
+function ApplicationSubmissionFormDisplay() {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
@@ -26,7 +22,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
   return (
     <main>
       <div>
-        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
+        <ApplicationFormSection title="Applicant Information" loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElementDisplay label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
@@ -58,11 +54,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
         <ApplicationFormSectionRule width={2} />
 
-        <ApplicationFormSection
-          title="Representative / Agent Contact Information"
-          isLoading={props.isLoading}
-          loadingFieldCount={3}
-        >
+        <ApplicationFormSection title="Representative / Agent Contact Information" loadingFieldCount={3}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElementDisplay label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
@@ -83,11 +75,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
         <ApplicationFormSectionRule width={2} />
 
         <div className="row">
-          <ApplicationFormSection
-            title="Property & Land Area Information"
-            className="col-lg-6 col-12"
-            isLoading={props.isLoading}
-          >
+          <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             {polygonData.map((field) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
@@ -118,11 +106,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
         <ApplicationFormSectionRule width={2} />
 
-        <ApplicationFormSection
-          title="Canal Company / Irrigation District"
-          isLoading={props.isLoading}
-          loadingFieldCount={3}
-        >
+        <ApplicationFormSection title="Canal Company / Irrigation District" loadingFieldCount={3}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElementDisplay label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
@@ -145,7 +129,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
         <ApplicationFormSectionRule width={2} />
 
-        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
+        <ApplicationFormSection title="Water Right Information" loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElementDisplay label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
@@ -180,7 +164,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
         <ApplicationFormSectionRule width={2} />
 
-        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
+        <ApplicationFormSection title="Estimation Summary" loadingFieldCount={5}>
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElementDisplay
@@ -221,7 +205,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
         <ApplicationFormSectionRule width={2} />
 
-        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
+        <ApplicationFormSection title="Conservation Plan" loadingFieldCount={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElementDisplay
               label="Funding Request $ Amount"

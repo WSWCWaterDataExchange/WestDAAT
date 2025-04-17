@@ -311,7 +311,21 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     const form = newState.conservationApplication.applicationSubmissionForm;
     expect(form.landownerName).toEqual('Bobby Hill');
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
+
+  it('saving application submission updates should update dirty flag in state', () => {
+    // Arrange
+    state.conservationApplication.isDirty = true;
+
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_SAVED'
+    });
+
+    // Assert
+    expect(newState.conservationApplication.isDirty).toBe(false);
+  })
 
   it('uploading documents should update state', () => {
     // Arrange
@@ -332,6 +346,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(uploadedDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(uploadedDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(uploadedDocument.description);
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
 
   it('removing an existing document should update state', () => {
@@ -359,6 +374,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(anotherDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(anotherDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
 
   it('setting document upload status should update state', () => {
@@ -794,6 +810,9 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
+
+      // application dirty status
+      expect(newState.conservationApplication.isDirty).toBe(false);
     });
 
     it('reviewer updating map data should update state', () => {
