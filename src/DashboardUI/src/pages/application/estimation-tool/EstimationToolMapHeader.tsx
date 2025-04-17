@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/esm/Modal';
-import { EstimationToolHelperVideo } from './EstimationToolHelperVideo';
+import { EstimationToolHelpVideo } from './EstimationToolHelpVideo';
 
 export function EstimationToolMapHeader() {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
@@ -12,12 +12,12 @@ export function EstimationToolMapHeader() {
         <span className="h5 fw-bold">Estimate consumptive use through OpenET for an irrigated field</span>
       </div>
 
-      <div>
-        <span className="me-2">
+      <div className="me-2">
+        <span>
           Click once to begin drawing a polygon around your land by using the shape tool. Then, use the panel on the
           left to review estimates and potential compensation as part of a voluntary and temporary measure.
         </span>
-        <Button className="" variant="link" onClick={() => setShowVideoPlayer(true)}>
+        <Button className="px-2 align-baseline" variant="link" onClick={() => setShowVideoPlayer(true)}>
           How does this work?
         </Button>
       </div>
@@ -34,7 +34,7 @@ export function EstimationToolMapHeader() {
       </div>
 
       <Modal centered show={showVideoPlayer} onHide={() => setShowVideoPlayer(false)}>
-        <EstimationToolHelperVideo onVideoEnd={() => setShowVideoPlayer(false)} />
+        <EstimationToolHelpVideo onVideoEnd={() => setShowVideoPlayer(false)} />
       </Modal>
     </div>
   );
