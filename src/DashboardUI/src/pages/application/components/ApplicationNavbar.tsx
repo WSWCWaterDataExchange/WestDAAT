@@ -3,9 +3,9 @@ import Icon from '@mdi/react';
 import Nav from 'react-bootstrap/esm/Nav';
 import Navbar from 'react-bootstrap/esm/Navbar';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 import './application-navbar.scss';
-import Spinner from 'react-bootstrap/esm/Spinner';
 
 interface ApplicationNavbarProps {
   navigateBack: () => void;
