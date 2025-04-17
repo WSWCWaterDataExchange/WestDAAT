@@ -112,8 +112,6 @@ function ApplicationReviewPage() {
         centerTextIsLoading={false}
         displayWaterIcon={false}
         rightButtonDisplayed={rightButtonDisplayed}
-        rightButtonDisabled={rightButtonDisabled}
-        rightButtonIsLoading={rightButtonIsLoading}
         rightButtonText={rightButtonText}
         rightButtonIcon={mdiArrowRight}
         onRightButtonClick={onRightButtonClick}
