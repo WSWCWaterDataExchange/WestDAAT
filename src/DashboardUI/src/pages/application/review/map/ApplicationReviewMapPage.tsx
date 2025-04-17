@@ -11,7 +11,6 @@ export function ApplicationReviewMapPage() {
 
   const handleEstimateConsumptiveUseClicked = async () => {
     await estimateConsumptiveUseMutation.mutateAsync({
-      // todo: pass in the correct value
       updateEstimate: false,
     });
   };
