@@ -59,7 +59,6 @@ function ApplicationReviewPage() {
 
   const onRightButtonClick = async () => {
     if (isOnMapPage) {
-      // todo: why does this not share the mutation state with the map page?
       return await reviewerEstimateConsumptiveUse();
     } else {
       return navigateToApprovalPage();

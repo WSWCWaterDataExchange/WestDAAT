@@ -141,8 +141,16 @@ export function useReviewerEstimateConsumptiveUseMutation() {
   const msalContext = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (options: { updateEstimate: boolean }) => {
+      dispatch({
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
+        payload: {
+          isLoading: true,
+          hasErrored: false,
+        },
+      });
+
       const apiCallFields: Parameters<typeof reviewerEstimateConsumptiveUse>[1] = {
         waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
         polygons: state.conservationApplication.estimateLocations.map(
@@ -174,10 +182,33 @@ export function useReviewerEstimateConsumptiveUseMutation() {
           },
         });
       }
+
+      dispatch({
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
+        payload: {
+          isLoading: false,
+          hasErrored: false,
+        },
+      });
     },
     onError: (error: Error) => {
       toast.error('Failed to estimate consumptive use. Please try again later.');
+
+      dispatch({
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
+        payload: {
+          isLoading: false,
+          hasErrored: true,
+        },
+      });
     },
     mutationKey: ['reviewer-estimate-consumptive-use'],
   });
+
+  // only exposing these methods forces the caller to reference state to get the mutation status
+  // this is necessary because even if we return the state value here, it will be stale
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+  };
 }

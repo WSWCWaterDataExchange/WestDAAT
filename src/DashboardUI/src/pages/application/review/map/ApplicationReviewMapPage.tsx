@@ -33,7 +33,7 @@ export function ApplicationReviewMapPage() {
           <ReviewMap
             waterRightNativeId={state.conservationApplication.waterRightNativeId}
             handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
-            isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
+            isLoadingConsumptiveUseEstimate={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
           />
         </div>
       </div>

@@ -59,6 +59,10 @@ export interface ConservationApplicationState {
   loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
   loadFundingOrganizationErrored: boolean;
+  reviewerEstimateConsumptiveUseMutationStatus: {
+    isLoading: boolean;
+    hasErrored: boolean;
+  };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -108,6 +112,10 @@ export const defaultState = (): ConservationApplicationState => ({
   loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
   loadFundingOrganizationErrored: false,
+  reviewerEstimateConsumptiveUseMutationStatus: {
+    isLoading: false,
+    hasErrored: false,
+  },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -124,6 +132,7 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
+  | ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction
   | ReviewerConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
@@ -219,6 +228,14 @@ export interface ApplicantConsumptiveUseEstimatedAction {
   };
 }
 
+export interface ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction {
+  type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED';
+  payload: {
+    isLoading: boolean;
+    hasErrored: boolean;
+  };
+}
+
 export interface ReviewerConsumptiveUseEstimatedAction {
   type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED';
   payload: {
@@ -229,7 +246,6 @@ export interface ReviewerConsumptiveUseEstimatedAction {
     controlDataCollection: PointEtDataCollection;
   };
 }
-
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
   payload: {
@@ -326,6 +342,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
       return onApplicantConsumptiveUseEstimated(draftState, action);
+    case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED':
+      return onReviewerConsumptiveUseEstimateMutationStatusUpdated(draftState, action);
     case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED':
       return onReviewerConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
@@ -625,6 +643,16 @@ const onApplicantConsumptiveUseEstimated = (
   updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
 
+  return draftState;
+};
+
+const onReviewerConsumptiveUseEstimateMutationStatusUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction,
+): ConservationApplicationState => {
+  draftState.reviewerEstimateConsumptiveUseMutationStatus = {
+    ...payload,
+  };
   return draftState;
 };
 
