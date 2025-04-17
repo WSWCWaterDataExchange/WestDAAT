@@ -60,10 +60,8 @@ export interface ConservationApplicationState {
   loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
   loadFundingOrganizationErrored: boolean;
-  reviewerEstimateConsumptiveUseMutationStatus: {
-    isLoading: boolean;
-    hasErrored: boolean;
-  };
+  isLoadingReviewerConsumptiveUseEstimate: boolean;
+  reviewerConsumptiveUseEstimateHasErrored: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -114,10 +112,8 @@ export const defaultState = (): ConservationApplicationState => ({
   loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
   loadFundingOrganizationErrored: false,
-  reviewerEstimateConsumptiveUseMutationStatus: {
-    isLoading: false,
-    hasErrored: false,
-  },
+  isLoadingReviewerConsumptiveUseEstimate: false,
+  reviewerConsumptiveUseEstimateHasErrored: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -659,9 +655,8 @@ const onReviewerConsumptiveUseEstimateMutationStatusUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction,
 ): ConservationApplicationState => {
-  draftState.reviewerEstimateConsumptiveUseMutationStatus = {
-    ...payload,
-  };
+  draftState.isLoadingReviewerConsumptiveUseEstimate = payload.isLoading;
+  draftState.reviewerConsumptiveUseEstimateHasErrored = payload.hasErrored;
   return draftState;
 };
 
