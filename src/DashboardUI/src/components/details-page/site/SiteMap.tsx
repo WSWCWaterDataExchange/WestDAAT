@@ -2,7 +2,7 @@ import React from 'react';
 import { useMemo } from 'react';
 import DetailsMap from '../DetailsMap';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import useSiteDigestMapPopup from '../../../hooks/map-popups/useSiteDigestMapPopup';
+import useUnifiedDigestPopup from "../../../hooks/map-popups/useUnifiedDigestPopup";
 import { useSiteDetailsContext } from './Provider';
 import MapProvider from '../../../contexts/MapProvider';
 import { useMapLegend } from './hooks/useMapLegend';
@@ -28,7 +28,7 @@ function Layout() {
     };
   }, [locationsQuery.data]);
 
-  useSiteDigestMapPopup();
+  useUnifiedDigestPopup()
   useMapLegend();
 
   if (locationsQuery.isLoading || !featureCollection) return null;

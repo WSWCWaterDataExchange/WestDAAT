@@ -6,6 +6,7 @@ interface MapPopupCardProps {
   children: {
     header?: ReactNode;
     body?: ReactNode;
+    footer?: ReactNode;
   };
   onClosePopup: () => void;
 }
@@ -19,6 +20,9 @@ function MapPopupCard(props: MapPopupCardProps) {
         </div>
       </CardHeader>
       <div className="card-body">{props.children.body}</div>
+      {props.children.footer && (
+        <div className="card-footer d-flex justify-content-end">{props.children.footer}</div>
+      )}
     </Card>
   );
 }
