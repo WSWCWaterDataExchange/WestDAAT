@@ -71,6 +71,16 @@ function ApplicationReviewPage() {
     });
   };
 
+  const rightButtonDisabled = useMemo(() => {
+    return isOnMapPage
+      ? !state.canEstimateConsumptiveUse || state.reviewerEstimateConsumptiveUseMutationStatus.isLoading
+      : false;
+  }, [isOnMapPage, state.canEstimateConsumptiveUse, state.reviewerEstimateConsumptiveUseMutationStatus.isLoading]);
+
+  const rightButtonIsLoading = useMemo(() => {
+    return isOnMapPage ? state.reviewerEstimateConsumptiveUseMutationStatus.isLoading : false;
+  }, [isOnMapPage, state.reviewerEstimateConsumptiveUseMutationStatus.isLoading]);
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -80,10 +90,8 @@ function ApplicationReviewPage() {
         centerTextIsLoading={false}
         displayWaterIcon={false}
         rightButtonDisplayed={rightButtonDisplayed}
-        rightButtonDisabled={
-          !state.canEstimateConsumptiveUse || state.reviewerEstimateConsumptiveUseMutationStatus.isLoading
-        }
-        rightButtonIsLoading={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
+        rightButtonDisabled={rightButtonDisabled}
+        rightButtonIsLoading={rightButtonIsLoading}
         rightButtonText={rightButtonText}
         rightButtonIcon={mdiArrowRight}
         onRightButtonClick={onRightButtonClick}
