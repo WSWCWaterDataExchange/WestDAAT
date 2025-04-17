@@ -21,17 +21,21 @@ internal class ValidationEngine : IValidationEngine
 
     private readonly IApplicationAccessor _applicationAccessor;
 
+    private readonly IUserAccessor _userAccessor;
+
     public ValidationEngine(
         IContextUtility contextUtility,
         ISecurityUtility securityUtility,
         IOrganizationAccessor organizationAccessor,
-        IApplicationAccessor applicationAccessor
+        IApplicationAccessor applicationAccessor,
+        IUserAccessor userAccessor
     )
     {
         _contextUtility = contextUtility;
         _securityUtility = securityUtility;
         _organizationAccessor = organizationAccessor;
         _applicationAccessor = applicationAccessor;
+        _userAccessor = userAccessor;
     }
 
     public async Task<ErrorBase> Validate(RequestBase request)
@@ -42,6 +46,7 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
+            EventBase req => ValidateEvent(req, context),
             FileSasTokenRequestBase req => await ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
@@ -69,7 +74,7 @@ internal class ValidationEngine : IValidationEngine
     private ErrorBase ValidateOrganizationApplicationDashboardLoadRequest(OrganizationApplicationDashboardLoadRequest request, ContextBase context)
     {
         // check if user is a global admin first
-        var rolePermissions = _securityUtility.Get(new DTO.PermissionsGetRequest
+        var rolePermissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest
         {
             Context = context
         });
@@ -85,7 +90,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationIdFilter.Value,
@@ -143,7 +148,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
         }
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = submittedApplicationResponse.FundingOrganizationId
@@ -163,17 +168,37 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
+            ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
+            ReviewerEstimateConsumptiveUseRequest req => await ValidateReviewerEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
+            WaterConservationApplicationRecommendationRequest req => await ValidateWaterConservationApplicationRecommendationRequest(req, context),
+            WaterConservationApplicationApprovalRequest req => await ValidateWaterConservationApplicationApprovalRequest(req, context),
+            WaterConservationApplicationNoteCreateRequest req => await ValidateApplicationNoteCreateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
+    private ErrorBase ValidateEvent(EventBase request, ContextBase context)
+    {
+        // Must be system context to process events
+        _contextUtility.GetRequiredContext<SystemContext>();
+
+        return request switch
+        {
+            WaterConservationApplicationSubmittedEvent => null,
+            WaterConservationApplicationRecommendedEvent => null,
+            WaterConservationApplicationApprovedEvent => null,
+            _ => throw new NotImplementedException(
+                $"Validation for event type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private async Task<ErrorBase> ValidateApplicantEstimateConsumptiveUseRequest(ApplicantEstimateConsumptiveUseRequest request,
         ContextBase context)
     {
         // verify user requesting an estimate is linking it to an application they own
@@ -199,7 +224,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt)).ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
         {
@@ -207,7 +232,76 @@ internal class ValidationEngine : IValidationEngine
             {
                 if (polygonGeometries[i].Intersects(polygonGeometries[j]))
                 {
-                    return CreateValidationError(request, nameof(EstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
+                    return CreateValidationError(request, nameof(ApplicantEstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateReviewerEstimateConsumptiveUseRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
+    {
+        // user must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // application must exist and must have been submitted
+        var applicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            ApplicationId = request.WaterConservationApplicationId,
+            HasSubmission = true,
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(applicationExistsRequest);
+
+        if (!applicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // user must have permission to update applications in the application's linked funding organization
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = applicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // if user provides an id in an attempt to update an existing location, then a location must already exist with that id
+        var requestLocationIds = request.Polygons
+            .Where(location => location.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(location => location.WaterConservationApplicationEstimateLocationId.Value);
+
+        var databaseLocationIds = applicationExistsResponse.EstimateLocationIds;
+
+        var requestLocationIdsNotInDatabase = requestLocationIds.Except(databaseLocationIds);
+
+        if (requestLocationIdsNotInDatabase.Any())
+        {
+            return CreateNotFoundError(context, $"EstimateLocations with Ids {string.Join(',', requestLocationIdsNotInDatabase)}");
+        }
+
+        // control location must not intersect with any polygons
+        // polygons must not intersect with each other
+        var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon)
+            .ToArray();
+
+        for (int i = 0; i < polygonGeometries.Length; i++)
+        {
+            if (controlLocationGeometry.Within(polygonGeometries[i]))
+            {
+                return CreateValidationError(request, nameof(ReviewerEstimateConsumptiveUseRequest.ControlLocation), "Control Location must not intersect with any polygons.");
+            }
+
+            for (int j = i + 1; j < polygonGeometries.Length; j++)
+            {
+                if (polygonGeometries[i].Intersects(polygonGeometries[j]))
+                {
+                    return CreateValidationError(request, nameof(ReviewerEstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
                 }
             }
         }
@@ -266,19 +360,104 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify application is in review
-        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
         {
-            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), "Application must be in review to be updated.");
+            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId),
+                "Application must be in review to be updated.");
         }
 
         // verify user belongs to the funding organization that is handling the application
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
         });
 
         if (!orgPermissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationRecommendationRequest(WaterConservationApplicationRecommendationRequest request, ContextBase context)
+    {
+        // verify the user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify the application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify the application is in review
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
+                "Application must be in review status to receive a recommendation for final review.");
+        }
+
+        // verify the user has permissions to submit a recommendation
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationRecommendation))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationApprovalRequest(WaterConservationApplicationApprovalRequest request, ContextBase context)
+    {
+        // verify the user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify the application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify the application has been through Technical Review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationApprovalRequest.WaterConservationApplicationId),
+                "Application must be in final review status to be approved or denied by a funding organization member.");
+        }
+
+        // verify the user has permissions to approve/deny an application
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationApprove))
         {
             return CreateForbiddenError(request, context);
         }
@@ -300,7 +479,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationDetailsListRequest(OrganizationDetailsListRequest request, ContextBase context)
     {
-        var permissionsRequest = new DTO.PermissionsGetRequest()
+        var permissionsRequest = new DTO.UserPermissionsGetRequest()
         {
             Context = context
         };
@@ -354,8 +533,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to add themselves to an organization since a user can only be in a single organization.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -379,6 +558,25 @@ internal class ValidationEngine : IValidationEngine
             return CreateConflictError(request, context, nameof(UserOrganization), request.UserId, request.OrganizationId);
         }
 
+        // Verify the user's email domain matches the organization's
+        var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
+            { UserId = request.UserId });
+        var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
+            { OrganizationId = request.OrganizationId });
+
+        // There is validation to ensure the user email includes an '@'.
+        // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
+        var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1];
+        var organizationEmailDomain = organizationEmailDomainResponse.Organization.EmailDomain.Contains('@')
+            ? organizationEmailDomainResponse.Organization.EmailDomain.Split("@")[1]
+            : organizationEmailDomainResponse.Organization.EmailDomain;
+
+        if (userEmailDomain.ToLower() != organizationEmailDomain.ToLower())
+        {
+            var errorMessage = "User's email domain does not match the organization's email domain.";
+            return CreateValidationError(request, "emailDomain", errorMessage);
+        }
+
         return null;
     }
 
@@ -391,8 +589,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to remove themselves from an organization.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -417,8 +615,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to modify their own organization role.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -460,7 +658,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationUserListRequest(OrganizationUserListRequest request, ContextBase context)
     {
-        var organizationPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var organizationPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -476,7 +674,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateUserListRequest(ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
 
         // Must have permission at the non-organization level (Global Admin, etc)
         if (!permissions.Contains(Permissions.UserList))
@@ -501,9 +699,9 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateUserSearchRequest(ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = null // Any organization
@@ -589,7 +787,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // Check if current user is a member of the application funding organization
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = documentExistsResponse.FundingOrganizationId
@@ -603,6 +801,39 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicationNoteCreateRequest(WaterConservationApplicationNoteCreateRequest request, ContextBase context)
+    {
+        // verify user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+        
+        // verify user belongs to the funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationNoteCreate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,

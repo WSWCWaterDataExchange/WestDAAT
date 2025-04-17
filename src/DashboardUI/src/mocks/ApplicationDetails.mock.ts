@@ -1,5 +1,7 @@
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
+import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export const applicationDetailsMock = (): ApplicationDetails => ({
   id: 'application-guid',
@@ -12,28 +14,43 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateDollars: 100,
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
-    totalAverageYearlyConsumptionEtAcreFeet: 300,
+    cumulativeTotalEtInAcreFeet: 300,
+    cumulativeNetEtInAcreFeet: 250,
     locations: [
       {
         id: 'location-guid',
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        drawToolType: DrawToolType.Rectangle,
         polygonAreaInAcres: 1,
         additionalDetails: 'I, the user, have some things to say about this field.',
-        consumptiveUses: [
+        waterMeasurements: [
           {
             id: 'consumptive-use-guid',
             year: 2025,
-            etInInches: 400,
+            totalEtInInches: 400,
+            effectivePrecipitationInInches: null,
+            netEtInInches: null,
           },
         ],
       },
     ],
+    controlLocation: {
+      id: 'control-location-guid',
+      pointWkt: 'POINT(0 0)',
+      waterMeasurements: [
+        {
+          id: 'control-location-water-measurement-guid',
+          year: 2025,
+          totalEtInInches: 1,
+        },
+      ],
+    },
   },
   submission: {
     id: 'submission-guid',
     submittedDate: '2025-01-01T00:00:00.0000000 +00:00',
-    acceptedDate: null,
-    rejectedDate: null,
+    approvedDate: null,
+    deniedDate: null,
 
     agentName: 'Agent Name',
     agentEmail: 'agent@email',
@@ -75,4 +92,5 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
       description: 'Document description',
     },
   ],
+  status: ConservationApplicationStatus.InTechnicalReview,
 });

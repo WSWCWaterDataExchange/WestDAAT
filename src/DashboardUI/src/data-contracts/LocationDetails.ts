@@ -1,9 +1,11 @@
-import { ConsumptiveUseDetails } from './ConsumptiveUseDetails';
+import { LocationWaterMeasurementDetails } from './LocationWaterMeasurementDetails';
+import { DrawToolType } from './DrawToolType';
 
 export interface LocationDetails {
   id: string;
   polygonWkt: string;
+  drawToolType: DrawToolType;
   polygonAreaInAcres: number;
   additionalDetails: string | null;
-  consumptiveUses: ConsumptiveUseDetails[];
+  waterMeasurements: LocationWaterMeasurementDetails[];
 }

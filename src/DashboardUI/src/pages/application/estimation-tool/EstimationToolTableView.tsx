@@ -64,8 +64,8 @@ function EstimationToolTableView() {
                         waterConservationApplicationEstimateLocationId:
                           field.waterConservationApplicationEstimateLocationId!,
                         polygonWkt: field.polygonWkt!,
-                        averageYearlyEtInInches: field.averageYearlyEtInInches,
-                        averageYearlyEtInAcreFeet: field.averageYearlyEtInAcreFeet,
+                        averageYearlyTotalEtInInches: field.averageYearlyEtInInches,
+                        averageYearlyTotalEtInAcreFeet: field.averageYearlyEtInAcreFeet,
                         datapoints: field.datapoints,
                       }}
                       fieldAcreage={field.acreage!}

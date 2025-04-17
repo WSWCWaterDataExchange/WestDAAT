@@ -1,26 +1,37 @@
+import Icon from '@mdi/react';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import { mdiCircle } from '@mdi/js';
+import {
+  ConservationApplicationStatus,
+  ConservationApplicationStatusDisplayNames,
+  getApplicationStatusIconClass,
+} from '../../../data-contracts/ConservationApplicationStatus';
 
-interface ApplicationReviewHeaderProps {
-  perspective: ApplicationReviewPerspective;
+export interface ApplicationReviewHeaderProps {
+  additionalText?: string;
 }
 
 function ApplicationReviewHeader(props: ApplicationReviewHeaderProps) {
-  const { perspective } = props;
   const { state } = useConservationApplicationContext();
 
-  const pageTitleOptions: Record<ApplicationReviewPerspective, string> = {
-    applicant: 'New Application',
-    reviewer: 'Application',
-  };
-
   return (
-    <>
-      <div className="mb-3">
-        <span className="fs-4 fw-bold">{pageTitleOptions[perspective]}</span>
+    <div className="my-4">
+      <div className="d-flex">
+        <h1 className="fs-4 fw-bold">
+          Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
+        </h1>
       </div>
-
-      <div className="d-flex gap-3 mb-4">
+      {state.conservationApplication.status !== ConservationApplicationStatus.Unknown && (
+        <div className="d-flex align-items-center gap-2 mb-2">
+          <Icon
+            size={0.7}
+            path={mdiCircle}
+            className={`flex-shrink-0 ` + getApplicationStatusIconClass(state.conservationApplication.status)}
+          />
+          {ConservationApplicationStatusDisplayNames[state.conservationApplication.status]}
+        </div>
+      )}
+      <div className="d-flex gap-3">
         <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
 
         <span className="fw-bold">
@@ -30,13 +41,10 @@ function ApplicationReviewHeader(props: ApplicationReviewHeaderProps) {
         <span className="fw-bold">Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
       </div>
 
-      <div className="mb-4">
-        <span>
-          Complete the below fields in order to submit your application to your state agency for verification. Be sure
-          everything is filled out accurately and truthfully.
-        </span>
+      <div className="mb-4 mt-2">
+        <span>{props.additionalText}</span>
       </div>
-    </>
+    </div>
   );
 }
 

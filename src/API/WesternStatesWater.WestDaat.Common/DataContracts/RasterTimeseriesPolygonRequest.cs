@@ -16,7 +16,7 @@ public class RasterTimeSeriesPolygonRequest
     /// </summary>
     public DateOnly DateRangeEnd { get; set; }
 
-    public NetTopologySuite.Geometries.Geometry Geometry { get; set; }
+    public NetTopologySuite.Geometries.Polygon Geometry { get; set; }
 
     public RasterTimeSeriesInterval Interval { get; set; }
 

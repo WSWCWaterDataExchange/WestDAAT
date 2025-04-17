@@ -17,6 +17,9 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { PartialPointData } from '../data-contracts/CombinedPointData';
+import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -33,19 +36,29 @@ export interface ConservationApplicationState {
     compensationRateModel: string | undefined;
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
-    totalAverageYearlyEtAcreFeet: number | undefined;
+    cumulativeTotalEtInAcreFeet: number | undefined;
+    cumulativeNetEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
+    controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
+    doesControlLocationOverlapWithPolygons: boolean;
     // derived/computed state
+    isDirty: boolean;
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
+    status: ConservationApplicationStatus;
   };
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
+  isLoadingApplication: boolean;
+  loadApplicationErrored: boolean;
+  isLoadingFundingOrganization: boolean;
+  loadFundingOrganizationErrored: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -54,8 +67,8 @@ export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   dashboardApplicationsStatistics: {
     submittedApplications: null,
-    acceptedApplications: null,
-    rejectedApplications: null,
+    approvedApplications: null,
+    deniedApplications: null,
     inReviewApplications: null,
     cumulativeEstimatedSavingsAcreFeet: null,
     totalObligationDollars: null,
@@ -72,18 +85,30 @@ export const defaultState = (): ConservationApplicationState => ({
     compensationRateModel: undefined,
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
-    totalAverageYearlyEtAcreFeet: undefined,
+    cumulativeTotalEtInAcreFeet: undefined,
+    cumulativeNetEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
+    controlLocation: undefined,
     doPolygonsOverlap: false,
+    doesControlLocationOverlapWithPolygons: false,
+    isDirty: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
     supportingDocuments: [],
     reviewerNotes: [],
+    reviewPipeline: {
+      reviewSteps: [],
+    },
+    status: ConservationApplicationStatus.Unknown,
   },
   isCreatingApplication: false,
   isUploadingDocument: false,
+  isLoadingApplication: false,
+  loadApplicationErrored: false,
+  isLoadingFundingOrganization: false,
+  loadFundingOrganizationErrored: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -92,17 +117,23 @@ export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | DashboardApplicationsFilteredAction
   | EstimationToolPageLoadedAction
+  | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
+  | FundingOrganizationLoadErrored
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction
+  | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
+  | ApplicationSavedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction
-  | ApplicationLoadedAction;
+  | ApplicationLoadingAction
+  | ApplicationLoadedAction
+  | ApplicationLoadErroredAction
+  | ApplicationReviewerNoteAddedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -125,6 +156,10 @@ export interface EstimationToolPageLoadedAction {
   };
 }
 
+export interface FundingOrganizationLoadingAction {
+  type: 'FUNDING_ORGANIZATION_LOADING';
+}
+
 export interface FundingOrganizationLoadedAction {
   type: 'FUNDING_ORGANIZATION_LOADED';
   payload: {
@@ -135,6 +170,10 @@ export interface FundingOrganizationLoadedAction {
     dateRangeEnd: Date;
     compensationRateModel: string;
   };
+}
+
+export interface FundingOrganizationLoadErrored {
+  type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -161,10 +200,10 @@ export interface ApplicationCreatedAction {
   };
 }
 
-export interface ConsumptiveUseEstimatedAction {
-  type: 'CONSUMPTIVE_USE_ESTIMATED';
+export interface ApplicantConsumptiveUseEstimatedAction {
+  type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED';
   payload: {
-    totalAverageYearlyEtAcreFeet: number;
+    cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
     dataCollections: PolygonEtDataCollection[];
   };
@@ -175,6 +214,10 @@ export interface ApplicationSubmissionFormUpdatedAction {
   payload: {
     formValues: ApplicationSubmissionFormData;
   };
+}
+
+export interface ApplicationSavedAction {
+  type: 'APPLICATION_SAVED';
 }
 
 export interface ApplicationDocumentUpdatedAction {
@@ -206,11 +249,27 @@ export interface ApplicationDocumentRemovedAction {
   };
 }
 
+export interface ApplicationLoadingAction {
+  type: 'APPLICATION_LOADING';
+}
+
 export interface ApplicationLoadedAction {
   type: 'APPLICATION_LOADED';
   payload: {
     application: ApplicationDetails;
     notes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
+  };
+}
+
+export interface ApplicationLoadErroredAction {
+  type: 'APPLICATION_LOAD_ERRORED';
+}
+
+export interface ApplicationReviewerNoteAddedAction {
+  type: 'APPLICATION_NOTE_ADDED';
+  payload: {
+    note: ApplicationReviewNote;
   };
 }
 
@@ -234,18 +293,24 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onDashboardApplicationsFiltered(draftState, action);
     case 'ESTIMATION_TOOL_PAGE_LOADED':
       return onEstimationToolPageLoaded(draftState, action);
+    case 'FUNDING_ORGANIZATION_LOADING':
+      return onFundingOrganizationLoading(draftState);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
+    case 'FUNDING_ORGANIZATION_LOAD_ERRORED':
+      return onFundingOrganizationLoadErrored(draftState);
     case 'APPLICATION_CREATED':
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
-    case 'CONSUMPTIVE_USE_ESTIMATED':
-      return onConsumptiveUseEstimated(draftState, action);
+    case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
+      return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
+    case 'APPLICATION_SAVED':
+      return onApplicationUpdatesSaved(draftState);
     case 'APPLICATION_DOCUMENT_UPDATED':
       return onApplicationDocumentUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPLOADING':
@@ -254,8 +319,14 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
       return onApplicationDocumentRemoved(draftState, action);
+    case 'APPLICATION_LOADING':
+      return onApplicationLoading(draftState);
     case 'APPLICATION_LOADED':
       return onApplicationLoaded(draftState, action);
+    case 'APPLICATION_LOAD_ERRORED':
+      return onApplicationLoadErrored(draftState);
+    case 'APPLICATION_NOTE_ADDED':
+      return onApplicationReviewerNoteAdded(draftState, action);
   }
 };
 
@@ -283,8 +354,12 @@ const onDashboardApplicationsFiltered = (
 function calculateApplicationStatistics(applications: ApplicationDashboardListItem[]): ApplicationDashboardStatistics {
   const submittedApps = applications.length;
   const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Approved).length;
-  const inReviewApps = applications.filter((app) => app?.status === ConservationApplicationStatus.InReview).length;
-  const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
+  const inTechReview = applications.filter(
+    (app) => app?.status === ConservationApplicationStatus.InTechnicalReview,
+  ).length;
+  const inFinalRevew = applications.filter((app) => app?.status === ConservationApplicationStatus.InFinalReview).length;
+  const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Denied).length;
+  const inReviewApps = inTechReview + inFinalRevew;
   const waterSavings = applications
     .filter((app) => app?.status === ConservationApplicationStatus.Approved)
     .filter((app) => app?.compensationRateUnits === CompensationRateUnits.AcreFeet)
@@ -295,8 +370,8 @@ function calculateApplicationStatistics(applications: ApplicationDashboardListIt
 
   return {
     submittedApplications: submittedApps,
-    acceptedApplications: approvedApps,
-    rejectedApplications: rejectedApps,
+    approvedApplications: approvedApps,
+    deniedApplications: rejectedApps,
     inReviewApplications: inReviewApps,
     cumulativeEstimatedSavingsAcreFeet: waterSavings,
     totalObligationDollars: totalObligation,
@@ -313,6 +388,12 @@ const onEstimationToolPageLoaded = (
   return draftState;
 };
 
+const onFundingOrganizationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.isLoadingFundingOrganization = true;
+  draftState.loadFundingOrganizationErrored = false;
+  return draftState;
+};
+
 const onFundingOrganizationLoaded = (
   draftState: ConservationApplicationState,
   { payload }: FundingOrganizationLoadedAction,
@@ -326,8 +407,17 @@ const onFundingOrganizationLoaded = (
   application.dateRangeEnd = payload.dateRangeEnd;
   application.compensationRateModel = payload.compensationRateModel;
 
+  draftState.isLoadingFundingOrganization = false;
+  draftState.loadFundingOrganizationErrored = false;
+
   checkCanEstimateConsumptiveUse(draftState);
 
+  return draftState;
+};
+
+const onFundingOrganizationLoadErrored = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.loadFundingOrganizationErrored = true;
+  draftState.isLoadingFundingOrganization = false;
   return draftState;
 };
 
@@ -376,13 +466,13 @@ const onEstimationFormUpdated = (
   return draftState;
 };
 
-const onConsumptiveUseEstimated = (
+const onApplicantConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
-  { payload }: ConsumptiveUseEstimatedAction,
+  { payload }: ApplicantConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 
-  application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
+  application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
   // combine polygon data
@@ -393,8 +483,8 @@ const onConsumptiveUseEstimated = (
     polygon.fieldName = `Field ${i + 1}`;
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
-    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyEtInInches;
-    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyEtInAcreFeet;
+    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
@@ -415,6 +505,13 @@ const onApplicationFormUpdated = (
 
   computeCombinedPolygonData(draftState);
 
+  draftState.conservationApplication.isDirty = true;
+
+  return draftState;
+};
+
+const onApplicationUpdatesSaved = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.isDirty = false;
   return draftState;
 };
 
@@ -425,9 +522,12 @@ const onApplicationDocumentUpdated = (
   const document = draftState.conservationApplication.supportingDocuments.find(
     (doc) => doc.blobName === payload.blobName,
   );
+
   if (document) {
     document.description = payload.description;
   }
+
+  draftState.conservationApplication.isDirty = true;
 
   return draftState;
 };
@@ -448,6 +548,7 @@ const onApplicationDocumentUploaded = (
     ...draftState.conservationApplication.supportingDocuments,
     ...payload.uploadedDocuments,
   ];
+  draftState.conservationApplication.isDirty = true;
   return draftState;
 };
 
@@ -459,6 +560,13 @@ const onApplicationDocumentRemoved = (
     (doc) => doc.blobName !== payload.removedBlobName,
   );
   draftState.conservationApplication.supportingDocuments = filteredDocuments;
+  draftState.conservationApplication.isDirty = true;
+  return draftState;
+};
+
+const onApplicationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.isLoadingApplication = true;
+  draftState.loadApplicationErrored = false;
   return draftState;
 };
 
@@ -477,7 +585,8 @@ const onApplicationLoaded = (
 
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
-  draftApplication.totalAverageYearlyEtAcreFeet = application.estimate.totalAverageYearlyConsumptionEtAcreFeet;
+  draftApplication.cumulativeTotalEtInAcreFeet = application.estimate.cumulativeTotalEtInAcreFeet;
+  draftApplication.cumulativeNetEtInAcreFeet = application.estimate.cumulativeNetEtInAcreFeet ?? undefined;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,
@@ -504,10 +613,11 @@ const onApplicationLoaded = (
     (location, index): PartialPolygonData => ({
       waterConservationApplicationEstimateLocationId: location.id,
       polygonWkt: location.polygonWkt,
+      drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
       fieldName: `Field ${index + 1}`,
-      datapoints: location.consumptiveUses,
+      datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
       averageYearlyEtInAcreFeet: undefined,
@@ -515,6 +625,24 @@ const onApplicationLoaded = (
     }),
   );
   draftApplication.doPolygonsOverlap = false;
+
+  const controlLocation = application.estimate.controlLocation;
+  if (controlLocation) {
+    draftApplication.controlLocation = {
+      waterConservationApplicationEstimateControlLocationId: controlLocation.id,
+      pointWkt: controlLocation.pointWkt,
+      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+        (measurement): GeometryEtDatapoint => ({
+          year: measurement.year,
+          totalEtInInches: measurement.totalEtInInches,
+          effectivePrecipitationInInches: null,
+          netEtInInches: null,
+        }),
+      ),
+    };
+  }
+  draftApplication.doesControlLocationOverlapWithPolygons = false;
+
   draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
     (sum, location) => sum + location.polygonAreaInAcres,
     0,
@@ -529,11 +657,27 @@ const onApplicationLoaded = (
   );
   draftApplication.reviewerNotes = payload.notes;
 
+  draftApplication.reviewPipeline = payload.reviewPipeline;
+  draftApplication.status = application.status;
+
+  draftState.isLoadingApplication = false;
+  draftState.loadApplicationErrored = false;
+  draftState.conservationApplication.isDirty = false;
+
+  return draftState;
+};
+
+const onApplicationLoadErrored = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.loadApplicationErrored = true;
+  draftState.isLoadingApplication = false;
   return draftState;
 };
 
 const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
+
+  const dollarsHasValue = !!app.desiredCompensationDollars;
+  const unitsHasValue = !!app.desiredCompensationUnits;
 
   draftState.canEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
@@ -542,6 +686,8 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.dateRangeStart &&
     !!app.dateRangeEnd &&
     !!app.estimateLocations &&
+    // cannot estimate consumptive use if the user has provided *only one* of dollars or units
+    ((dollarsHasValue && unitsHasValue) || (!dollarsHasValue && !unitsHasValue)) &&
     app.estimateLocations.length > 0 &&
     app.estimateLocations.length <= 20 &&
     app.estimateLocations.every((p) => p.acreage! <= 50000) &&
@@ -560,7 +706,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.dateRangeEnd &&
     !!app.desiredCompensationDollars &&
     !!app.desiredCompensationUnits &&
-    !!app.totalAverageYearlyEtAcreFeet &&
+    !!app.cumulativeTotalEtInAcreFeet &&
     !!app.conservationPayment &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
@@ -569,7 +715,8 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 };
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
-  draftState.conservationApplication.totalAverageYearlyEtAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
   // this `reset` method is activated when the user:
@@ -584,6 +731,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
     const polygonPostMapSelection: MapSelectionPolygonData = {
       polygonWkt: polygon.polygonWkt!,
+      drawToolType: polygon.drawToolType!,
       acreage: polygon.acreage!,
     };
 
@@ -625,6 +773,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       // carry over existing data
       waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygon.polygonWkt,
+      drawToolType: polygon.drawToolType,
       acreage: polygon.acreage,
       averageYearlyEtInInches: polygon.averageYearlyEtInInches,
       averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,
@@ -638,4 +787,12 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
   }
 
   draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
+};
+
+const onApplicationReviewerNoteAdded = (
+  draftState: ConservationApplicationState,
+  action: ApplicationReviewerNoteAddedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.reviewerNotes.push(action.payload.note);
+  return draftState;
 };

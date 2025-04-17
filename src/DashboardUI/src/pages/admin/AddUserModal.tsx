@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal, { ModalProps } from 'react-bootstrap/Modal';
-import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
-import { Role, RoleDisplayNames } from '../../config/role';
-import { useMutation, useQueryClient } from 'react-query';
-import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
+import { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/esm/Alert';
-import { addOrganizationMember } from '../../accessors/organizationAccessor';
+import Modal, { ModalProps } from 'react-bootstrap/Modal';
+import { useMutation, useQueryClient } from 'react-query';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import { toast } from 'react-toastify';
+import { addOrganizationMember } from '../../accessors/organizationAccessor';
+import { searchUsers } from '../../accessors/userAccessor';
+import { Role, RoleDisplayNames } from '../../config/role';
+import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
 interface AddUserModalProps extends ModalProps {
@@ -44,13 +44,22 @@ function AddUserModal(props: AddUserModalProps) {
         autoClose: 1000,
       });
     },
-    onError: (error: { status?: number }) => {
+    onError: (error: { status?: number; errors?: any }) => {
       if (error?.status === 409) {
         toast.error('User is already a member of an organization', {
           position: 'top-center',
           theme: 'colored',
           autoClose: 3000,
         });
+      } else if (error.errors['emailDomain']) {
+        toast.error(
+          `User must have an ${props.organization!.emailDomain} email address to be added to this organization.`,
+          {
+            position: 'top-center',
+            theme: 'colored',
+            autoClose: 3000,
+          },
+        );
       } else {
         toast.error('Error adding user to organization', {
           position: 'top-center',

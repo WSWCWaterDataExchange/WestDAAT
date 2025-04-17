@@ -18,7 +18,6 @@ export function AccountLayout() {
       </div>
 
       <SiteFooter />
-      <ToastContainer />
     </div>
   );
 }

@@ -8,6 +8,9 @@ import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { DrawToolType } from '../data-contracts/DrawToolType';
+import { ReviewStepStatus } from '../data-contracts/ReviewStepStatus';
+import { ReviewStepType } from '../data-contracts/ReviewStepType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -43,8 +46,12 @@ describe('ConservationApplicationState reducer', () => {
     // Arrange
     state.dashboardApplications = [
       { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Approved },
-      { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Rejected },
-      { ...mockApplication, applicationId: 'application-guid-3', status: ConservationApplicationStatus.InReview },
+      { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Denied },
+      {
+        ...mockApplication,
+        applicationId: 'application-guid-3',
+        status: ConservationApplicationStatus.InTechnicalReview,
+      },
       { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Approved },
       {
         ...mockApplication,
@@ -65,8 +72,8 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 4,
-      acceptedApplications: 2,
-      rejectedApplications: 1,
+      approvedApplications: 2,
+      deniedApplications: 1,
       inReviewApplications: 1,
       cumulativeEstimatedSavingsAcreFeet: 300,
       totalObligationDollars: 400,
@@ -87,8 +94,8 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.dashboardApplications).toEqual([]);
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 0,
-      acceptedApplications: 0,
-      rejectedApplications: 0,
+      approvedApplications: 0,
+      deniedApplications: 0,
       inReviewApplications: 0,
       cumulativeEstimatedSavingsAcreFeet: 0,
       totalObligationDollars: 0,
@@ -184,6 +191,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -196,6 +204,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
+    expect(newState.conservationApplication.estimateLocations[0].drawToolType).toEqual(DrawToolType.Freeform);
     expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
@@ -233,6 +242,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt,
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -242,20 +252,24 @@ describe('ConservationApplicationState reducer', () => {
 
     // Act
     newState = reducer(newState, {
-      type: 'CONSUMPTIVE_USE_ESTIMATED',
+      type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
       payload: {
-        totalAverageYearlyEtAcreFeet: 100,
+        cumulativeTotalEtInAcreFeet: 100,
         conservationPayment: 200,
         dataCollections: [
           {
             waterConservationApplicationEstimateLocationId: 'location-guid',
             polygonWkt: polygonWkt,
-            averageYearlyEtInAcreFeet: 50,
-            averageYearlyEtInInches: 400,
+            averageYearlyTotalEtInAcreFeet: 50,
+            averageYearlyTotalEtInInches: 400,
+            averageYearlyNetEtInInches: null,
+            averageYearlyNetEtInAcreFeet: null,
             datapoints: [
               {
                 year: 2025,
-                etInInches: 400,
+                totalEtInInches: 400,
+                effectivePrecipitationInInches: null,
+                netEtInInches: null,
               },
             ],
           },
@@ -264,7 +278,7 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
+    expect(newState.conservationApplication.cumulativeTotalEtInAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
     expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
     expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
@@ -290,7 +304,21 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     const form = newState.conservationApplication.applicationSubmissionForm;
     expect(form.landownerName).toEqual('Bobby Hill');
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
+
+  it('saving application submission updates should update dirty flag in state', () => {
+    // Arrange
+    state.conservationApplication.isDirty = true;
+
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_SAVED'
+    });
+
+    // Assert
+    expect(newState.conservationApplication.isDirty).toBe(false);
+  })
 
   it('uploading documents should update state', () => {
     // Arrange
@@ -311,6 +339,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(uploadedDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(uploadedDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(uploadedDocument.description);
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
 
   it('removing an existing document should update state', () => {
@@ -338,6 +367,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(anotherDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(anotherDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
+    expect(newState.conservationApplication.isDirty).toBe(true);
   });
 
   it('setting document upload status should update state', () => {
@@ -398,6 +428,7 @@ describe('ConservationApplicationState reducer', () => {
 
       const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        drawToolType: DrawToolType.Freeform,
         acreage: 1,
       };
 
@@ -413,7 +444,7 @@ describe('ConservationApplicationState reducer', () => {
       shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     });
 
-    it('estimate consumptive use should be enabled when all required data is present', () => {
+    it('estimate consumptive use should be enabled when at least one map polygon is present', () => {
       // Arrange
       // Act
       let newState = reducer(state, {
@@ -449,6 +480,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -457,6 +489,83 @@ describe('ConservationApplicationState reducer', () => {
       });
 
       // Assert
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
+    });
+
+    it('estimate consumptive use should be enabled or disabled depending on the sidebar inputs', () => {
+      // Arrange - initialize page, setup map
+      let newState = reducer(state, {
+        type: 'ESTIMATION_TOOL_PAGE_LOADED',
+        payload: {
+          waterRightNativeId: 'mock-water-right-native-id',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'FUNDING_ORGANIZATION_LOADED',
+        payload: {
+          fundingOrganizationId: 'funding-organization-guid',
+          fundingOrganizationName: 'Mock Funding Organization',
+          openEtModelName: 'Mock Open ET Model',
+          dateRangeStart: new Date(2025, 0, 1),
+          dateRangeEnd: new Date(2025, 11, 31),
+          compensationRateModel: 'Mock Compensation Rate Model',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'APPLICATION_CREATED',
+        payload: {
+          waterConservationApplicationId: 'application-guid',
+          waterConservationApplicationDisplayId: 'display-id',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [
+            {
+              polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
+              acreage: 1,
+            },
+          ],
+          doPolygonsOverlap: false,
+        },
+      });
+
+      // Act / Assert
+      // estimation form has no data
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
+
+      // estimation form has partial data
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: 100,
+          desiredCompensationUnits: undefined,
+        },
+      });
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
+
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: undefined,
+          desiredCompensationUnits: CompensationRateUnits.AcreFeet,
+        },
+      });
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
+
+      // estimation form has all data
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: 100,
+          desiredCompensationUnits: CompensationRateUnits.AcreFeet,
+        },
+      });
       shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
     });
 
@@ -503,6 +612,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -519,20 +629,24 @@ describe('ConservationApplicationState reducer', () => {
       });
 
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },
@@ -563,22 +677,31 @@ describe('ConservationApplicationState reducer', () => {
         payload: {
           application: applicationDetails,
           notes: [note],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
         },
       });
 
       // Assert
       const application = newState.conservationApplication;
 
-      // application / application estimate
+      // application
       expect(application.waterConservationApplicationId).toEqual(applicationDetails.id);
       expect(application.waterRightNativeId).toEqual(applicationDetails.waterRightNativeId);
       expect(application.fundingOrganizationId).toEqual(applicationDetails.fundingOrganizationId);
 
+      // application estimate
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.totalAverageYearlyEtAcreFeet).toEqual(
-        applicationDetails.estimate.totalAverageYearlyConsumptionEtAcreFeet,
-      );
+      expect(application.cumulativeTotalEtInAcreFeet).toEqual(applicationDetails.estimate.cumulativeTotalEtInAcreFeet);
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 
       // application estimate locations
@@ -587,16 +710,34 @@ describe('ConservationApplicationState reducer', () => {
       expect(application.estimateLocations.length).toEqual(applicationDetails.estimate.locations.length);
       expect(location.waterConservationApplicationEstimateLocationId).toEqual(expectedLocation.id);
       expect(location.polygonWkt).toEqual(expectedLocation.polygonWkt);
+      expect(location.drawToolType).toEqual(expectedLocation.drawToolType);
       expect(location.acreage).toEqual(expectedLocation.polygonAreaInAcres);
       expect(location.fieldName).toEqual('Field 1');
       expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);
 
-      // application estimate location consumptive uses
+      // application estimate location water measurements
       const consumptiveUse = location.datapoints![0];
-      const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
-      expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
+      const expectedConsumptiveUse = expectedLocation.waterMeasurements[0];
+      expect(location.datapoints!.length).toEqual(expectedLocation.waterMeasurements.length);
       expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
-      expect(consumptiveUse.etInInches).toEqual(expectedConsumptiveUse.etInInches);
+      expect(consumptiveUse.totalEtInInches).toEqual(expectedConsumptiveUse.totalEtInInches);
+
+      // application estimate control location
+      const controlLocation = application.controlLocation!;
+      const expectedControlLocation = applicationDetails.estimate.controlLocation;
+      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
+      expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
+      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+
+      // application estimate control location water measurements
+      const controlLocationWaterMeasurement = controlLocation.datapoints![0];
+      const expectedControlLocationWaterMeasurement = expectedControlLocation.waterMeasurements[0];
+      expect(controlLocationWaterMeasurement.year).toEqual(expectedControlLocationWaterMeasurement.year);
+      expect(controlLocationWaterMeasurement.totalEtInInches).toEqual(
+        expectedControlLocationWaterMeasurement.totalEtInInches,
+      );
+      expect(controlLocationWaterMeasurement.effectivePrecipitationInInches).toEqual(null);
+      expect(controlLocationWaterMeasurement.netEtInInches).toEqual(null);
 
       // application supporting documents
       const document = application.supportingDocuments[0];
@@ -658,6 +799,8 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
 
+      // application dirty status
+      expect(newState.conservationApplication.isDirty).toBe(false);
     });
   });
 
@@ -671,6 +814,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -680,20 +824,24 @@ describe('ConservationApplicationState reducer', () => {
 
       // user then requests an estimate for said polygons
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: polygonWkt,
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },

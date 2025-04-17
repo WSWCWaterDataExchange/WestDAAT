@@ -11,8 +11,8 @@ import { ApplicationReviewPerspective } from '../data-contracts/ApplicationRevie
 import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
-import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
-import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
+import { ApplicantEstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseApplicantRequest';
+import { ApplicantEstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
@@ -24,6 +24,18 @@ import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-con
 import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
+import { MapPolygon } from '../data-contracts/MapPolygon';
+import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
+import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
+import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
+import { ApprovalDecision } from '../data-contracts/ApprovalDecision';
+import { WaterConservationApplicationApprovalRequest } from '../data-contracts/WaterConservationApplicationApprovalRequest';
+import { MapPoint } from '../data-contracts/MapPoint';
+import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
+import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
+import { WaterConservationApplicationNoteCreateResponse } from '../data-contracts/WaterConservationApplicationNoteCreateResponse';
+import { WaterConservationApplicationNoteCreateRequest } from '../data-contracts/WaterConservationApplicationNoteCreateRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -62,26 +74,56 @@ export const createWaterConservationApplication = async (
   return data;
 };
 
-export const estimateConsumptiveUse = async (
+export const applicantEstimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    polygonWkts: string[];
+    polygons: MapPolygon[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },
-): Promise<EstimateConsumptiveUseResponse> => {
-  const request: EstimateConsumptiveUseRequest = {
+): Promise<ApplicantEstimateConsumptiveUseResponse> => {
+  const request: ApplicantEstimateConsumptiveUseRequest = {
+    $type: 'ApplicantEstimateConsumptiveUseRequest',
     waterConservationApplicationId: fields.waterConservationApplicationId,
     waterRightNativeId: fields.waterRightNativeId,
-    polygons: fields.polygonWkts,
+    polygons: fields.polygons,
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
   };
 
   const api = await westDaatApi(context);
-  const { data } = await api.post<EstimateConsumptiveUseResponse>('Applications/EstimateConsumptiveUse', request);
+  const { data } = await api.post<ApplicantEstimateConsumptiveUseResponse>(
+    'Applications/EstimateConsumptiveUse',
+    request,
+  );
+
+  return data;
+};
+
+export const reviewerEstimateConsumptiveUse = async (
+  context: IMsalContext,
+  fields: {
+    waterConservationApplicationId: string;
+    polygons: MapPolygon[];
+    controlLocation: MapPoint;
+    updateEstimate: boolean;
+  },
+): Promise<ReviewerEstimateConsumptiveUseResponse> => {
+  const request: ReviewerEstimateConsumptiveUseRequest = {
+    $type: 'ReviewerEstimateConsumptiveUseRequest',
+    waterConservationApplicationId: fields.waterConservationApplicationId,
+    polygons: fields.polygons,
+    controlLocation: fields.controlLocation,
+    updateEstimate: fields.updateEstimate,
+  };
+
+  const api = await westDaatApi(context);
+  const { data } = await api.post<ReviewerEstimateConsumptiveUseResponse>(
+    'Applications/EstimateConsumptiveUse',
+    request,
+  );
 
   return data;
 };
@@ -110,13 +152,10 @@ export const uploadApplicationDocuments = async (
   return applicationDocuments;
 };
 
-export const downloadApplicationDocuments = async (
-  context: IMsalContext,
-  documentId: string
-): Promise<void> => {
+export const downloadApplicationDocuments = async (context: IMsalContext, documentId: string): Promise<void> => {
   const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
   await downloadFilesFromBlobStorage(sasToken, fileName);
-}
+};
 
 export const submitApplication = async (
   context: IMsalContext,
@@ -130,6 +169,7 @@ export const submitApplication = async (
   const api = await westDaatApi(context);
 
   const request: WaterConservationApplicationSubmissionRequest = {
+    $type: 'WaterConservationApplicationSubmissionRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     waterRightNativeId: data.waterRightNativeId,
     agentName: data.form.agentName,
@@ -174,7 +214,7 @@ export const updateApplicationSubmission = async (
     supportingDocuments: ApplicationDocument[];
     note: string;
   },
-): Promise<void> => {
+): Promise<WaterConservationApplicationSubmissionUpdateResponse> => {
   const api = await westDaatApi(context);
 
   const request: WaterConservationApplicationSubmissionUpdateRequest = {
@@ -210,8 +250,53 @@ export const updateApplicationSubmission = async (
     note: data.note,
   };
 
-  await api.put<void>(`Applications/${data.waterConservationApplicationId}`, request);
+  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(
+    `Applications/${data.waterConservationApplicationId}`,
+    request,
+  );
+
+  return response;
 };
+
+export const submitApplicationRecommendation = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    recommendationDecision: RecommendationDecision;
+    recommendationNotes?: string;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationRecommendationRequest = {
+    $type: 'WaterConservationApplicationRecommendationRequest',
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    recommendationDecision: data.recommendationDecision,
+    recommendationNotes: data.recommendationNotes,
+  };
+
+  await api.post<void>('Applications/Submit', request);
+};
+
+export const submitApplicationApproval = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    approvalDecision: ApprovalDecision;
+    approvalNotes: string;
+  }
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationApprovalRequest = {
+    $type: 'WaterConservationApplicationApprovalRequest',
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    approvalDecision: data.approvalDecision,
+    approvalNotes: data.approvalNotes
+  }
+
+  await api.post<void>('Applications/Submit', request);
+}
 
 export const getApplication = async (
   context: IMsalContext,
@@ -219,7 +304,7 @@ export const getApplication = async (
     applicationId: string;
     perspective: ApplicationReviewPerspective;
   },
-): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
+): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[]; reviewPipeline?: ReviewPipeline }> => {
   const api = await westDaatApi(context);
 
   let request: ApplicationLoadRequestBase;
@@ -252,7 +337,34 @@ export const getApplication = async (
     }
     case 'reviewer': {
       const reviewerResponse = response as ReviewerConservationApplicationLoadResponse;
-      return { application: reviewerResponse.application, notes: reviewerResponse.notes };
+      return {
+        application: reviewerResponse.application,
+        notes: reviewerResponse.notes,
+        reviewPipeline: reviewerResponse.reviewPipeline,
+      };
     }
   }
 };
+
+export const createApplicationReviewerNote = async (
+  context: IMsalContext,
+  data: {
+    applicationId: string;
+    note: string;
+  },
+): Promise<WaterConservationApplicationNoteCreateResponse> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationNoteCreateRequest = {
+    $type: 'WaterConservationApplicationNoteCreateRequest',
+    waterConservationApplicationId: data.applicationId,
+    note: data.note,
+  };
+
+  const { data: response } = await api.post<WaterConservationApplicationNoteCreateResponse>(
+    'Applications/Notes',
+    request,
+  );
+
+  return response;
+}

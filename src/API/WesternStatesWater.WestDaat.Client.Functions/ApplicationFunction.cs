@@ -3,8 +3,11 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Net;
+using System.Text.Json;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 namespace WesternStatesWater.WestDaat.Client.Functions;
@@ -41,13 +44,22 @@ public class ApplicationFunction : FunctionBase
 
     [Function(nameof(EstimateConsumptiveUse))]
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicantEstimateConsumptiveUseResponse))]
     public async Task<HttpResponseData> EstimateConsumptiveUse(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
     {
-        var request = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
-        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(request);
+        var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
+
+        ApplicationStoreResponseBase results = request switch
+        {
+            ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager
+                .Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
+            ReviewerEstimateConsumptiveUseRequest reviewerRequest => await _applicationManager
+                .Store<ReviewerEstimateConsumptiveUseRequest, ReviewerEstimateConsumptiveUseResponse>(reviewerRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
+
         return await CreateResponse(req, results);
     }
 
@@ -70,8 +82,17 @@ public class ApplicationFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Submit")]
         HttpRequestData req)
     {
-        var request = await ParseRequestBody<WaterConservationApplicationSubmissionRequest>(req);
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(request);
+        var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
+        var results = request switch
+        {
+            WaterConservationApplicationSubmissionRequest submissionRequest => await _applicationManager
+                .Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(submissionRequest),
+            WaterConservationApplicationRecommendationRequest recommendationRequest => await _applicationManager
+                .Store<WaterConservationApplicationRecommendationRequest, ApplicationStoreResponseBase>(recommendationRequest),
+            WaterConservationApplicationApprovalRequest approvalRequest => await _applicationManager
+                .Store<WaterConservationApplicationApprovalRequest, ApplicationStoreResponseBase>(approvalRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
         return await CreateResponse(req, results);
     }
 
@@ -85,7 +106,7 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
             new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, WaterConservationApplicationSubmissionUpdateResponse>(request);
         return await CreateResponse(req, results);
     }
 
@@ -106,5 +127,26 @@ public class ApplicationFunction : FunctionBase
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(OnApplicationStatusChanged))]
+    public async Task OnApplicationStatusChanged(
+        [ServiceBusTrigger(queueName: Queues.ConservationApplicationStatusChanged, Connection = "ServiceBusConnection")]
+        string eventJson)
+    {
+        var dto = JsonSerializer.Deserialize<WaterConservationApplicationStatusChangedEventBase>(eventJson, JsonSerializerOptions);
+        await _applicationManager.OnApplicationStatusChanged<WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(dto);
+    }
+
+    [Function(nameof(CreateApplicationNotes))]
+    [OpenApiOperation(nameof(CreateApplicationNotes))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterConservationApplicationNoteCreateResponse))]
+    public async Task<HttpResponseData> CreateApplicationNotes(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Notes")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<WaterConservationApplicationNoteCreateRequest>(req);
+        var results = await _applicationManager.Store<WaterConservationApplicationNoteCreateRequest, WaterConservationApplicationNoteCreateResponse>(request);
+        return await CreateResponse(req, results);
     }
 }

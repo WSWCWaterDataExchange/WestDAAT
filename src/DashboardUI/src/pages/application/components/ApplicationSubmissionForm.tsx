@@ -1,4 +1,4 @@
-import { createRef, useRef, useState } from 'react';
+import { createRef, useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
@@ -15,22 +15,29 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormProps {
+  perspective: ApplicationReviewPerspective;
   ref: React.Ref<HTMLFormElement>;
   formValidated: boolean;
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const { ref, formValidated } = props;
+  const { perspective, ref, formValidated } = props;
 
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
+
+  const navigate = useNavigate();
+  const navigateToReviewPageMap = () => {
+    navigate('map');
+  };
 
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
@@ -269,6 +276,11 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         <div className="col-lg-6 col-12">
           Static map here
           <NotImplementedPlaceholder />
+          {perspective === 'reviewer' && (
+            <Button variant="outline-primary" onClick={navigateToReviewPageMap}>
+              Edit in Estimator
+            </Button>
+          )}
         </div>
       </div>
 
@@ -422,7 +434,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
               <span className="fw-bold">Consumptive Use</span>
             </div>
             <div>
-              <span>{formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet</span>
+              <span>{formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2)} Acre-Feet</span>
             </div>
           </div>
 

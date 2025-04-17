@@ -28,12 +28,16 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         protected Mock<IOpenEtSdk> OpenEtSdkMock { get; private set; }
 
+        protected Mock<IEmailNotificationSdk> EmailNotificationSdkMock { get; private set; }
+
+        protected Mock<IMessageBusUtility> MessageBusUtilityMock { get; private set; }
+
         [TestInitialize]
         public void BaseTestInitialize()
         {
             var transactionOptions = new TransactionOptions
             {
-                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsolationLevel = IsolationLevel.Serializable,
                 Timeout = TransactionManager.MaximumTimeout
             };
 
@@ -68,6 +72,12 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
                 "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
+            { $"{ConfigurationRootNames.Environment}:{nameof(EnvironmentConfiguration.SiteUrl)}", "http://localhost:3000" },
+            { $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.UseDevelopmentEmulator)}", "true" },
+            {
+                $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.ServiceBusUrl)}",
+                "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+            },
         };
 
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)
@@ -81,9 +91,12 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .AddEnvironmentVariables()
                 .Build();
 
-            serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
-            serviceCollection.AddScoped(_ => config.GetPerformanceConfiguration());
             serviceCollection.AddScoped(_ => config.GetBlobStorageConfiguration());
+            serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
+            serviceCollection.AddScoped(_ => config.GetEnvironmentConfiguration());
+            serviceCollection.AddScoped(_ => config.GetMessageBusConfiguration());
+            serviceCollection.AddScoped(_ => config.GetPerformanceConfiguration());
+            serviceCollection.AddScoped(_ => config.GetSmtpConfiguration());
         }
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)
@@ -113,6 +126,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             serviceCollection.AddTransient<ITestEngine, TestEngine>();
             serviceCollection.AddTransient<IUserNameFormattingEngine, FormattingEngine>();
             serviceCollection.AddTransient<IValidationEngine, ValidationEngine>();
+            serviceCollection.AddTransient<INotificationFilteringEngine, FilteringEngine>();
+            serviceCollection.AddTransient<INotificationFormattingEngine, FormattingEngine>();
         }
 
         private void RegisterAccessorServices(IServiceCollection serviceCollection)
@@ -141,6 +156,12 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             OpenEtSdkMock = new Mock<IOpenEtSdk>(MockBehavior.Strict);
             serviceCollection.AddScoped(_ => OpenEtSdkMock.Object);
+
+            EmailNotificationSdkMock = new Mock<IEmailNotificationSdk>(MockBehavior.Default);
+            serviceCollection.AddScoped(_ => EmailNotificationSdkMock.Object);
+
+            MessageBusUtilityMock = new Mock<IMessageBusUtility>(MockBehavior.Default);
+            serviceCollection.AddScoped(_ => MessageBusUtilityMock.Object);
 
             serviceCollection.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         }
@@ -195,6 +216,17 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             ContextUtilityMock
                 .Setup(mock => mock.GetRequiredContext<ContextBase>())
                 .Returns(context ?? new UserContext());
+        }
+
+        protected void UseSystemContext(SystemContext context = null)
+        {
+            ContextUtilityMock
+                .Setup(mock => mock.GetContext())
+                .Returns(context ?? new SystemContext());
+
+            ContextUtilityMock
+                .Setup(mock => mock.GetRequiredContext<ContextBase>())
+                .Returns(context ?? new SystemContext());
         }
     }
 }

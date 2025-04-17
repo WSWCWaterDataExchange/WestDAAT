@@ -19,7 +19,6 @@ export function ApplicationLayout() {
         </ConservationApplicationProvider>
       </div>
 
-      <ToastContainer />
       <SiteFooter />
     </div>
   );

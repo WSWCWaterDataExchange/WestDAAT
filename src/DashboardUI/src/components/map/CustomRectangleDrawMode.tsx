@@ -1,6 +1,7 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import { Feature, GeoJSON, GeoJsonProperties, Geometry } from 'geojson';
 import bboxPolygon from '@turf/bbox-polygon';
+import { buildDefaultNewRectangleFeature } from '../../utilities/customMapShapesUtility';
 
 interface RectangleDrawModeState {
   rectangleDrawFeature: MapboxDraw.DrawPolygon | undefined;
@@ -18,16 +19,7 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
 
   onSetup: function (opts: any): RectangleDrawModeState {
     // Initialization logic for your custom mode
-    const rectangleFeature: Feature<Geometry, GeoJsonProperties> = {
-      type: 'Feature',
-      properties: {
-        isRectangle: true,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[]],
-      },
-    };
+    const rectangleFeature = buildDefaultNewRectangleFeature();
     const rectangleDrawFeature = this.newFeature(rectangleFeature) as MapboxDraw.DrawPolygon;
     this.addFeature(rectangleDrawFeature);
 

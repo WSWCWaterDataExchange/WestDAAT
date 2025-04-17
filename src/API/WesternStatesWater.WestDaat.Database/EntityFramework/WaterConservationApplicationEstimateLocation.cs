@@ -13,11 +13,13 @@ public class WaterConservationApplicationEstimateLocation
 
     public string PolygonWkt { get; set; } = null!;
 
+    public Common.DataContracts.DrawToolType DrawToolType { get; set; }
+
     public double PolygonAreaInAcres { get; set; }
 
-    public string AdditionalDetails { get; set; } = null!;
+    public string? AdditionalDetails { get; set; } = null!;
 
     public virtual WaterConservationApplicationEstimate Estimate { get; set; } = null!;
 
-    public virtual ICollection<WaterConservationApplicationEstimateLocationConsumptiveUse> ConsumptiveUses { get; set; } = null!;
+    public virtual ICollection<LocationWaterMeasurement> WaterMeasurements { get; set; } = null!;
 }

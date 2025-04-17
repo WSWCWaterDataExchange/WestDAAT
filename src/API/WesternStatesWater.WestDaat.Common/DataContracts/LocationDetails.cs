@@ -6,9 +6,11 @@ public class LocationDetails
 
     public string PolygonWkt { get; set; } = null!;
 
+    public DrawToolType DrawToolType { get; set; }
+
     public double PolygonAreaInAcres { get; set; }
 
     public string AdditionalDetails { get; set; } = null!;
 
-    public ConsumptiveUseDetails[] ConsumptiveUses { get; set; } = null!;
+    public LocationWaterMeasurementDetails[] WaterMeasurements { get; set; } = null!;
 }

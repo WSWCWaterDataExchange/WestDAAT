@@ -14,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public abstract class FunctionBase(ILogger logger)
     {
-        private static JsonSerializerOptions JsonSerializerOptions => new()
+        protected static JsonSerializerOptions JsonSerializerOptions => new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };

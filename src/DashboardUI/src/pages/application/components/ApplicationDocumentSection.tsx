@@ -1,18 +1,46 @@
+import { toast } from 'react-toastify';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
+import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface ApplicationDocumentSectionProps {
   readOnly: boolean;
+  perspective: ApplicationReviewPerspective;
 }
 
 function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
-  const { readOnly } = props;
+  const msalContext = useMsal();
+  const { readOnly, perspective } = props;
+
+  const handleDownload = async (fileName: string, fileId?: string) => {
+    if (!fileId) {
+      throw new Error('File ID is required to download the document');
+    }
+
+    toast.info(`Downloading ${fileName}`, { autoClose: 1000 });
+
+    await downloadApplicationDocuments(msalContext, fileId).catch(() =>
+      toast.error(`An error occurred while downloading ${fileName}`, {
+        autoClose: 3000,
+      }),
+    );
+  };
 
   return (
-    <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-      {readOnly ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
-    </ApplicationFormSection>
+    <>
+      {readOnly && <ApplicationFormSectionRule width={2} />}
+      <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
+        {readOnly ? (
+          <ApplicationDocumentDownload onDownloadClicked={handleDownload} />
+        ) : (
+          <ApplicationDocumentUpload onDownloadClicked={handleDownload} perspective={perspective} />
+        )}
+      </ApplicationFormSection>
+    </>
   );
 }
 

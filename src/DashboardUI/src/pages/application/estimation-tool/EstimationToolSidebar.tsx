@@ -103,7 +103,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
-          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water nott returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
+          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
           isLoading={props.isLoading}
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
@@ -113,13 +113,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {(state.conservationApplication.totalAverageYearlyEtAcreFeet ?? 0) > 0 ? (
+            {(state.conservationApplication.cumulativeTotalEtInAcreFeet ?? 0) > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
                 <span className="fs-5 fw-bold et-blue-text">
-                  {formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet
+                  {formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2)} Acre-Feet
                 </span>
               </>
             ) : (
@@ -158,7 +158,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
                   type="number"
-                  placeholder="100"
+                  placeholder=""
                   min={1}
                   aria-describedby="dollar-sign-addon"
                   aria-label="Desired compensation in dollars"
