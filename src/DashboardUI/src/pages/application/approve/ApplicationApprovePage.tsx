@@ -130,7 +130,7 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canApproveApplication && !isApplicationFinalized}
+        rightButtonDisplayed={canApproveApplication && !isApplicationFinalized && !isPageLoading}
         rightButtonText="Edit Application"
         onRightButtonClick={navigateToReviewPage}
       />
