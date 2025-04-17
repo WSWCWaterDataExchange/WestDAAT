@@ -25,7 +25,7 @@ import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointD
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
-  handleEstimateConsumptiveUseClicked: () => void;
+  handleEstimateConsumptiveUseClicked: (updateEstimate: boolean) => void;
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
@@ -182,16 +182,25 @@ function ReviewMap(props: ReviewMapProps) {
 
   return (
     <div className="flex-grow-1 position-relative">
-      <div className="w-100 position-absolute d-flex justify-content-center p-1 d-print-none">
+      <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
         <Button
           variant="success"
           style={{ zIndex: 1000 }}
-          onClick={props.handleEstimateConsumptiveUseClicked}
+          onClick={() => props.handleEstimateConsumptiveUseClicked(false)}
           disabled={!estimateButtonEnabled}
         >
           {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
           Estimate Consumptive Use for the Drawn Polygon(s)
+        </Button>
+
+        <Button
+          variant="success"
+          style={{ zIndex: 1000 }}
+          onClick={() => props.handleEstimateConsumptiveUseClicked(true)}
+          disabled={!estimateButtonEnabled}
+        >
+          Save Changes
         </Button>
       </div>
       <Map

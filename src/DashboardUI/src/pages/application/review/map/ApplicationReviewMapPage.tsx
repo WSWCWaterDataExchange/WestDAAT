@@ -9,9 +9,9 @@ export function ApplicationReviewMapPage() {
 
   const estimateConsumptiveUseMutation = useReviewerEstimateConsumptiveUseMutation();
 
-  const handleEstimateConsumptiveUseClicked = async () => {
+  const handleEstimateConsumptiveUseClicked = async (updateEstimate: boolean) => {
     await estimateConsumptiveUseMutation.mutateAsync({
-      updateEstimate: false,
+      updateEstimate,
     });
   };
 
