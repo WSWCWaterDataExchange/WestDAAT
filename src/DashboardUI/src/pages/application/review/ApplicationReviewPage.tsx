@@ -46,7 +46,7 @@ function ApplicationReviewPage() {
 
   const rightButtonDisplayed = useMemo(() => {
     return isOnMapPage ? true : canApproveApplication;
-  }, [isOnMapPage, state.canEstimateConsumptiveUse, canApproveApplication]);
+  }, [isOnMapPage, canApproveApplication]);
 
   const navigateToApprovalPage = () => {
     const id = state.conservationApplication.waterConservationApplicationId;
@@ -80,7 +80,9 @@ function ApplicationReviewPage() {
         centerTextIsLoading={false}
         displayWaterIcon={false}
         rightButtonDisplayed={rightButtonDisplayed}
-        rightButtonDisabled={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
+        rightButtonDisabled={
+          !state.canEstimateConsumptiveUse || state.reviewerEstimateConsumptiveUseMutationStatus.isLoading
+        }
         rightButtonIsLoading={state.reviewerEstimateConsumptiveUseMutationStatus.isLoading}
         rightButtonText={rightButtonText}
         rightButtonIcon={mdiArrowRight}
