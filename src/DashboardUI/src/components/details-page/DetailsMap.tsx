@@ -43,7 +43,6 @@ function DetailsMap(props: detailsMapProps) {
           handleMapFitChange={handleMapFitChange}
           isConsumptiveUseAlertEnabled={false}
           isGeocoderInputFeatureEnabled={true}
-          isControlLocationSelectionToolDisplayed={false}
         />
       </div>
       <div className="theme-selector-container pt-3 ps-3">

@@ -71,7 +71,6 @@ function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLa
             handleMapFitChange={handleMapFitRequested}
             isConsumptiveUseAlertEnabled={true}
             isGeocoderInputFeatureEnabled={true}
-            isControlLocationSelectionToolDisplayed={false}
           />
           <TableView />
         </div>
