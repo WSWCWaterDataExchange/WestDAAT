@@ -31,7 +31,8 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
       <div className="d-flex justify-content-around gap-3 mb-3">
         {renderCard(props.fieldAcreage, 'Field Area', 'acres')}
         {renderCard(props.data?.averageYearlyTotalEtInInches, 'Average Yearly Total ET', 'inches')}
-        {renderCard(props.data?.averageYearlyNetEtInInches ?? undefined, 'Average Yearly Net ET', 'inches')}
+        {props.perspective === 'reviewer' &&
+          renderCard(props.data?.averageYearlyNetEtInInches ?? undefined, 'Average Yearly Net ET', 'inches')}
       </div>
 
       <Table>
