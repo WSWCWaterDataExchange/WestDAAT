@@ -18,11 +18,22 @@ export enum Permission {
 export const RolePermissions: Record<Role, Permission[]> = {
   [Role.Member]: [
     Permission.ApplicationApprove,
-    Permission.ApplicationReview,
     Permission.OrganizationApplicationDashboardLoad,
   ],
   [Role.TechnicalReviewer]: [
+    /**
+     * Permission.ApplicationReview
+     * 
+     * ApplicationReviewFormPage - should show action buttons
+     * ApplicationApprovePage - should show navbar link to review page
+     * OrganizationDashboardPage - determine if user should go to review page or approve page when app is in InTechnicalReview status
+     */
     Permission.ApplicationReview,
+    /**
+     * Permission.ApplicationUpdate
+     * 
+     * not used anywhere... remove it and rename Review to Update?
+     */
     Permission.ApplicationUpdate,
     Permission.ApplicationRecommendation,
     Permission.OrganizationApplicationDashboardLoad,
