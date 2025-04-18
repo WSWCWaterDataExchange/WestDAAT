@@ -1471,7 +1471,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataRow(true, false, false, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
     [DataRow(true, true, false, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
     [DataRow(true, true, true, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
-    [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    [DataRow(true, true, true, Roles.Member, false, nameof(ForbiddenError), DisplayName = "Member cannot edit an Application Submission")]
+    [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "Technical Reviewer has permission to edit an Application Submission")]
+    [DataRow(true, true, true, Roles.OrganizationAdmin, true, "", DisplayName = "Organization Admin has permission to edit an Application Submission")]
     public async Task Store_UpdateApplicationSubmission_Success(
         bool userIsLoggedIn,
         bool applicationExists,
