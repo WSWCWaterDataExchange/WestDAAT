@@ -654,6 +654,8 @@ const onGISFileAddedToMap = (
     }
   }
 
+  console.log('GIS file added. done. ', JSON.parse(JSON.stringify(draftState)));
+
   return draftState;
 };
 

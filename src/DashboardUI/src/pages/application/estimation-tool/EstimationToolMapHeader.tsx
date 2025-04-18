@@ -127,7 +127,10 @@ export function EstimationToolMapHeader(props: EstimationToolMapHeaderProps) {
     dispatch({
       type: 'GIS_FILE_ADDED_TO_MAP',
       payload: {
-        polygons: uploadedFileFeatures.features.map(fromGeometryFeatureToMapSelectionPolygonData),
+        polygons: uploadedFileFeatures.features.map(fromGeometryFeatureToMapSelectionPolygonData).map((polygon, i) => ({
+          ...polygon,
+          fieldName: 'test ' + i,
+        })),
         doPolygonsOverlap: doPolygonsOverlap,
         doesControlLocationOverlapWithPolygons,
         perspective: props.perspective,
