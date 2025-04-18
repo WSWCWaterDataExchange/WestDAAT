@@ -144,11 +144,7 @@ export function useReviewerEstimateConsumptiveUseMutation() {
   const mutation = useMutation({
     mutationFn: async (options: { updateEstimate: boolean }) => {
       dispatch({
-        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
-        payload: {
-          isLoading: true,
-          hasErrored: false,
-        },
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_STARTED',
       });
 
       const apiCallFields: Parameters<typeof reviewerEstimateConsumptiveUse>[1] = {
@@ -182,24 +178,12 @@ export function useReviewerEstimateConsumptiveUseMutation() {
           },
         });
       }
-
-      dispatch({
-        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
-        payload: {
-          isLoading: false,
-          hasErrored: false,
-        },
-      });
     },
     onError: (error: Error) => {
       toast.error('Failed to estimate consumptive use. Please try again later.');
 
       dispatch({
-        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED',
-        payload: {
-          isLoading: false,
-          hasErrored: true,
-        },
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_ERRORED',
       });
     },
     mutationKey: ['reviewer-estimate-consumptive-use'],
