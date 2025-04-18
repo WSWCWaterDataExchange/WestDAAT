@@ -34,8 +34,9 @@ function ApplicationReviewPage() {
     return isOnMapPage ? 'Back to Application' : 'Back to Dashboard';
   }, [isOnMapPage]);
 
-  const canApproveApplication =
-    hasPermission(user, Permission.ApplicationApprove) &&
+  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+
+  const isApplicationInFinalReview =
     state.conservationApplication.status === ConservationApplicationStatus.InFinalReview;
 
   const isPageLoading = state.isLoadingApplication || state.isLoadingFundingOrganization;
@@ -78,7 +79,7 @@ function ApplicationReviewPage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canApproveApplication && !isPageLoading}
+        rightButtonDisplayed={canApproveApplication && isApplicationInFinalReview && !isPageLoading}
         rightButtonText="Continue to Final Approval"
         rightButtonIcon={mdiArrowRight}
         onRightButtonClick={navigateToApprovalPage}
