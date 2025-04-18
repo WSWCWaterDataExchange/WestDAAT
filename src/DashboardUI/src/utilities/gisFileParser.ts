@@ -59,7 +59,8 @@ const validateFeatureCollection = (data: FeatureCollection): void => {
     data.features.length > 0 &&
     !data.features.every(
       (feature: Feature) =>
-        feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon'),
+        // todo: do we need to support any other geometry types (i.e. multipolygon)?
+        feature.geometry && feature.geometry.type === 'Polygon',
     )
   ) {
     throw new Error(
