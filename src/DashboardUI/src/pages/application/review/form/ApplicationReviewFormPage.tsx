@@ -111,7 +111,7 @@ export function ApplicationReviewFormPage() {
     );
   }
 
-  const canReviewApplication = hasPermission(user, Permission.ApplicationReview);
+  const canUpdateApplication = hasPermission(user, Permission.ApplicationUpdate);
   const canRecommendApplication = hasPermission(user, Permission.ApplicationRecommendation);
   const isApplicationFinalized =
     state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
@@ -125,7 +125,7 @@ export function ApplicationReviewFormPage() {
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
       <ApplicationReviewButtonRow
-        isHidden={!(canReviewApplication && canRecommendApplication) || isApplicationFinalized}
+        isHidden={!(canUpdateApplication && canRecommendApplication) || isApplicationFinalized}
         isFormDirty={state.conservationApplication.isDirty}
         isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
