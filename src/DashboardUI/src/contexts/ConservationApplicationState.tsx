@@ -22,6 +22,7 @@ import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
+import { ApplicationReviewPerspective } from '../data-contracts/ApplicationReviewPerspective';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -126,6 +127,7 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
+  | GISFileAddedToMapAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
@@ -183,6 +185,16 @@ export interface FundingOrganizationLoadedAction {
 
 export interface FundingOrganizationLoadErrored {
   type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
+}
+
+export interface GISFileAddedToMapAction {
+  type: 'GIS_FILE_ADDED_TO_MAP';
+  payload: {
+    polygons: MapSelectionPolygonData[];
+    doPolygonsOverlap: boolean;
+    doesControlLocationOverlapWithPolygons: boolean;
+    perspective: ApplicationReviewPerspective;
+  };
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -342,6 +354,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
+    case 'GIS_FILE_ADDED_TO_MAP':
+      return onGISFileAddedToMap(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
@@ -604,6 +618,38 @@ const onReviewerMapPolygonsUpdated = (
   resetConsumptiveUseEstimation(draftState);
   updatePolygonAcreageSum(draftState);
   checkCanReviewerEstimateConsumptiveUse(draftState);
+
+  return draftState;
+};
+
+const onGISFileAddedToMap = (
+  draftState: ConservationApplicationState,
+  { payload }: GISFileAddedToMapAction,
+): ConservationApplicationState => {
+  // append new polygons to existing polygons
+  draftState.conservationApplication.estimateLocations = [
+    ...draftState.conservationApplication.estimateLocations,
+    ...payload.polygons,
+  ];
+  draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
+  draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
+    payload.doesControlLocationOverlapWithPolygons;
+
+  resetConsumptiveUseEstimation(draftState);
+  updatePolygonAcreageSum(draftState);
+  switch (payload.perspective) {
+    case 'applicant': {
+      checkCanApplicantEstimateConsumptiveUse(draftState);
+      break;
+    }
+    case 'reviewer': {
+      checkCanReviewerEstimateConsumptiveUse(draftState);
+      break;
+    }
+    default: {
+      throw new Error(`Unknown perspective: ${payload.perspective}`);
+    }
+  }
 
   return draftState;
 };
