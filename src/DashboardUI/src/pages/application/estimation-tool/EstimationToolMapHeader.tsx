@@ -1,12 +1,33 @@
 import { useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
+import { parseGISFileToGeoJSON } from '../../../utilities/gisFileParser';
+import { FeatureCollection } from 'geojson';
+import { toast } from 'react-toastify';
 
 export function EstimationToolMapHeader() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    console.log('files selected', files);
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      let data: FeatureCollection | undefined = undefined;
+      try {
+        data = await parseGISFileToGeoJSON(file);
+      } catch (error: any) {
+        toast.error(`Error parsing file: "${error.message}"`);
+      }
+    }
+
+    // reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -32,6 +53,7 @@ export function EstimationToolMapHeader() {
         <input
           type="file"
           accept=".json, .geojson, .zip, .shp"
+          multiple
           className="d-none"
           ref={fileInputRef}
           onChange={handleFilesSelected}
