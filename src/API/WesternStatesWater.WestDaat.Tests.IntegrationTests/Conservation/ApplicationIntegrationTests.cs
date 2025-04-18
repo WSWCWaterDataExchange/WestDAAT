@@ -1474,6 +1474,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataRow(true, true, true, Roles.Member, false, nameof(ForbiddenError), DisplayName = "Member cannot edit an Application Submission")]
     [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "Technical Reviewer has permission to edit an Application Submission")]
     [DataRow(true, true, true, Roles.OrganizationAdmin, true, "", DisplayName = "Organization Admin has permission to edit an Application Submission")]
+    [DataRow(true, true, true, Roles.GlobalAdmin, true, "", DisplayName = "Globa Admin has permission to edit an Application Submission")]
     public async Task Store_UpdateApplicationSubmission_Success(
         bool userIsLoggedIn,
         bool applicationExists,
