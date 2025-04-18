@@ -14,8 +14,10 @@ import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
 import Button from 'react-bootstrap/esm/Button';
 import { useNavigate } from 'react-router-dom';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface EstimationToolSidebarProps {
+  perspective: ApplicationReviewPerspective;
   isLoading: boolean;
   loadFailed: boolean;
 }
@@ -164,6 +166,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   aria-label="Desired compensation in dollars"
                   defaultValue={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
+                  disabled={props.perspective !== 'applicant'}
                 ></Form.Control>
               </InputGroup>
 
@@ -171,6 +174,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 aria-label="Desired compensation units"
                 defaultValue={state.conservationApplication.desiredCompensationUnits}
                 ref={desiredUnitsRef}
+                disabled={props.perspective !== 'applicant'}
               >
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
@@ -224,25 +228,27 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           )}
         </SidebarElement>
 
-        <SidebarElement>
-          <div className="mb-3">
-            <Button
-              variant="primary"
-              className="w-100"
-              disabled={!state.canContinueToApplication}
-              onClick={navigateToCreateApplicationPage}
-            >
-              Continue to Application
-            </Button>
-          </div>
-          <div>
-            <span className="text-muted">
-              If you own this water right or have legal authority over the use of its water, you may apply to a water
-              conservation program for compensated, temporary, and voluntary measure. Pending verification and approval
-              by appropriate parties.
-            </span>
-          </div>
-        </SidebarElement>
+        {props.perspective === 'applicant' && (
+          <SidebarElement>
+            <div className="mb-3">
+              <Button
+                variant="primary"
+                className="w-100"
+                disabled={!state.canContinueToApplication}
+                onClick={navigateToCreateApplicationPage}
+              >
+                Continue to Application
+              </Button>
+            </div>
+            <div>
+              <span className="text-muted">
+                If you own this water right or have legal authority over the use of its water, you may apply to a water
+                conservation program for compensated, temporary, and voluntary measure. Pending verification and
+                approval by appropriate parties.
+              </span>
+            </div>
+          </SidebarElement>
+        )}
       </div>
     </div>
   );
