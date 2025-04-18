@@ -87,7 +87,7 @@ function App({ msalInstance }: AppProps) {
   }, []);
 
   const reviewerRoles = [Role.TechnicalReviewer, Role.OrganizationAdmin, Role.GlobalAdmin];
-  const approverRoles = [Role.Member, Role.OrganizationAdmin, Role.GlobalAdmin];
+  const approvePageViewerRoles = [Role.Member, Role.TechnicalReviewer, Role.OrganizationAdmin, Role.GlobalAdmin];
   const adminRoles = [Role.OrganizationAdmin, Role.GlobalAdmin];
 
   return (
@@ -124,7 +124,7 @@ function App({ msalInstance }: AppProps) {
                             <Route path="map" element={<ApplicationReviewMapPage />} />
                           </Route>
                         </Route>
-                        <Route path="approve" element={<RoleGuard allowedRoles={approverRoles} />}>
+                        <Route path="approve" element={<RoleGuard allowedRoles={approvePageViewerRoles} />}>
                           <Route index element={<ApplicationApprovePage />} />
                         </Route>
                       </Route>

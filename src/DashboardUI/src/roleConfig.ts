@@ -18,7 +18,6 @@ export enum Permission {
 export const RolePermissions: Record<Role, Permission[]> = {
   [Role.Member]: [
     Permission.ApplicationApprove,
-    Permission.ApplicationReview,
     Permission.OrganizationApplicationDashboardLoad,
   ],
   [Role.TechnicalReviewer]: [
