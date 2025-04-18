@@ -1,6 +1,14 @@
+import { useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 
 export function EstimationToolMapHeader() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    console.log('files selected', files);
+  };
+
   return (
     <div className="p-3 d-flex flex-column gap-2 d-print-none">
       <div>
@@ -17,12 +25,17 @@ export function EstimationToolMapHeader() {
       <div>
         <span className="me-2">Or, you can upload a file from your device.</span>
 
-        <Button
-          variant="outline-primary"
-          onClick={() => alert('This feature will be implemented in a future release.')}
-        >
+        <Button variant="outline-primary" onClick={() => fileInputRef.current?.click()}>
           Upload File
         </Button>
+
+        <input
+          type="file"
+          accept=".json, .geojson, .zip, .shp"
+          className="d-none"
+          ref={fileInputRef}
+          onChange={handleFilesSelected}
+        />
       </div>
     </div>
   );
