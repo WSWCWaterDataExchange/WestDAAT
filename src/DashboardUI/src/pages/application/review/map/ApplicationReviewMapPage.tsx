@@ -28,7 +28,7 @@ export function ApplicationReviewMapPage() {
         </div>
 
         <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
-          <EstimationToolMapHeader />
+          <EstimationToolMapHeader perspective="reviewer" />
           <ReviewMap
             waterRightNativeId={state.conservationApplication.waterRightNativeId}
             handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}

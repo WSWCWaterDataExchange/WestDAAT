@@ -8,7 +8,6 @@ import {
   conservationApplicationMaxPolygonCount,
 } from '../../../config/constants';
 import { doesPointExistWithinPolygon, doPolygonsIntersect } from '../../../utilities/geometryHelpers';
-import { MapSelectionPolygonData } from '../../../data-contracts/CombinedPolygonData';
 import {
   fromGeometryFeatureToMapSelectionPolygonData,
   fromPartialPointDataToPointFeature,
@@ -16,8 +15,13 @@ import {
 } from '../../../utilities/mapUtility';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
-export function EstimationToolMapHeader() {
+interface EstimationToolMapHeaderProps {
+  perspective: ApplicationReviewPerspective;
+}
+
+export function EstimationToolMapHeader(props: EstimationToolMapHeaderProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -126,6 +130,7 @@ export function EstimationToolMapHeader() {
         polygons: uploadedFileFeatures.features.map(fromGeometryFeatureToMapSelectionPolygonData),
         doPolygonsOverlap: doPolygonsOverlap,
         doesControlLocationOverlapWithPolygons,
+        perspective: props.perspective,
       },
     });
 
