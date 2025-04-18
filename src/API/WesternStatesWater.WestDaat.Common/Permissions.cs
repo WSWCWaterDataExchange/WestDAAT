@@ -4,9 +4,9 @@ namespace WesternStatesWater.WestDaat.Common;
 
 public static class Permissions
 {
-    public const string ApplicationReview = "Application_Review"; // ApplicationDocumentDownloadSasTokenRequest, ReviewerConservationApplicationLoadRequest
-    public const string ApplicationUpdate = "Application_Update"; // ReviewerEstimateConsumptiveUseRequest, WaterConservationApplicationSubmissionUpdateRequest
-    public const string ApplicationRecommendation = "Application_Recommendation"; // WaterConservationApplicationRecommendationRequest
+    public const string ApplicationReview = "Application_Review";
+    public const string ApplicationUpdate = "Application_Update";
+    public const string ApplicationRecommendation = "Application_Recommendation";
     public const string ApplicationApprove = "Application_Approve";
     public const string ApplicationNoteCreate = "ApplicationNote_Create";
     public const string OrganizationApplicationDashboardLoad = "Organization_Application_Dashboard_Load";
