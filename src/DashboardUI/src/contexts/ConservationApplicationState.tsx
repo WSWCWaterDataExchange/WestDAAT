@@ -133,7 +133,8 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
-  | ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction
+  | ReviewerConsumptiveUseEstimateStartedAction
+  | ReviewerConsumptiveUseEstimateErroredAction
   | ReviewerConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationSavedAction
@@ -240,12 +241,12 @@ export interface ApplicantConsumptiveUseEstimatedAction {
   };
 }
 
-export interface ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction {
-  type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED';
-  payload: {
-    isLoading: boolean;
-    hasErrored: boolean;
-  };
+export interface ReviewerConsumptiveUseEstimateStartedAction {
+  type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_STARTED';
+}
+
+export interface ReviewerConsumptiveUseEstimateErroredAction {
+  type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_ERRORED';
 }
 
 export interface ReviewerConsumptiveUseEstimatedAction {
@@ -360,8 +361,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
       return onApplicantConsumptiveUseEstimated(draftState, action);
-    case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_MUTATION_STATUS_UPDATED':
-      return onReviewerConsumptiveUseEstimateMutationStatusUpdated(draftState, action);
+    case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_STARTED':
+      return onReviewerConsumptiveUseEstimateStartedAction(draftState);
+    case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_ERRORED':
+      return onReviewerConsumptiveUseEstimateErroredAction(draftState);
     case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED':
       return onReviewerConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
@@ -698,12 +701,19 @@ const onApplicantConsumptiveUseEstimated = (
   return draftState;
 };
 
-const onReviewerConsumptiveUseEstimateMutationStatusUpdated = (
+const onReviewerConsumptiveUseEstimateStartedAction = (
   draftState: ConservationApplicationState,
-  { payload }: ReviewerConsumptiveUseEstimateMutationStatusUpdatedAction,
 ): ConservationApplicationState => {
-  draftState.isLoadingReviewerConsumptiveUseEstimate = payload.isLoading;
-  draftState.reviewerConsumptiveUseEstimateHasErrored = payload.hasErrored;
+  draftState.isLoadingReviewerConsumptiveUseEstimate = true;
+  draftState.reviewerConsumptiveUseEstimateHasErrored = false;
+  return draftState;
+};
+
+const onReviewerConsumptiveUseEstimateErroredAction = (
+  draftState: ConservationApplicationState,
+): ConservationApplicationState => {
+  draftState.isLoadingReviewerConsumptiveUseEstimate = false;
+  draftState.reviewerConsumptiveUseEstimateHasErrored = true;
   return draftState;
 };
 
@@ -711,6 +721,9 @@ const onReviewerConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
+  draftState.isLoadingReviewerConsumptiveUseEstimate = false;
+  draftState.reviewerConsumptiveUseEstimateHasErrored = false;
+
   const application = draftState.conservationApplication;
 
   application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
