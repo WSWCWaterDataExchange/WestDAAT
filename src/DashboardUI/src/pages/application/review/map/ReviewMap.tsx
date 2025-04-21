@@ -114,6 +114,7 @@ function ReviewMap(props: ReviewMapProps) {
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
       padding: 25,
       maxZoom: 16,
+      duration: 2000,
     });
 
     setHasInitializedMap(true);
