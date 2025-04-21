@@ -1,5 +1,3 @@
-import './estimation-tool-helper-video.css';
-
 export interface EstimationToolHelpVideoProps {
   onVideoEnd: () => void;
 }
@@ -10,14 +8,7 @@ export function EstimationToolHelpVideo(props: EstimationToolHelpVideoProps) {
 
   return (
     <>
-      <video
-        id="estimation-tool-help-video"
-        className="video-js"
-        preload="auto"
-        autoPlay
-        muted
-        onEnded={props.onVideoEnd}
-      >
+      <video controls preload="auto" autoPlay muted onEnded={props.onVideoEnd}>
         <source src={videoUrl} />
       </video>
     </>

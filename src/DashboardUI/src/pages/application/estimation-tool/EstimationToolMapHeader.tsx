@@ -33,8 +33,8 @@ export function EstimationToolMapHeader() {
         </Button>
       </div>
 
-      <Modal centered show={showVideoPlayer} onHide={() => setShowVideoPlayer(false)}>
-        <EstimationToolHelpVideo onVideoEnd={() => setShowVideoPlayer(false)} />
+      <Modal dialogClassName="modal-75w" centered show={showVideoPlayer} onHide={() => setShowVideoPlayer(false)}>
+        <EstimationToolHelpVideo onVideoEnd={() => setShowVideoPlayer(true)} />
       </Modal>
     </div>
   );
