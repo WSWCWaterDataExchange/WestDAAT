@@ -116,7 +116,7 @@ export function ApplicationApprovePage() {
     }
   };
 
-  const canReviewApplication = hasPermission(user, Permission.ApplicationReview);
+  const canUpdateApplication = hasPermission(user, Permission.ApplicationUpdate);
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
 
   const isApplicationInFinalReview =
@@ -135,7 +135,7 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canReviewApplication && !isApplicationFinalized && !isPageLoading}
+        rightButtonDisplayed={canUpdateApplication && !isApplicationFinalized && !isPageLoading}
         rightButtonText="Edit Application"
         onRightButtonClick={navigateToReviewPage}
       />
