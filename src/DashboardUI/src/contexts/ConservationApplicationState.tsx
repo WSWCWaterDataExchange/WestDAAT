@@ -680,7 +680,11 @@ const onReviewerConsumptiveUseEstimated = (
 ): ConservationApplicationState => {
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
-  draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
+
+  // if an estimated has already been saved, we don't want to overwrite that flag
+  if (!draftState.controlPointLocationHasBeenSaved) {
+    draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
+  }
 
   const application = draftState.conservationApplication;
 
@@ -890,6 +894,7 @@ const onApplicationLoaded = (
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
   draftState.conservationApplication.isDirty = false;
+  draftState.controlPointLocationHasBeenSaved = payload.application.estimate.controlLocation?.id !== undefined;
 
   return draftState;
 };
