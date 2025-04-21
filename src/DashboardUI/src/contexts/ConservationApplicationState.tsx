@@ -55,6 +55,7 @@ export interface ConservationApplicationState {
     reviewPipeline: ReviewPipeline;
     status: ConservationApplicationStatus;
   };
+  displayDataTable: boolean;
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
   isLoadingApplication: boolean;
@@ -107,6 +108,7 @@ export const defaultState = (): ConservationApplicationState => ({
     },
     status: ConservationApplicationStatus.Unknown,
   },
+  displayDataTable: false,
   isCreatingApplication: false,
   isUploadingDocument: false,
   isLoadingApplication: false,
@@ -143,7 +145,8 @@ export type ApplicationAction =
   | ApplicationLoadingAction
   | ApplicationLoadedAction
   | ApplicationLoadErroredAction
-  | ApplicationReviewerNoteAddedAction;
+  | ApplicationReviewerNoteAddedAction
+  | DataTableToggledAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -311,6 +314,10 @@ export interface ApplicationReviewerNoteAddedAction {
   };
 }
 
+export interface DataTableToggledAction {
+  type: 'DATA_TABLE_TOGGLED';
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -373,6 +380,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationLoadErrored(draftState);
     case 'APPLICATION_NOTE_ADDED':
       return onApplicationReviewerNoteAdded(draftState, action);
+    case 'DATA_TABLE_TOGGLED':
+      return onDataTableToggled(draftState);
   }
 };
 
@@ -648,6 +657,8 @@ const onApplicantConsumptiveUseEstimated = (
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
+  draftState.displayDataTable = true;
+
   checkCanContinueToApplication(draftState);
   updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
@@ -709,6 +720,8 @@ const onReviewerConsumptiveUseEstimated = (
     averageYearlyTotalEtInInches: payload.controlDataCollection.averageYearlyTotalEtInInches,
     datapoints: payload.controlDataCollection.datapoints,
   };
+
+  draftState.displayDataTable = true;
 
   updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
@@ -1054,5 +1067,10 @@ const onApplicationReviewerNoteAdded = (
   action: ApplicationReviewerNoteAddedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.reviewerNotes.push(action.payload.note);
+  return draftState;
+};
+
+const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.displayDataTable = !draftState.displayDataTable;
   return draftState;
 };
