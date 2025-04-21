@@ -97,6 +97,8 @@ interface MapContextState {
   ) => void;
   userDrawnPolygonData: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[];
   setUserDrawnPolygonData: (polygons: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[]) => void;
+  isControlLocationSelectionToolEnabled: boolean;
+  setIsControlLocationSelectionToolEnabled: (value: boolean) => void;
   vectorUrls: { source: string; url: string }[];
   setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[];
@@ -155,6 +157,8 @@ const defaultState: MapContextState = {
   setGeoJsonData: () => {},
   userDrawnPolygonData: [],
   setUserDrawnPolygonData: () => {},
+  isControlLocationSelectionToolEnabled: false,
+  setIsControlLocationSelectionToolEnabled: () => {},
   vectorUrls: [],
   setVectorUrl: () => {},
   visibleLayers: [],
@@ -345,6 +349,8 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setAllVectorUrls],
   );
 
+  const [isControlLocationSelectionToolEnabled, setIsControlLocationSelectionToolEnabled] = useState(false);
+
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
   const [legend, setLegend] = useState<JSX.Element | null>(null);
@@ -424,6 +430,8 @@ const MapProvider = ({ children }: MapProviderProps) => {
     setGeoJsonData,
     userDrawnPolygonData,
     setUserDrawnPolygonData,
+    isControlLocationSelectionToolEnabled,
+    setIsControlLocationSelectionToolEnabled,
     vectorUrls,
     setVectorUrl,
     visibleLayers,
