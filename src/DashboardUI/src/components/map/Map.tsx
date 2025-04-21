@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorPolygon, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -27,16 +27,16 @@ import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
-import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
+import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 import './map.scss';
-import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -44,6 +44,7 @@ interface mapProps {
   polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
+  isControlLocationSelectionToolDisplayed?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -56,6 +57,7 @@ function Map({
   polygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
+  isControlLocationSelectionToolDisplayed,
 }: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -66,6 +68,7 @@ function Map({
     visibleLayers,
     geoJsonData,
     userDrawnPolygonData,
+    isControlLocationSelectionToolEnabled,
     filters,
     circleColors,
     circleRadii,
@@ -95,6 +98,7 @@ function Map({
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const drawControlStateRef = useRef<MapboxDraw | null>(null);
+  const isControlLocationSelectionToolEnabledRef = useRef<boolean>(isControlLocationSelectionToolEnabled);
 
   const geocoderControl = useRef(
     new MapboxGeocoder({
@@ -134,17 +138,34 @@ function Map({
     }
   };
 
+  useEffect(() => {
+    isControlLocationSelectionToolEnabledRef.current = isControlLocationSelectionToolEnabled;
+  }, [isControlLocationSelectionToolEnabled]);
+
   const mapboxDrawControl = (mapInstance: mapboxgl.Map): void => {
     if (!handleMapDrawnPolygonChange) {
       return;
     }
+
+    const controlLocationSelectionToolDrawBarButton: DrawBarButton = {
+      on: 'click',
+      title: 'Control Location tool',
+      buttonIconPath: mdiMapMarker,
+      action: () => {
+        // cannot reference the state variable directly inside of an inline function
+        const isEnabled: boolean = isControlLocationSelectionToolEnabledRef.current;
+        if (isEnabled) {
+          drawControlStateRef.current?.changeMode('draw_point');
+        } else {
+          toast.error('Only one Control Location is allowed.');
+        }
+      },
+    };
+
     const dc = new ExtendedMapboxDraw({
       props: {
         displayControlsDefault: false,
         controls: {
-          // These controls must be enabled to allow the custom draw modes to work.
-          // Enabling this functionality also has the side effect of adding the corresponding buttons to the draw bar
-          polygon: true,
           trash: true,
         },
         modes: {
@@ -156,6 +177,15 @@ function Map({
       },
       // these buttons are rendered in reverse order
       buttons: [
+        {
+          on: 'click',
+          title: 'Polygon tool',
+          buttonIconPath: mdiVectorPolygon,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_polygon');
+          },
+        },
+        ...(isControlLocationSelectionToolDisplayed ? [controlLocationSelectionToolDrawBarButton] : []),
         {
           on: 'click',
           title: 'Rectangle tool',
