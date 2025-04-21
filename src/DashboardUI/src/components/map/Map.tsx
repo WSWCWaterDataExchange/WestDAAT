@@ -490,15 +490,10 @@ function Map({
       return;
     }
 
-    console.log('useeffect activated');
     const existingPolygons = drawControl?.getAll() ?? [];
     const newPolygons = userDrawnPolygonData.filter(
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
-
-    console.log('user drawn polygon data', userDrawnPolygonData);
-    console.log('existing polygons', existingPolygons);
-    console.log('new polygons', newPolygons);
 
     map.once('styledata', () => {
       newPolygons.forEach((polygon) => drawControl.add(polygon));
