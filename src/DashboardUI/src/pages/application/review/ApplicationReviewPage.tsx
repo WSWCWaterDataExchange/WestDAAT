@@ -10,6 +10,7 @@ import { hasPermission } from '../../../utilities/securityHelpers';
 import { Permission } from '../../../roleConfig';
 import { mdiArrowRight } from '@mdi/js';
 import { CancelChangesModal } from './form/CancelChangesModal';
+import { ConservationApplicationStatus } from '../../../data-contracts/ConservationApplicationStatus';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
@@ -34,6 +35,11 @@ function ApplicationReviewPage() {
   }, [isOnMapPage]);
 
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+
+  const isApplicationInFinalReview =
+    state.conservationApplication.status === ConservationApplicationStatus.InFinalReview;
+
+  const isPageLoading = state.isLoadingApplication || state.isLoadingFundingOrganization;
 
   const navigateBack = () => {
     if (isOnMapPage) {
@@ -73,7 +79,7 @@ function ApplicationReviewPage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canApproveApplication}
+        rightButtonDisplayed={canApproveApplication && isApplicationInFinalReview && !isPageLoading}
         rightButtonText="Continue to Final Approval"
         rightButtonIcon={mdiArrowRight}
         onRightButtonClick={navigateToApprovalPage}

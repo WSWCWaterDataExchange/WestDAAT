@@ -17,6 +17,10 @@ import { UnsavedChangesModal } from './UnsavedChangesModal';
 import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationReviewNote';
 import GenericLoadingForm from '../../../../components/GenericLoadingForm';
 import { CancelChangesModal } from './CancelChangesModal';
+import { hasPermission } from '../../../../utilities/securityHelpers';
+import { Permission } from '../../../../roleConfig';
+import { useAuthenticationContext } from '../../../../hooks/useAuthenticationContext';
+import { ConservationApplicationStatus } from '../../../../data-contracts/ConservationApplicationStatus';
 import { ControlPointRequiredModal } from './ControlPointRequiredModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
@@ -26,6 +30,7 @@ export function ApplicationReviewFormPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state, dispatch } = useConservationApplicationContext();
+  const { user } = useAuthenticationContext();
 
   const isApplicationLoading = state.isLoadingApplication;
   const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
@@ -110,6 +115,13 @@ export function ApplicationReviewFormPage() {
     );
   }
 
+  const canUpdateApplication = hasPermission(user, Permission.ApplicationUpdate);
+  const canRecommendApplication = hasPermission(user, Permission.ApplicationRecommendation);
+  const isApplicationFinalized =
+    state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
+    state.conservationApplication.status === ConservationApplicationStatus.Approved ||
+    state.conservationApplication.status === ConservationApplicationStatus.Denied;
+
   return (
     <div className="container">
       <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
@@ -117,6 +129,7 @@ export function ApplicationReviewFormPage() {
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
       <ApplicationReviewButtonRow
+        isHidden={!(canUpdateApplication && canRecommendApplication) || isApplicationFinalized}
         isFormDirty={state.conservationApplication.isDirty}
         isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
