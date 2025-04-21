@@ -1,21 +1,18 @@
-import { useMutation } from 'react-query';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { EstimationToolSidebar } from '../../estimation-tool/EstimationToolSidebar';
 import { EstimationToolMapHeader } from '../../estimation-tool/EstimationToolMapHeader';
 import ReviewMap from './ReviewMap';
+import { useReviewerEstimateConsumptiveUseMutation } from '../../../../hooks/queries/useApplicationQuery';
 
 export function ApplicationReviewMapPage() {
   const { state } = useConservationApplicationContext();
 
-  const estimateConsumptiveUseMutation = useMutation({
-    mutationFn: async () => {
-      alert('Not implemented. This feature will be available in a future release.');
-      return;
-    },
-  });
+  const estimateConsumptiveUseMutation = useReviewerEstimateConsumptiveUseMutation();
 
-  const handleEstimateConsumptiveUseClicked = async () => {
-    await estimateConsumptiveUseMutation.mutateAsync();
+  const handleEstimateConsumptiveUseClicked = async (updateEstimate: boolean) => {
+    await estimateConsumptiveUseMutation.mutateAsync({
+      updateEstimate,
+    });
   };
 
   return (
@@ -24,6 +21,7 @@ export function ApplicationReviewMapPage() {
       <div className="h-100 d-flex overflow-y-auto align-items-stretch">
         <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
           <EstimationToolSidebar
+            perspective="reviewer"
             isLoading={state.isLoadingApplication || state.isLoadingFundingOrganization}
             loadFailed={state.loadApplicationErrored || state.loadFundingOrganizationErrored}
           />
@@ -34,7 +32,7 @@ export function ApplicationReviewMapPage() {
           <ReviewMap
             waterRightNativeId={state.conservationApplication.waterRightNativeId}
             handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
-            isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
+            isLoadingConsumptiveUseEstimate={state.isLoadingReviewerConsumptiveUseEstimate}
           />
         </div>
       </div>
