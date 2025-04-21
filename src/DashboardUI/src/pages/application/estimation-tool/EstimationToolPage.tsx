@@ -79,7 +79,7 @@ export function EstimationToolPage() {
   });
 
   const handleEstimateConsumptiveUseClicked = async () => {
-    await estimateConsumptiveUseMutation.mutateAsync({
+    await estimateConsumptiveUseMutation.mutate({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
       polygons: state.conservationApplication.estimateLocations.map(

@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
 import centerOfMass from '@turf/center-of-mass';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 import { useWaterRightSiteLocations } from '../../../hooks/queries';
 import { mapLayerNames, mapSourceNames } from '../../../config/maps';
@@ -25,7 +25,7 @@ import { formatNumber } from '../../../utilities/valueFormatters';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
-  handleEstimateConsumptiveUseClicked: () => Promise<void>;
+  handleEstimateConsumptiveUseClicked: () => void;
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
@@ -33,9 +33,6 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
   const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
     useMapContext();
-
-  const [showDataTable, setShowDataTable] = useState(false);
-  const toggleShowDataTable = () => setShowDataTable((prev) => !prev);
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -141,11 +138,6 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
-  const handleEstimateConsumptiveUseClicked = async () => {
-    await props.handleEstimateConsumptiveUseClicked();
-    setShowDataTable(true);
-  };
-
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-center p-1 d-print-none">
@@ -153,7 +145,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         <Button
           variant="success"
           style={{ zIndex: 1000 }}
-          onClick={async () => handleEstimateConsumptiveUseClicked()}
+          onClick={props.handleEstimateConsumptiveUseClicked}
           disabled={!estimateButtonEnabled}
         >
           {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
@@ -166,7 +158,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />
-      <EstimationToolTableView perspective="applicant" show={showDataTable} toggleShow={toggleShowDataTable} />
+      <EstimationToolTableView perspective="applicant" />
     </div>
   );
 }
