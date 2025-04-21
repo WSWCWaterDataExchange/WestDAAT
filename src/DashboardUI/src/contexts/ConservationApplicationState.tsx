@@ -64,7 +64,8 @@ export interface ConservationApplicationState {
   loadFundingOrganizationErrored: boolean;
   isLoadingReviewerConsumptiveUseEstimate: boolean;
   reviewerConsumptiveUseEstimateHasErrored: boolean;
-  canEstimateConsumptiveUse: boolean;
+  canApplicantEstimateConsumptiveUse: boolean;
+  canReviewerEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
   controlPointLocationHasBeenSaved: boolean;
 }
@@ -118,7 +119,8 @@ export const defaultState = (): ConservationApplicationState => ({
   loadFundingOrganizationErrored: false,
   isLoadingReviewerConsumptiveUseEstimate: false,
   reviewerConsumptiveUseEstimateHasErrored: false,
-  canEstimateConsumptiveUse: false,
+  canApplicantEstimateConsumptiveUse: false,
+  canReviewerEstimateConsumptiveUse: false,
   canContinueToApplication: false,
   controlPointLocationHasBeenSaved: false,
 });
@@ -441,7 +443,7 @@ const onEstimationToolPageLoaded = (
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterRightNativeId = payload.waterRightNativeId;
 
-  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -468,7 +470,7 @@ const onFundingOrganizationLoaded = (
   draftState.isLoadingFundingOrganization = false;
   draftState.loadFundingOrganizationErrored = false;
 
-  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -489,7 +491,7 @@ const onApplicationCreated = (
 
   draftState.isCreatingApplication = true;
 
-  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -502,7 +504,7 @@ const onMapPolygonsUpdated = (
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
   resetConsumptiveUseEstimation(draftState);
-  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
   updatePolygonAcreageSum(draftState);
   computeCombinedPolygonData(draftState);
   resetApplicationFormLocationDetails(draftState);
@@ -618,7 +620,7 @@ const onReviewerMapPolygonsUpdated = (
   // side effects
   resetConsumptiveUseEstimation(draftState);
   updatePolygonAcreageSum(draftState);
-  checkCanReviewerEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -633,7 +635,7 @@ const onEstimationFormUpdated = (
   application.desiredCompensationUnits = payload.desiredCompensationUnits;
 
   resetConsumptiveUseEstimation(draftState);
-  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -918,13 +920,18 @@ const onApplicationLoadErrored = (draftState: ConservationApplicationState): Con
   return draftState;
 };
 
+const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
+  checkCanApplicantEstimateConsumptiveUse(draftState);
+  checkCanReviewerEstimateConsumptiveUse(draftState);
+};
+
 const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
   const dollarsHasValue = !!app.desiredCompensationDollars;
   const unitsHasValue = !!app.desiredCompensationUnits;
 
-  draftState.canEstimateConsumptiveUse =
+  draftState.canApplicantEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
     !!app.waterRightNativeId &&
     !!app.openEtModelName &&
@@ -942,14 +949,14 @@ const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplica
 const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
-  draftState.canEstimateConsumptiveUse =
+  draftState.canReviewerEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
     app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
     app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap &&
-    !!app.controlLocation &&
+    !!app.controlLocation?.pointWkt &&
     !app.doesControlLocationOverlapWithPolygons;
 };
 

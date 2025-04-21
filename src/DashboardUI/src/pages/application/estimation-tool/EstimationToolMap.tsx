@@ -136,7 +136,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     setUserDrawnPolygonData(polygons);
   };
 
-  const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
+  const estimateButtonEnabled = state.canApplicantEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
   return (
     <div className="flex-grow-1 position-relative">

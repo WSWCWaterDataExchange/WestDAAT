@@ -198,7 +198,7 @@ function ReviewMap(props: ReviewMapProps) {
     });
   };
 
-  const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
+  const estimateButtonEnabled = state.canReviewerEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
   const allLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     return userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
