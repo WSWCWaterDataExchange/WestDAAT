@@ -708,16 +708,7 @@ const onReviewerConsumptiveUseEstimated = (
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    application.estimateLocations[i] = {
-      // preserve existing entry's data
-      ...application.estimateLocations[i],
-      // merge consumptive use data into entry
-      ...matchingConsumptiveUseData,
-      // ensure that the Id is preserved, assuming it exists
-      waterConservationApplicationEstimateLocationId:
-        matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ??
-        application.estimateLocations[i].waterConservationApplicationEstimateLocationId,
-    };
+    Object.assign(application.estimateLocations[i], matchingConsumptiveUseData);
   }
 
   // update control location
