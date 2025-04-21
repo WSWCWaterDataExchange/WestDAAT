@@ -333,7 +333,6 @@ export const reducer = (
 
 // Given an action and the current state, return the new state
 const reduce = (draftState: ConservationApplicationState, action: ApplicationAction): ConservationApplicationState => {
-  console.log('performing action', action);
   switch (action.type) {
     case 'DASHBOARD_APPLICATIONS_LOADED':
       return onDashboardApplicationsLoaded(draftState, action);
