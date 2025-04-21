@@ -86,7 +86,7 @@ function ReviewMap(props: ReviewMapProps) {
       type: 'Feature',
       geometry: controlLocationFeature.geometry,
       properties: {
-        title: 'Control Location',
+        title: 'Control Point',
       },
     };
   }, [controlLocationFeature, controlLocationFeature?.geometry]);
