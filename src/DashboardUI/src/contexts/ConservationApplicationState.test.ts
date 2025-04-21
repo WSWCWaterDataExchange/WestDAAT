@@ -1071,6 +1071,7 @@ describe('ConservationApplicationState reducer', () => {
             },
           ],
         },
+        estimateWasSaved: true
       },
     };
     newState = reducer(newState, estimateConsumptiveUseAction);
@@ -1112,6 +1113,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(controlLocation?.pointWkt).toEqual(controlLocationPayload.pointWkt);
     expect(controlLocation?.averageYearlyTotalEtInInches).toEqual(controlLocationPayload.averageYearlyTotalEtInInches);
     expect(controlLocation?.datapoints).toEqual(controlLocationPayload.datapoints);
+    expect(state.controlPointLocationHasBeenSaved).toEqual(true);
   });
 
   describe('Additional Use Cases', () => {

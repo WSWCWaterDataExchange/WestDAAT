@@ -66,6 +66,8 @@ export function ApplicationReviewFormPage() {
   const handleSubmitClicked = () => {
     if (state.conservationApplication.isDirty) {
       setShowUnsavedChangesModal(true);
+    } else if (!state.controlPointLocationHasBeenSaved) {
+      alert('you need to set a control point');
     } else {
       setShowSubmitRecommendationModal(true);
     }

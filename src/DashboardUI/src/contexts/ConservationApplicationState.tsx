@@ -65,6 +65,7 @@ export interface ConservationApplicationState {
   reviewerConsumptiveUseEstimateHasErrored: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
+  controlPointLocationHasBeenSaved: boolean;
 }
 
 export const defaultState = (): ConservationApplicationState => ({
@@ -117,6 +118,7 @@ export const defaultState = (): ConservationApplicationState => ({
   reviewerConsumptiveUseEstimateHasErrored: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
+  controlPointLocationHasBeenSaved: false,
 });
 
 export type ApplicationAction =
@@ -245,6 +247,7 @@ export interface ReviewerConsumptiveUseEstimatedAction {
     conservationPayment: number;
     dataCollections: PolygonEtDataCollection[];
     controlDataCollection: PointEtDataCollection;
+    estimateWasSaved: boolean;
   };
 }
 export interface ApplicationSubmissionFormUpdatedAction {
@@ -677,6 +680,7 @@ const onReviewerConsumptiveUseEstimated = (
 ): ConservationApplicationState => {
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
+  draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
 
   const application = draftState.conservationApplication;
 
