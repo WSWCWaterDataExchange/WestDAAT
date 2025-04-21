@@ -94,3 +94,6 @@ export const overlaysColorList = [
 ];
 
 export const timeSeriesColor = '#FF7F50';
+
+export const conservationApplicationMaxPolygonCount = 20;
+export const conservationApplicationMaxPolygonAcreage = 50_000;

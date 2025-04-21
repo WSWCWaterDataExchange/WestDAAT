@@ -8,17 +8,27 @@ import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 import './estimation-tool-table-view.scss';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
-function EstimationToolTableView() {
+interface EstimationToolTableViewProps {
+  perspective: ApplicationReviewPerspective;
+}
+
+function EstimationToolTableView(props: EstimationToolTableViewProps) {
   const { state } = useConservationApplicationContext();
   const polygons = state.conservationApplication.estimateLocations;
 
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>();
+  const [hasPerformedInitialTableShow, setHasPerformedInitialTableShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
 
   useEffect(() => {
+    if (hasPerformedInitialTableShow) {
+      return;
+    }
+
     const hasPerformedEstimation = polygons.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return;
@@ -28,6 +38,7 @@ function EstimationToolTableView() {
       // wait a few seconds to allow the user to notice the map zooming in
       setActiveTab(polygons[0].fieldName);
       setShow(true);
+      setHasPerformedInitialTableShow(true);
     }, 1000);
   }, [polygons]);
 
@@ -60,12 +71,13 @@ function EstimationToolTableView() {
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
                   {show && activeTab === field.fieldName && (
                     <EstimationToolFieldDataTable
+                      perspective={props.perspective}
                       data={{
                         waterConservationApplicationEstimateLocationId:
                           field.waterConservationApplicationEstimateLocationId!,
                         polygonWkt: field.polygonWkt!,
-                        averageYearlyTotalEtInInches: field.averageYearlyEtInInches,
-                        averageYearlyTotalEtInAcreFeet: field.averageYearlyEtInAcreFeet,
+                        averageYearlyTotalEtInInches: field.averageYearlyTotalEtInInches,
+                        averageYearlyNetEtInInches: field.averageYearlyNetEtInInches,
                         datapoints: field.datapoints,
                       }}
                       fieldAcreage={field.acreage!}

@@ -1,22 +1,27 @@
-import ConfirmationModal from '../../../../components/ConfirmationModal';
+import Button from 'react-bootstrap/esm/Button';
+import Modal from 'react-bootstrap/esm/Modal';
 
 export interface CancelChangesModalProps {
   show: boolean;
-  onCancel: () => void;
+  onClose: () => void;
   onConfirm: () => void;
 }
 
 export function CancelChangesModal(props: CancelChangesModalProps) {
   return (
-    <ConfirmationModal
-      show={props.show}
-      onCancel={props.onCancel}
-      onConfirm={props.onConfirm}
-      titleText="Are you sure you want to leave?"
-      cancelText="Cancel"
-      confirmText="Okay"
-    >
-      Any changes to this application will not be saved.
-    </ConfirmationModal>
+    <Modal show={props.show} centered>
+      <Modal.Header closeButton onClick={props.onClose}>
+        <Modal.Title>You have unsaved changes</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>Unsaved changes will be lost if you proceed. Do you want to continue?</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={props.onClose}>
+          Cancel
+        </Button>
+        <Button variant="danger" onClick={props.onConfirm}>
+          Discard Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }

@@ -90,7 +90,7 @@ function ApplicationReviewPage() {
             <CancelChangesModal
               show={showCancelConfirmationModal}
               onConfirm={handleCancelConfirmed}
-              onCancel={() => setShowCancelConfirmationModal(false)}
+              onClose={() => setShowCancelConfirmationModal(false)}
             />
           </>
         )}

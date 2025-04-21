@@ -245,10 +245,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(src.PolygonWkt));
                     return new CommonContracts.ApplicationEstimateUpdateLocationDetails
                     {
-                        // mapping from Guid to Guid? -> default values should be treated as null
-                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId != Guid.Empty
-                            ? src.WaterConservationApplicationEstimateLocationId
-                            : null,
+                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId,
                         PolygonWkt = src.PolygonWkt,
                         DrawToolType = src.DrawToolType,
                         PolygonAreaInAcres = polygonAreaInAcres,
@@ -348,10 +345,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
-            
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CommonContracts.WaterConservationApplicationNoteCreateRequest>()
                 .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore());
-            
+
             CreateMap<CommonContracts.WaterConservationApplicationNoteCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
