@@ -17,7 +17,7 @@ export function EstimationToolMapHeader() {
           Click once to begin drawing a polygon around your land by using the shape tool. Then, use the panel on the
           left to review estimates and potential compensation as part of a voluntary and temporary measure.
         </span>
-        <Button className="" variant="link" onClick={() => setShowVideoPlayer(true)}>
+        <Button className="p-0 mb-1 border-0" variant="link" onClick={() => setShowVideoPlayer(true)}>
           How does this work?
         </Button>
       </div>
