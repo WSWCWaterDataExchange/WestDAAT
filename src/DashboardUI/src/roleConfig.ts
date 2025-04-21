@@ -5,6 +5,7 @@ export enum Permission {
   ApplicationUpdate = 'Application_Update',
   ApplicationRecommendation = 'Application_Recommendation',
   ApplicationApprove = 'Application_Approve',
+  ApplicationNoteCreate = "ApplicationNote_Create",
   OrganizationApplicationDashboardLoad = 'Organization_Application_Dashboard_Load',
   OrganizationDetailsList = 'Organization_List_Details',
   OrganizationMemberAdd = 'Organization_Member_Add',
@@ -18,12 +19,15 @@ export enum Permission {
 export const RolePermissions: Record<Role, Permission[]> = {
   [Role.Member]: [
     Permission.ApplicationApprove,
+    Permission.ApplicationReview,
+    Permission.ApplicationNoteCreate,
     Permission.OrganizationApplicationDashboardLoad,
   ],
   [Role.TechnicalReviewer]: [
     Permission.ApplicationReview,
     Permission.ApplicationUpdate,
     Permission.ApplicationRecommendation,
+    Permission.ApplicationNoteCreate,
     Permission.OrganizationApplicationDashboardLoad,
   ],
   [Role.OrganizationAdmin]: [
@@ -31,6 +35,7 @@ export const RolePermissions: Record<Role, Permission[]> = {
     Permission.ApplicationReview,
     Permission.ApplicationUpdate,
     Permission.ApplicationRecommendation,
+    Permission.ApplicationNoteCreate,
     Permission.OrganizationApplicationDashboardLoad,
     Permission.OrganizationMemberAdd,
     Permission.OrganizationMemberRemove,
