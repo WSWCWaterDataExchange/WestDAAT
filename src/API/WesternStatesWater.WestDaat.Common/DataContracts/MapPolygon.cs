@@ -2,6 +2,8 @@
 
 public class MapPolygon
 {
+    public Guid? WaterConservationApplicationEstimateLocationId { get; set; } = null!;
+
     /// <summary>
     /// Polygon in "Well-known text" (WKT) format.
     /// <br />
