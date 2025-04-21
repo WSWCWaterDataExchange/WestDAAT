@@ -758,6 +758,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
       expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
       expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+      expect(newState.controlPointLocationHasBeenSaved).toBe(true);
 
       // application estimate control location water measurements
       const controlLocationWaterMeasurement = controlLocation.datapoints![0];
@@ -1090,6 +1091,7 @@ describe('ConservationApplicationState reducer', () => {
     newState = reducer(newState, addControlLocationAction);
 
     expect(newState.conservationApplication.controlLocation).toBeDefined();
+    expect(newState.controlPointLocationHasBeenSaved).toBe(true);
 
     // Act
     const estimateConsumptiveUseAction: ReviewerConsumptiveUseEstimatedAction = {
@@ -1129,6 +1131,7 @@ describe('ConservationApplicationState reducer', () => {
             },
           ],
         },
+        estimateWasSaved: false
       },
     };
     newState = reducer(newState, estimateConsumptiveUseAction);
@@ -1170,6 +1173,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(controlLocation?.pointWkt).toEqual(controlLocationPayload.pointWkt);
     expect(controlLocation?.averageYearlyTotalEtInInches).toEqual(controlLocationPayload.averageYearlyTotalEtInInches);
     expect(controlLocation?.datapoints).toEqual(controlLocationPayload.datapoints);
+    expect(newState.controlPointLocationHasBeenSaved).toEqual(true);
   });
 
   describe('Additional Use Cases', () => {

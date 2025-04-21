@@ -163,9 +163,11 @@ export function useReviewerEstimateConsumptiveUseMutation() {
         updateEstimate: options.updateEstimate,
       };
 
-      return await reviewerEstimateConsumptiveUse(msalContext, apiCallFields);
+      const result = await reviewerEstimateConsumptiveUse(msalContext, apiCallFields);
+      return { result, estimateWasSaved: options.updateEstimate };
     },
-    onSuccess: (result: ReviewerEstimateConsumptiveUseResponse) => {
+    onSuccess: (data: { result: ReviewerEstimateConsumptiveUseResponse, estimateWasSaved: boolean }) => {
+      const { result, estimateWasSaved } = data;
       if (result) {
         dispatch({
           type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
@@ -175,6 +177,7 @@ export function useReviewerEstimateConsumptiveUseMutation() {
             conservationPayment: result.conservationPayment,
             dataCollections: result.dataCollections,
             controlDataCollection: result.controlDataCollection,
+            estimateWasSaved
           },
         });
       }

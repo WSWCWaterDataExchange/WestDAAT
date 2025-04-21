@@ -67,6 +67,7 @@ export interface ConservationApplicationState {
   canApplicantEstimateConsumptiveUse: boolean;
   canReviewerEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
+  controlPointLocationHasBeenSaved: boolean;
 }
 
 export const defaultState = (): ConservationApplicationState => ({
@@ -121,6 +122,7 @@ export const defaultState = (): ConservationApplicationState => ({
   canApplicantEstimateConsumptiveUse: false,
   canReviewerEstimateConsumptiveUse: false,
   canContinueToApplication: false,
+  controlPointLocationHasBeenSaved: false,
 });
 
 export type ApplicationAction =
@@ -250,6 +252,7 @@ export interface ReviewerConsumptiveUseEstimatedAction {
     conservationPayment: number;
     dataCollections: PolygonEtDataCollection[];
     controlDataCollection: PointEtDataCollection;
+    estimateWasSaved: boolean;
   };
 }
 export interface ApplicationSubmissionFormUpdatedAction {
@@ -691,6 +694,11 @@ const onReviewerConsumptiveUseEstimated = (
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
 
+  // if an estimated has already been saved, we don't want to overwrite that flag
+  if (!draftState.controlPointLocationHasBeenSaved) {
+    draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
+  }
+
   const application = draftState.conservationApplication;
 
   application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
@@ -878,6 +886,7 @@ const onApplicationLoaded = (
         }),
       ),
     };
+    draftState.controlPointLocationHasBeenSaved = true;
   }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 
