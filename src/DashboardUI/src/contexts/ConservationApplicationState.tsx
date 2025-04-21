@@ -871,6 +871,7 @@ const onApplicationLoaded = (
         }),
       ),
     };
+    draftState.controlPointLocationHasBeenSaved = true;
   }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 
@@ -894,7 +895,6 @@ const onApplicationLoaded = (
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
   draftState.conservationApplication.isDirty = false;
-  draftState.controlPointLocationHasBeenSaved = payload.application.estimate.controlLocation?.id !== undefined;
 
   return draftState;
 };
