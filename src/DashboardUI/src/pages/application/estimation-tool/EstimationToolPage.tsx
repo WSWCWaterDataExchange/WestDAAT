@@ -79,20 +79,23 @@ export function EstimationToolPage() {
   });
 
   const handleEstimateConsumptiveUseClicked = async () => {
-    await estimateConsumptiveUseMutation.mutateAsync({
-      waterRightNativeId: state.conservationApplication.waterRightNativeId,
-      waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      polygons: state.conservationApplication.estimateLocations.map(
-        (polygon): MapPolygon => ({
-          // backend overwrites locations for applicant EstimateConsumptiveUse use case
-          waterConservationApplicationEstimateLocationId: null,
-          polygonWkt: polygon.polygonWkt!,
-          drawToolType: polygon.drawToolType!,
-        }),
-      ),
-      compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
-      units: state.conservationApplication.desiredCompensationUnits,
-    });
+    await estimateConsumptiveUseMutation
+      .mutateAsync({
+        waterRightNativeId: state.conservationApplication.waterRightNativeId,
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
+        polygons: state.conservationApplication.estimateLocations.map(
+          (polygon): MapPolygon => ({
+            // backend overwrites locations for applicant EstimateConsumptiveUse use case
+            waterConservationApplicationEstimateLocationId: null,
+            polygonWkt: polygon.polygonWkt!,
+            drawToolType: polygon.drawToolType!,
+          }),
+        ),
+        compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
+        units: state.conservationApplication.desiredCompensationUnits,
+      })
+      // intentionally swallow error - toast notification is already displayed
+      .catch((error) => {});
   };
 
   const navigateToWaterRightLandingPage = () => {
