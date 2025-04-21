@@ -948,7 +948,7 @@ const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicat
     app.estimateLocations.length <= conservationApplicationMaxPolygonCount &&
     app.estimateLocations.every((p) => p.acreage! <= conservationApplicationMaxPolygonAcreage) &&
     !app.doPolygonsOverlap &&
-    !!app.controlLocation &&
+    !!app.controlLocation?.pointWkt &&
     !app.doesControlLocationOverlapWithPolygons;
 };
 
