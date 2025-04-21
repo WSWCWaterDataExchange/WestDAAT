@@ -34,7 +34,7 @@ export function EstimationToolMapHeader() {
       </div>
 
       <Modal dialogClassName="modal-75w" centered show={showVideoPlayer} onHide={() => setShowVideoPlayer(false)}>
-        <EstimationToolHelpVideo onVideoEnd={() => setShowVideoPlayer(true)} />
+        <EstimationToolHelpVideo onVideoEnd={() => setShowVideoPlayer(false)} />
       </Modal>
     </div>
   );
