@@ -21,6 +21,7 @@ import { hasPermission } from '../../../../utilities/securityHelpers';
 import { Permission } from '../../../../roleConfig';
 import { useAuthenticationContext } from '../../../../hooks/useAuthenticationContext';
 import { ConservationApplicationStatus } from '../../../../data-contracts/ConservationApplicationStatus';
+import { ControlPointRequiredModal } from './ControlPointRequiredModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -38,6 +39,7 @@ export function ApplicationReviewFormPage() {
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
   const [showSubmitRecommendationModal, setShowSubmitRecommendationModal] = useState(false);
+  const [showControlPointRequiredModal, setShowControlPointRequiredModal] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -71,6 +73,8 @@ export function ApplicationReviewFormPage() {
   const handleSubmitClicked = () => {
     if (state.conservationApplication.isDirty) {
       setShowUnsavedChangesModal(true);
+    } else if (!state.controlPointLocationHasBeenSaved) {
+      setShowControlPointRequiredModal(true);
     } else {
       setShowSubmitRecommendationModal(true);
     }
@@ -146,6 +150,10 @@ export function ApplicationReviewFormPage() {
         disableActionButtons={updateApplicationSubmissionMutation.isLoading}
       />
       <UnsavedChangesModal show={showUnsavedChangesModal} onClose={() => setShowUnsavedChangesModal(false)} />
+      <ControlPointRequiredModal
+        show={showControlPointRequiredModal}
+        onClose={() => setShowControlPointRequiredModal(false)}
+      />
       <SubmitApplicationRecommendationModal
         show={showSubmitRecommendationModal}
         applicationId={applicationId!}
