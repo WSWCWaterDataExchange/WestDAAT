@@ -26,6 +26,13 @@ const shouldApplicantBeAbleToPerformConsumptiveUseEstimate = (
   expect(state.canApplicantEstimateConsumptiveUse).toEqual(expected);
 };
 
+const shouldReviewerBeAbleToPerformConsumptiveUseEstimate = (
+  state: ConservationApplicationState,
+  expected: boolean,
+): void => {
+  expect(state.canReviewerEstimateConsumptiveUse).toEqual(expected);
+};
+
 const shouldBeAbleToContinueToApplication = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canContinueToApplication).toEqual(expected);
 };
@@ -141,6 +148,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.waterRightNativeId).toEqual('mock-water-right-native-id');
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -168,6 +176,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.compensationRateModel).toEqual('Mock Compensation Rate Model');
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -189,6 +198,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.isCreatingApplication).toBe(true);
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -219,6 +229,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -238,6 +249,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.desiredCompensationUnits).toEqual(CompensationRateUnits.AcreFeet);
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -295,6 +307,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.estimateLocations[0].fieldName).toEqual('Field 1');
 
     shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
 
@@ -404,6 +417,7 @@ describe('ConservationApplicationState reducer', () => {
       // Act
       // Assert
       shouldApplicantBeAbleToPerformConsumptiveUseEstimate(state, false);
+      shouldReviewerBeAbleToPerformConsumptiveUseEstimate(state, false);
     });
 
     it('estimate consumptive use should be disabled when more than the maximum number of polygons have been selected', () => {
@@ -452,9 +466,10 @@ describe('ConservationApplicationState reducer', () => {
 
       // Assert
       shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, false);
+      shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
     });
 
-    it('estimate consumptive use should be enabled when at least one map polygon is present', () => {
+    it('applicant should be able to estimate consumptive use when at least one map polygon is present', () => {
       // Arrange
       // Act
       let newState = reducer(state, {
@@ -502,7 +517,7 @@ describe('ConservationApplicationState reducer', () => {
       shouldApplicantBeAbleToPerformConsumptiveUseEstimate(newState, true);
     });
 
-    it('estimate consumptive use should be enabled or disabled depending on the sidebar inputs', () => {
+    it('applicant should be able to estimate consumptive use depending on the sidebar inputs', () => {
       // Arrange - initialize page, setup map
       let newState = reducer(state, {
         type: 'ESTIMATION_TOOL_PAGE_LOADED',
@@ -993,6 +1008,46 @@ describe('ConservationApplicationState reducer', () => {
       expect(controlLocation?.averageYearlyTotalEtInInches).toBe(undefined);
       expect(controlLocation?.datapoints).toEqual([]);
     });
+  });
+
+  it('reviewer should be able to estimate consumptive use once control location is present', () => {
+    // Arrange
+    let newState = reducer(state, {
+      type: 'APPLICATION_LOADED',
+      payload: {
+        application: applicationDetailsMock(),
+        notes: [],
+        reviewPipeline: {
+          reviewSteps: [],
+        },
+      },
+    });
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, false);
+
+    // Act
+    newState = reducer(newState, {
+      type: 'REVIEWER_MAP_DATA_UPDATED',
+      payload: {
+        // polygons remain as-is
+        polygons: newState.conservationApplication.estimateLocations.map(
+          (polygon): MapSelectionPolygonData => ({
+            waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
+            polygonWkt: polygon.polygonWkt!,
+            acreage: polygon.acreage!,
+            drawToolType: polygon.drawToolType!,
+          }),
+        ),
+        doPolygonsOverlap: false,
+        // new control location
+        controlLocation: {
+          pointWkt: 'POINT (5 5)',
+        },
+        doesControlLocationOverlapWithPolygons: false,
+      },
+    });
+
+    // Assert
+    shouldReviewerBeAbleToPerformConsumptiveUseEstimate(newState, true);
   });
 
   it('reviewer estimating consumptive use should update state', () => {
