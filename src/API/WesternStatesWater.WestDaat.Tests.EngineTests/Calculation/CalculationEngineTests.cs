@@ -415,6 +415,50 @@ public class CalculationEngineTests : EngineTestBase
         }
     }
 
+    [TestMethod]
+    public async Task Calculate_MultiPolygonYearlyEt_ShouldPreserveRequestId()
+    {
+        // Arrange
+        var twentyTwentyFive = DateOnly.FromDateTime(new DateTime(2025, 1, 1));
+        _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<RasterTimeSeriesPolygonRequest>()))
+            .ReturnsAsync(new RasterTimeSeriesPolygonResponse
+            {
+                Data = [
+                    new()
+                    {
+                        Evapotranspiration = 1.0,
+                        Time = twentyTwentyFive
+                    }
+                ]
+            });
+
+        var request = new MultiPolygonYearlyEtRequest
+        {
+            DateRangeStart = DateOnly.MinValue,
+            DateRangeEnd = DateOnly.MaxValue,
+            Model = RasterTimeSeriesModel.SSEBop,
+            Polygons =
+            [
+                new MapPolygon
+                {
+                    WaterConservationApplicationEstimateLocationId = Guid.NewGuid(),
+                    PolygonWkt = arbitraryValidPolygonWkt1,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
+            ControlLocation = null
+        };
+
+        // Act
+        var response = (MultiPolygonYearlyEtResponse)await _calculationEngine.Calculate(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        response.DataCollections.Length.Should().Be(1);
+        response.DataCollections[0].WaterConservationApplicationEstimateLocationId.Should().Be(request.Polygons[0].WaterConservationApplicationEstimateLocationId);
+    }
+
     [DataTestMethod]
     [DataRow(CompensationRateUnits.AcreFeet, false)]
     [DataRow(CompensationRateUnits.AcreFeet, true)]
