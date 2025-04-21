@@ -77,6 +77,20 @@ function ReviewMap(props: ReviewMapProps) {
       });
   }, [userDrawnPolygonFeatures]);
 
+  const controlLocationLabelFeature: Feature<Point, GeoJsonProperties> | undefined = useMemo(() => {
+    if (!controlLocationFeature) {
+      return undefined;
+    }
+
+    return {
+      type: 'Feature',
+      geometry: controlLocationFeature.geometry,
+      properties: {
+        title: 'Control Point',
+      },
+    };
+  }, [controlLocationFeature, controlLocationFeature?.geometry]);
+
   useEffect(() => {
     if (!userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
       return;
@@ -185,6 +199,8 @@ function ReviewMap(props: ReviewMapProps) {
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
+  const allLabelFeatures = userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
+
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
@@ -213,7 +229,7 @@ function ReviewMap(props: ReviewMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={userDrawnPolygonLabelFeatures}
+        polygonLabelFeatures={allLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
