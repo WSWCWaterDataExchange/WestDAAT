@@ -2,6 +2,7 @@ import Button from 'react-bootstrap/esm/Button';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 
 export interface ApplicationReviewButtonRowProps {
+  isHidden: boolean;
   isFormDirty: boolean;
   isFormSubmitting: boolean;
   handleCancelClicked: () => void;
@@ -10,9 +11,19 @@ export interface ApplicationReviewButtonRowProps {
 }
 
 export function ApplicationReviewButtonRow(props: ApplicationReviewButtonRowProps) {
-  const { isFormDirty, isFormSubmitting, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } =
-    props;
+  const {
+    isHidden,
+    isFormDirty,
+    isFormSubmitting,
+    handleCancelClicked,
+    handleSaveClicked,
+    handleSubmitForFinalReviewClicked,
+  } = props;
   const { state } = useConservationApplicationContext();
+
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <div className="d-flex justify-content-between p-3">

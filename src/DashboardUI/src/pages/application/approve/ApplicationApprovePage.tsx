@@ -108,7 +108,6 @@ export function ApplicationApprovePage() {
       });
     },
   });
-  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
 
   const navigateToReviewPage = () => {
     const id = state.conservationApplication.waterConservationApplicationId;
@@ -116,6 +115,12 @@ export function ApplicationApprovePage() {
       navigate(`/application/${id}/review`);
     }
   };
+
+  const canUpdateApplication = hasPermission(user, Permission.ApplicationUpdate);
+  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+
+  const isApplicationInFinalReview =
+    state.conservationApplication.status === ConservationApplicationStatus.InFinalReview;
 
   const isApplicationFinalized =
     state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
@@ -130,7 +135,7 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canApproveApplication && !isApplicationFinalized}
+        rightButtonDisplayed={canUpdateApplication && !isApplicationFinalized && !isPageLoading}
         rightButtonText="Edit Application"
         onRightButtonClick={navigateToReviewPage}
       />
@@ -149,7 +154,7 @@ export function ApplicationApprovePage() {
                   <ApplicationReviewersNotesSection />
                   <ApplicationFormSectionRule width={1} />
                   <ApplicationApproveButtonRow
-                    isHidden={!canApproveApplication || isApplicationFinalized}
+                    isHidden={!canApproveApplication || !isApplicationInFinalReview}
                     disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
                     handleApproveClicked={handleApproveClicked}
                     handleDenyClicked={handleDenyClicked}
