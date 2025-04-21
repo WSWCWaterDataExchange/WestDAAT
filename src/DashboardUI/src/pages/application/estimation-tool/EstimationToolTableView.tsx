@@ -12,39 +12,27 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 
 interface EstimationToolTableViewProps {
   perspective: ApplicationReviewPerspective;
+  show: boolean;
+  toggleShow: () => void;
 }
 
 function EstimationToolTableView(props: EstimationToolTableViewProps) {
   const { state } = useConservationApplicationContext();
   const polygons = state.conservationApplication.estimateLocations;
 
-  const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>();
-  const [hasPerformedInitialTableShow, setHasPerformedInitialTableShow] = useState(false);
-
-  const toggleShow = () => setShow(!show);
 
   useEffect(() => {
-    if (hasPerformedInitialTableShow) {
+    if (!props.show) {
       return;
     }
 
-    const hasPerformedEstimation = polygons.some((p) => !!p.waterConservationApplicationEstimateLocationId);
-    if (!hasPerformedEstimation) {
-      return;
-    }
-
-    setTimeout(() => {
-      // wait a few seconds to allow the user to notice the map zooming in
-      setActiveTab(polygons[0].fieldName);
-      setShow(true);
-      setHasPerformedInitialTableShow(true);
-    }, 1000);
-  }, [polygons]);
+    setActiveTab(polygons[0].fieldName);
+  }, [props.show]);
 
   return (
     <div
-      className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} d-flex flex-column position-absolute start-0 end-0 bottom-0`}
+      className={`estimation-tool-table-view-container ${props.show ? 'expanded' : ''} d-flex flex-column position-absolute start-0 end-0 bottom-0`}
     >
       <div className="estimation-tool-table-view-slide-content flex-grow-1 d-flex flex-column">
         <div className="d-flex flex-column flex-grow-1 h-100">
@@ -69,7 +57,7 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
 
               {polygons.map((field) => (
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
-                  {show && activeTab === field.fieldName && (
+                  {props.show && activeTab === field.fieldName && (
                     <EstimationToolFieldDataTable
                       perspective={props.perspective}
                       data={{
@@ -94,10 +82,10 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
         type="button"
         className="estimation-tool-table-view-toggle-btn d-flex align-items-center justify-content-center py-2 px-4"
         variant="primary"
-        onClick={toggleShow}
+        onClick={props.toggleShow}
       >
         <span>DATA TABLE</span>
-        <Icon path={show ? mdiChevronDown : mdiChevronUp} size={1} />
+        <Icon path={props.show ? mdiChevronDown : mdiChevronUp} size={1} />
       </Button>
     </div>
   );

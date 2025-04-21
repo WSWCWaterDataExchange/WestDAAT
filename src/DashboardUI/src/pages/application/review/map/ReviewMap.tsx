@@ -30,7 +30,7 @@ import { formatNumber } from '../../../../utilities/valueFormatters';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
-  handleEstimateConsumptiveUseClicked: (updateEstimate: boolean) => void;
+  handleEstimateConsumptiveUseClicked: (updateEstimate: boolean) => Promise<void>;
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
@@ -45,6 +45,8 @@ function ReviewMap(props: ReviewMapProps) {
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
+  const [showDataTable, setShowDataTable] = useState(false);
+  const toggleShowDataTable = () => setShowDataTable((prev) => !prev);
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -201,6 +203,11 @@ function ReviewMap(props: ReviewMapProps) {
 
   const allLabelFeatures = userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
 
+  const handleEstimateConsumptiveUseClicked = async (updateEstimate: boolean) => {
+    await props.handleEstimateConsumptiveUseClicked(updateEstimate);
+    setShowDataTable(true);
+  };
+
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
@@ -213,13 +220,13 @@ function ReviewMap(props: ReviewMapProps) {
 
           <Dropdown.Menu>
             <Dropdown.Item
-              onClick={() => props.handleEstimateConsumptiveUseClicked(false)}
+              onClick={async () => await handleEstimateConsumptiveUseClicked(false)}
               disabled={!estimateButtonEnabled}
             >
               Only Retrieve Estimate
             </Dropdown.Item>
             <Dropdown.Item
-              onClick={() => props.handleEstimateConsumptiveUseClicked(true)}
+              onClick={async () => await handleEstimateConsumptiveUseClicked(true)}
               disabled={!estimateButtonEnabled}
             >
               Retrieve Estimate and Save Changes
@@ -234,7 +241,7 @@ function ReviewMap(props: ReviewMapProps) {
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
       />
-      <EstimationToolTableView perspective="reviewer" />
+      <EstimationToolTableView perspective="reviewer" show={showDataTable} toggleShow={toggleShowDataTable} />
     </div>
   );
 }
