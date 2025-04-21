@@ -199,7 +199,9 @@ function ReviewMap(props: ReviewMapProps) {
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
-  const allLabelFeatures = userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
+  const allLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
+    return userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
+  }, [userDrawnPolygonFeatures, controlLocationLabelFeature]);
 
   return (
     <div className="flex-grow-1 position-relative">
