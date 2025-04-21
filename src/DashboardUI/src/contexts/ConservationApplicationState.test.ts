@@ -20,7 +20,7 @@ import { ReviewStepStatus } from '../data-contracts/ReviewStepStatus';
 import { ReviewStepType } from '../data-contracts/ReviewStepType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
-  expect(state.canEstimateConsumptiveUse).toEqual(expected);
+  expect(state.canApplicantEstimateConsumptiveUse).toEqual(expected);
 };
 
 const shouldBeAbleToContinueToApplication = (state: ConservationApplicationState, expected: boolean): void => {
