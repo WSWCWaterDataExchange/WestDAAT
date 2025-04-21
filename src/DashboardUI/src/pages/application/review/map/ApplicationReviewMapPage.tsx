@@ -10,12 +10,9 @@ export function ApplicationReviewMapPage() {
   const estimateConsumptiveUseMutation = useReviewerEstimateConsumptiveUseMutation();
 
   const handleEstimateConsumptiveUseClicked = async (updateEstimate: boolean) => {
-    await estimateConsumptiveUseMutation
-      .mutateAsync({
-        updateEstimate,
-      })
-      // intentionally swallow error - toast notification is already displayed
-      .catch((error) => {});
+    await estimateConsumptiveUseMutation.mutateAsync({
+      updateEstimate,
+    });
   };
 
   return (
