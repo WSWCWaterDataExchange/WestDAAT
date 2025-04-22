@@ -561,6 +561,16 @@ const onReviewerMapPolygonsUpdated = (
           draftState.conservationApplication.estimateLocations.filter(
             (p) => p.polygonWkt !== removedPolygon.polygonWkt,
           );
+
+        // important - may also need to update the ApplicationSubmission form
+        if (removedPolygon.waterConservationApplicationEstimateLocationId) {
+          draftState.conservationApplication.applicationSubmissionForm.fieldDetails =
+            draftState.conservationApplication.applicationSubmissionForm.fieldDetails.filter(
+              (location) =>
+                location.waterConservationApplicationEstimateLocationId !==
+                removedPolygon.waterConservationApplicationEstimateLocationId,
+            );
+        }
       }
     } else {
       // polygon modified
@@ -694,7 +704,7 @@ const onReviewerConsumptiveUseEstimated = (
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
 
-  // if an estimated has already been saved, we don't want to overwrite that flag
+  // if an estimate has already been saved, we don't want to overwrite that flag
   if (!draftState.controlPointLocationHasBeenSaved) {
     draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
   }
@@ -705,12 +715,27 @@ const onReviewerConsumptiveUseEstimated = (
   application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
-  // combine polygon data
+  // combine polygon data and update field names
+  // start with the highest field name index + 1
+  // ie if "Field 3" exists, start with "Field 4"
+  const existingFieldNameIndices = application.estimateLocations
+    .filter((location) => !!location.fieldName)
+    .map((location) => Number(location.fieldName!.split(' ')[1]));
+  const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
+
+  let assignedFieldNameIndex = maxFieldNameIndex + 1;
   for (let i = 0; i < application.estimateLocations.length; i++) {
+    // update polygon entry
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
     Object.assign(application.estimateLocations[i], matchingConsumptiveUseData);
+
+    // update field name
+    if (!polygon.fieldName) {
+      polygon.fieldName = `Field ${assignedFieldNameIndex}`;
+      assignedFieldNameIndex++;
+    }
   }
 
   // update control location
