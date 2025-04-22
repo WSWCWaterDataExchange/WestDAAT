@@ -723,10 +723,15 @@ const onReviewerConsumptiveUseEstimated = (
     .map((location): number => {
       // validate field name was generated in expected format
       if (!location.fieldName!.startsWith('Field ')) {
-        throw new Error(`Field name ${location.fieldName} is not in expected format`);
+        console.error(`Field name ${location.fieldName} is not in expected format`);
       }
 
-      return Number(location.fieldName!.split(' ')[1]);
+      // handle field number being in unexpected format
+      let fieldNumber: number = Number(location.fieldName!.split(' ')[1]);
+      if (isNaN(fieldNumber)) {
+        fieldNumber = conservationApplicationMaxPolygonCount;
+      }
+      return fieldNumber;
     });
   const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
 
