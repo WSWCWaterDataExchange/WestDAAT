@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import MapPopupCard from './MapPopupCard';
-import { mdiChevronLeftBox, mdiChevronRightBox, mdiOpenInNew, mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
 import SiteDigest from '../../data-contracts/SiteDigest';
 import { FormattedDate } from '../FormattedDate';
@@ -15,17 +15,14 @@ interface SiteDigestCardProps {
 }
 
 function SiteDigestCard({
-  site,
-  onClosePopup,
-  currentIndex,
-  total,
-  goToNext,
-  goToPrevious,
-}: SiteDigestCardProps) {
+                          site,
+                          onClosePopup,
+                          currentIndex,
+                          total,
+                          goToNext,
+                          goToPrevious,
+                        }: SiteDigestCardProps) {
   const { siteType, siteUuid, hasTimeSeriesData, timeSeriesVariableTypes, waterRightsDigests } = site;
-  const currWaterRight = useMemo(() => {
-    return waterRightsDigests[currentIndex || 0];
-  }, [waterRightsDigests, currentIndex]);
 
   const showNavigation = total && total > 1;
 
@@ -33,49 +30,56 @@ function SiteDigestCard({
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
         header: (
-          <div>
-            Site ID:{' '}
-            <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
-              {siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-waterRights-link-icon"/>
-            </a>
+          <div className="flex justify-between items-center">
+            <div>
+              <strong>Site ID:</strong>{' '}
+              <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
+                {siteUuid}{' '}
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon inline" />
+              </a>
+            </div>
           </div>
         ),
         body: (
-          <div className="map-popup-card-waterRights-body">
+          <div className="map-popup-card-water-rights-body">
             <div className="mb-2">
-              <div>
-                <strong>Site Type:</strong>
+              <strong>Site Type:</strong>
               <div>{siteType}</div>
-              </div>
             </div>
-            <div className="map-popup-card-waterRights-native-id-row">
-              <strong>Water Right Native ID:</strong>{' '}
-              {currWaterRight ? (
-                <span>{currWaterRight.nativeId}</span>
+            <div className="mb-2">
+              <strong>Water Right Digests:</strong>
+              {waterRightsDigests.length === 0 ? (
+                <div>(no water right data)</div>
               ) : (
-                <span>(no water right data)</span>
-              )}
-            </div>
-            <div>
-              {!currWaterRight ? (
-                <div className="mb-2">(no water right data)</div>
-              ) : (
-                <div className="mb-2">
-                  <div>{currWaterRight.nativeId}{' '}</div>
-                  <div>
-                    <a href={`/details/right/${currWaterRight.allocationUuid}`} target="_blank"
-                       rel="noopener noreferrer">
-                      View Water Right Landing Page{' '}
-                      <Icon path={mdiOpenInNew} className="map-popup-card-waterRights-link-icon"/>
-                    </a>
+                waterRightsDigests.map((right, i) => (
+                  <div key={i} className="mb-2 border-b pb-2">
+                    <div>{right.nativeId}</div>
+                    <div>
+                      <a
+                        href={`/details/right/${right.allocationUuid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Water Right Landing Page{' '}
+                        <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                      </a>
+                    </div>
+                    <div>
+                      <strong>Beneficial Uses:</strong>
+                      {right.beneficialUses.map((use) => (
+                        <div key={use}>{use}</div>
+                      ))}
+                    </div>
+                    <div>
+                      <strong>Priority Date:</strong>{' '}
+                      <FormattedDate>{right.priorityDate}</FormattedDate>
+                    </div>
                   </div>
-                </div>
+                ))
               )}
             </div>
             <div className="mb-2">
-              <div>
-                <strong>Has Time Series Data:</strong>
-              </div>
+              <strong>Has Time Series Data:</strong>
               <div>
                 {hasTimeSeriesData ? (
                   <a
@@ -84,48 +88,18 @@ function SiteDigestCard({
                     rel="noopener noreferrer"
                   >
                     View Time Series Landing Page{' '}
-                    <Icon path={mdiOpenInNew} className="map-popup-card-waterRights-link-icon" />
+                    <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
                   </a>
                 ) : (
                   '(no time series data)'
                 )}
               </div>
             </div>
-            <div className="mb-2">
-              <div>
-                <strong>Water Right Digests:</strong>
-              </div>
-              {currWaterRight ? (
-                <>
-                  {currWaterRight.beneficialUses.map((a) => (
-                    <div key={a}>{a}</div>
-                  ))}
-                </>
-              ) : (
-                <div>-</div>
-              )}
-            </div>
-            <div className="mb-2">
-              <div>
-                <strong>Priority Date:</strong>
-              </div>
-              <div>
-                {currWaterRight ? (
-                  <FormattedDate>{currWaterRight.priorityDate}</FormattedDate>
-                ) : (
-                  <div>-</div>
-                )}
-              </div>
-            </div>
             <div className="mb-0">
-              <div>
-                <strong>Time Series Variable Types:</strong>
-              </div>
+              <strong>Time Series Variable Types:</strong>
               <div>
                 {timeSeriesVariableTypes.length > 0 ? (
-                  timeSeriesVariableTypes.map((a) => (
-                    <div key={a}>{a}</div>
-                  ))
+                  timeSeriesVariableTypes.map((type) => <div key={type}>{type}</div>)
                 ) : (
                   <div>-</div>
                 )}

@@ -14,17 +14,18 @@ interface OverlayDigestCardProps {
 }
 
 function OverlayDigestCard({
-  overlay,
-  onClosePopup,
-  currentIndex,
-  total,
-  goToNext,
-  goToPrevious,
-}: OverlayDigestCardProps) {
+                             overlay,
+                             onClosePopup,
+                             currentIndex,
+                             total,
+                             goToNext,
+                             goToPrevious,
+                           }: OverlayDigestCardProps) {
   const {
     waDeAreaReportingUuid,
     reportingAreaNativeId,
     reportingAreaName,
+    waDeOverlayAreaType,
     nativeOverlayAreaType,
   } = overlay;
 
@@ -34,21 +35,30 @@ function OverlayDigestCard({
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
         header: (
-          <div>
-            <strong> Overlay ID: </strong>
-            <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
-              {waDeAreaReportingUuid}
-              <Icon path={mdiOpenInNew} className="map-popup-card-waterRights-link-icon" />
-            </a>
+          <div className="flex justify-between items-center">
+            <div>
+              <strong>Overlay ID:</strong>{' '}
+              <a
+                href={`/details/overlay/${waDeAreaReportingUuid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {waDeAreaReportingUuid}
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+              </a>
+            </div>
           </div>
         ),
         body: (
-          <div>
+          <div className="map-popup-card-overlay-body">
             <div className="mb-2">
               <strong>Reporting Area Native ID:</strong> {reportingAreaNativeId}
             </div>
             <div className="mb-2">
               <strong>Reporting Area Name:</strong> {reportingAreaName}
+            </div>
+            <div className="mb-2">
+              <strong>WaDE Overlay Area Types:</strong> {waDeOverlayAreaType.join(', ')}
             </div>
             <div className="mb-2">
               <strong>Native Overlay Area Type:</strong> {nativeOverlayAreaType}
