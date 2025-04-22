@@ -561,6 +561,16 @@ const onReviewerMapPolygonsUpdated = (
           draftState.conservationApplication.estimateLocations.filter(
             (p) => p.polygonWkt !== removedPolygon.polygonWkt,
           );
+
+        // important - may also need to update the ApplicationSubmission form
+        if (removedPolygon.waterConservationApplicationEstimateLocationId) {
+          draftState.conservationApplication.applicationSubmissionForm.fieldDetails =
+            draftState.conservationApplication.applicationSubmissionForm.fieldDetails.filter(
+              (location) =>
+                location.waterConservationApplicationEstimateLocationId !==
+                removedPolygon.waterConservationApplicationEstimateLocationId,
+            );
+        }
       }
     } else {
       // polygon modified
@@ -654,7 +664,7 @@ const onApplicantConsumptiveUseEstimated = (
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    polygon.fieldName = `Field ${i + 1}`;
+    polygon.fieldName = generateFieldName(i + 1);
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ?? undefined;
     polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
@@ -694,7 +704,7 @@ const onReviewerConsumptiveUseEstimated = (
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
 
-  // if an estimated has already been saved, we don't want to overwrite that flag
+  // if an estimate has already been saved, we don't want to overwrite that flag
   if (!draftState.controlPointLocationHasBeenSaved) {
     draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
   }
@@ -705,12 +715,39 @@ const onReviewerConsumptiveUseEstimated = (
   application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
-  // combine polygon data
+  // combine polygon data and update field names
+  // start with the highest field name index + 1
+  // ie if "Field 3" exists, start with "Field 4"
+  const existingFieldNameIndices = application.estimateLocations
+    .filter((location) => !!location.fieldName)
+    .map((location): number => {
+      // validate field name was generated in expected format
+      if (!location.fieldName!.startsWith('Field ')) {
+        console.error(`Field name ${location.fieldName} is not in expected format`);
+      }
+
+      // handle field number being in unexpected format
+      let fieldNumber: number = Number(location.fieldName!.split(' ')[1]);
+      if (isNaN(fieldNumber)) {
+        fieldNumber = conservationApplicationMaxPolygonCount;
+      }
+      return fieldNumber;
+    });
+  const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
+
+  let assignedFieldNameIndex = maxFieldNameIndex + 1;
   for (let i = 0; i < application.estimateLocations.length; i++) {
+    // update polygon entry
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
     Object.assign(application.estimateLocations[i], matchingConsumptiveUseData);
+
+    // update field name
+    if (!polygon.fieldName) {
+      polygon.fieldName = generateFieldName(assignedFieldNameIndex);
+      assignedFieldNameIndex++;
+    }
   }
 
   // update control location
@@ -853,7 +890,7 @@ const onApplicationLoaded = (
       drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
-      fieldName: `Field ${index + 1}`,
+      fieldName: generateFieldName(index + 1),
       datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
@@ -1080,4 +1117,8 @@ const onApplicationReviewerNoteAdded = (
 const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.displayDataTable = !draftState.displayDataTable;
   return draftState;
+};
+
+const generateFieldName = (index: number): string => {
+  return `Field ${index}`;
 };
