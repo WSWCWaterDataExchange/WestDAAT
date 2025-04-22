@@ -733,7 +733,7 @@ const onReviewerConsumptiveUseEstimated = (
 
     // update field name
     if (!polygon.fieldName) {
-      polygon.fieldName = `Field ${assignedFieldNameIndex}`;
+      polygon.fieldName = generateFieldName(assignedFieldNameIndex);
       assignedFieldNameIndex++;
     }
   }
@@ -878,7 +878,7 @@ const onApplicationLoaded = (
       drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
-      fieldName: `Field ${index + 1}`,
+      fieldName: generateFieldName(index + 1),
       datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
@@ -1105,4 +1105,8 @@ const onApplicationReviewerNoteAdded = (
 const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.displayDataTable = !draftState.displayDataTable;
   return draftState;
+};
+
+const generateFieldName = (index: number): string => {
+  return `Field ${index}`;
 };
