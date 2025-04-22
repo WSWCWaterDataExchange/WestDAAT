@@ -4,9 +4,22 @@ import useMapPopupOnClick from './useMapPopupOnClick';
 import { NldiSiteData } from './useNldiClickedOnMap';
 
 export type ProcessedFeature =
-  | { type: 'site'; siteUuid: string }
-  | { type: 'overlay'; siteUuid: string; oType: string }
-  | { type: 'nldi'; nldiData: NldiSiteData };
+  | {
+  type: 'site';
+  siteUuid: string;
+  feature: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+}
+  | {
+  type: 'overlay';
+  siteUuid: string;
+  oType: string;
+  feature: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+}
+  | {
+  type: 'nldi';
+  nldiData: NldiSiteData;
+  feature: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+};
 
 function useSiteClickedOnMap() {
   const { updatePopup, clickedFeatures } = useMapPopupOnClick();
@@ -17,8 +30,8 @@ function useSiteClickedOnMap() {
     const uniqueFeatures = new Map<string, ProcessedFeature>();
     clickedFeatures.forEach((feature) => {
       const props = feature.properties || {};
-      const siteUuid = props[waterRightsProperties.siteUuid as string];
-      const oType = props[overlayProperties.overlayType as string];
+      const siteUuid = props[waterRightsProperties.siteUuid as string] as string | undefined;
+      const oType = props[overlayProperties.overlayType as string] as string | undefined;
 
       if (props[nldiSiteProperties.sourceName]) {
         const nldiData = getNldiSite(props);
@@ -27,17 +40,30 @@ function useSiteClickedOnMap() {
         }
         const key = `nldi-${nldiData.identifier}`;
         if (!uniqueFeatures.has(key)) {
-          uniqueFeatures.set(key, { type: 'nldi', nldiData });
+          uniqueFeatures.set(key, {
+            type: 'nldi',
+            nldiData,
+            feature,
+          });
         }
       } else if (oType && siteUuid) {
         const key = `overlay-${siteUuid}-${oType}`;
         if (!uniqueFeatures.has(key)) {
-          uniqueFeatures.set(key, { type: 'overlay', siteUuid, oType });
+          uniqueFeatures.set(key, {
+            type: 'overlay',
+            siteUuid,
+            oType,
+            feature,
+          });
         }
       } else if (siteUuid) {
         const key = `site-${siteUuid}`;
         if (!uniqueFeatures.has(key)) {
-          uniqueFeatures.set(key, { type: 'site', siteUuid });
+          uniqueFeatures.set(key, {
+            type: 'site',
+            siteUuid,
+            feature,
+          });
         }
       }
     });

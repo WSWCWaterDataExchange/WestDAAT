@@ -25,6 +25,11 @@ const timeSeriesLayers = [
   mapLayerNames.timeSeriesPolygonsLayer
 ];
 
+const highlightLayers = [
+  'selected-feature-outline',
+  'selected-feature-point-outline',
+];
+
 export function useDisplayOptions() {
   const {
     filters: { riverBasinNames, isNldiFilterActive, isWaterRightsFilterActive },
@@ -36,6 +41,8 @@ export function useDisplayOptions() {
 
   useEffect(() => {
     const visible: string[] = [];
+
+    visible.push(...highlightLayers);
 
     if (isWaterRightsFilterActive) {
       visible.push(...baseLayers);

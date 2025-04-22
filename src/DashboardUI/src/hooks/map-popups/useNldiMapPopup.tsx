@@ -1,25 +1,23 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import useSiteClickedOnMap from './useSiteClickedOnMap';
-
-import NldiSiteCard from '../../components/map-popups/NldiSiteCard';
-import { NldiSiteCardProps } from '../../components/map-popups/NldiSiteCard';
-import { NldiSiteData } from "./useNldiClickedOnMap";
+import React, { useEffect, useCallback } from 'react';
+import useSiteClickedOnMap, { ProcessedFeature } from './useSiteClickedOnMap';
+import NldiSiteCard, { NldiSiteCardProps } from '../../components/map-popups/NldiSiteCard';
 
 function useNldiMapPopup() {
   const { updatePopup, features } = useSiteClickedOnMap();
-  const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 
-  const nldiFeature = features.find(
-    (feature): feature is { type: 'nldi'; nldiData: NldiSiteData } => feature.type === 'nldi'
-  );
-  const nldiData = nldiFeature?.nldiData;
+  const handleClosePopup = useCallback(() => {
+    updatePopup(undefined);
+  }, [updatePopup]);
 
-  const result = useMemo(() => {
-    if (!nldiData) {
-      return undefined;
+  useEffect(() => {
+    const nldiFeature = features.find((f): f is ProcessedFeature & { type: 'nldi' } => f.type === 'nldi');
+    if (!nldiFeature) {
+      updatePopup(undefined);
+      return;
     }
 
-    const cardProps: NldiSiteCardProps = {
+    const { nldiData } = nldiFeature;
+    const props: NldiSiteCardProps = {
       sourceName: nldiData.sourceName,
       identifier: nldiData.identifier,
       uri: nldiData.uri,
@@ -28,16 +26,8 @@ function useNldiMapPopup() {
       isTimeSeries: nldiData.isTimeSeries || false,
     };
 
-    return <NldiSiteCard {...cardProps} />;
-  }, [nldiData, handleClosePopup]);
-
-  useEffect(() => {
-    if (result) {
-      updatePopup(result);
-    } else {
-      updatePopup(undefined);
-    }
-  }, [result, updatePopup]);
+    updatePopup(<NldiSiteCard {...props} />);
+  }, [features, updatePopup, handleClosePopup]);
 
   return null;
 }

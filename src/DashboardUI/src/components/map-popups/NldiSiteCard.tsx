@@ -29,15 +29,13 @@ function NldiSiteCard({
               <strong>NLDI Site ID:</strong>{' '}
               <a href={uri} target="_blank" rel="noopener noreferrer">
                 {identifier}{' '}
-                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                <Icon
+                  path={mdiOpenInNew}
+                  className="map-popup-card-water-rights-link-icon"
+                />
               </a>
             </div>
-            {/* Close button likely handled by MapPopupCard; include if needed */}
-            <button
-              type="button"
-              onClick={onClosePopup}
-              className="btn-close map-popup-close-btn"
-            ></button>
+            {/* no custom close button here—MapPopupCard will inject it */}
           </div>
         ),
         body: (
@@ -64,9 +62,16 @@ function NldiSiteCard({
                 <strong>Identifier:</strong>
               </div>
               <div>
-                <a href={`/details/site/${identifier}`} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={`/details/site/${identifier}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {identifier}{' '}
-                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                  <Icon
+                    path={mdiOpenInNew}
+                    className="map-popup-card-water-rights-link-icon"
+                  />
                 </a>
               </div>
             </div>

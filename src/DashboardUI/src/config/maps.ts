@@ -142,6 +142,11 @@ const mapsJson: {
         features: [],
       },
     },
+    {
+      id: 'selected-feature',
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    },
   ],
   layers: [
     {
@@ -340,16 +345,40 @@ const mapsJson: {
       },
     },
     {
+      id: 'selected-feature-outline',
+      type: 'line',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+      paint: {
+        'line-color': '#000000',
+        'line-width': 3,
+      },
+    },
+    {
+      id: 'selected-feature-point-outline',
+      type: 'circle',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
+      paint: {
+        'circle-color': 'rgba(0,0,0,0)',
+        'circle-stroke-color': '#000000',
+        'circle-stroke-width': 3,
+        'circle-radius': defaultPointCircleRadius,
+      },
+    },
+    {
       id: mapLayerNames.userDrawnPolygonLabelsLayer,
       type: 'symbol',
       source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       layout: {
         'text-field': ['get', 'title'],
-        'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
+        'text-font': ['Open Sans Bold'],
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
         'text-size': 20,
         'text-justify': 'center',
-        'text-letter-spacing': 0.05, // default is 0
+        'text-letter-spacing': 0.05,
         'icon-image': ['get', 'icon'],
       },
       paint: {
