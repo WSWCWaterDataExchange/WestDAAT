@@ -8,8 +8,6 @@
         public string VariableSpecificUuid { get; set; }
         public string AllocationUuid { get; set; }
         public DateTime? AllocationApplicationDate { get; set; }
-        public string AllocationAssociatedConsumptiveUseSiteIds { get; set; }
-        public string AllocationAssociatedWithdrawalSiteIds { get; set; }
         public string AllocationBasisCv { get; set; }
         public string AllocationChangeApplicationIndicator { get; set; }
         public string AllocationCommunityWaterSupplySystem { get; set; }

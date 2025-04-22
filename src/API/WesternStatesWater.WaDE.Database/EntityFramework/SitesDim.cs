@@ -59,7 +59,7 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
         public virtual ICollection<WaterSourceBridgeSitesFact> WaterSourceBridgeSitesFact { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFact { get; set; }
-        public virtual ICollection<RegulatoryOverlayBridgeSitesFact> RegulatoryOverlayBridgeSitesFact { get; set; }
+        public virtual ICollection<OverlayBridgeSitesFact> OverlayBridgeSitesFact { get; set; }
         public virtual ICollection<PODSiteToPOUSiteFact> PODSiteToPOUSitePODFact { get; set; }
         public virtual ICollection<PODSiteToPOUSiteFact> PODSiteToPOUSitePOUFact { get; set; }
     }
