@@ -664,7 +664,7 @@ const onApplicantConsumptiveUseEstimated = (
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    polygon.fieldName = generateFieldName(i);
+    polygon.fieldName = generateFieldName(i + 1);
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ?? undefined;
     polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
