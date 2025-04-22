@@ -194,7 +194,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
         >
-          {state.conservationApplication.conservationPayment ? (
+          {state.conservationApplication.conservationPayment !== undefined ? (
             <>
               <div>
                 <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
