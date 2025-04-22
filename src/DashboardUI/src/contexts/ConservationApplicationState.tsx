@@ -720,7 +720,14 @@ const onReviewerConsumptiveUseEstimated = (
   // ie if "Field 3" exists, start with "Field 4"
   const existingFieldNameIndices = application.estimateLocations
     .filter((location) => !!location.fieldName)
-    .map((location) => Number(location.fieldName!.split(' ')[1]));
+    .map((location): number => {
+      // validate field name was generated in expected format
+      if (!location.fieldName!.startsWith('Field ')) {
+        throw new Error(`Field name ${location.fieldName} is not in expected format`);
+      }
+
+      return Number(location.fieldName!.split(' ')[1]);
+    });
   const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
 
   let assignedFieldNameIndex = maxFieldNameIndex + 1;
