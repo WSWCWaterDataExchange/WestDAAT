@@ -1,4 +1,4 @@
-import { createRef, useRef } from 'react';
+import { createRef, useMemo, useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
@@ -32,7 +32,14 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
-  const polygonData = state.conservationApplication.estimateLocations;
+
+  const validPolygonData = useMemo(
+    () =>
+      state.conservationApplication.estimateLocations.filter(
+        (location) => !!location.waterConservationApplicationEstimateLocationId,
+      ),
+    [state.conservationApplication.estimateLocations],
+  );
 
   const navigate = useNavigate();
   const navigateToReviewPageMap = () => {
@@ -50,7 +57,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef(polygonData.map(() => createRef()));
+  const propertyAdditionalDetailsRef = useRef(validPolygonData.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -92,7 +99,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      fieldDetails: polygonData.map((field, index) => ({
+      fieldDetails: validPolygonData.map((field, index) => ({
         waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
@@ -243,7 +250,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
       <div className="row">
         <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-          {polygonData.map((field, index) => (
+          {validPolygonData.map((field, index) => (
             <div className="row mb-4" key={field.fieldName}>
               <div className="col-3">
                 <span>{field.fieldName}</span>
