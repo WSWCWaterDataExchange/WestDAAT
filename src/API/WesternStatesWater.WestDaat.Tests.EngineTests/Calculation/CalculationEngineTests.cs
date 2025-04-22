@@ -609,7 +609,7 @@ public class CalculationEngineTests : EngineTestBase
     }
 
     [TestMethod]
-    public async Task Calculate_EstimateConservationPayment_NegativeEt_ShouldReturnZeroDollars()
+    public async Task Calculate_EstimateConservationPayment_NegativeNetEt_ShouldReturnZeroDollars()
     {
         // Arrange
 
