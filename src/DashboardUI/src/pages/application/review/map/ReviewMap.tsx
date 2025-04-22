@@ -210,13 +210,13 @@ function ReviewMap(props: ReviewMapProps) {
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
         <Dropdown style={{ zIndex: 1000 }}>
-          <div>
+          <div className="d-flex align-items-center gap-2">
             <Dropdown.Toggle variant="success" disabled={!estimateButtonEnabled}>
               {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
               Estimate Consumptive Use
             </Dropdown.Toggle>
 
-            <OverlayTooltip text="You must provide a control point to estimate consumptive use." placement="right" />
+            <OverlayTooltip text="You must provide a control point to estimate consumptive use." placement="bottom" />
           </div>
 
           <Dropdown.Menu>
