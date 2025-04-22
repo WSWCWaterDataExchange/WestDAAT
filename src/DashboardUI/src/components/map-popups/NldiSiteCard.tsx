@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
-import { mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
+import { mdiOpenInNew } from '@mdi/js';
+import MapPopupCard from './MapPopupCard';
 
 interface NldiSiteCardProps {
   sourceName: string;
@@ -21,24 +21,59 @@ function NldiSiteCard({
                         isTimeSeries = false,
                       }: NldiSiteCardProps) {
   return (
-    <Card className="map-popup-card">
-      <Card.Header>
-        <div className="d-flex justify-content-between">
-          <div>
-            <strong>NLDI Site ID:</strong>{' '}
-            <a href={uri} target="_blank" rel="noopener noreferrer">
-              {identifier} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
-            </a>
+    <MapPopupCard onClosePopup={onClosePopup}>
+      {{
+        header: (
+          <div className="d-flex justify-content-between">
+            <div>
+              <strong>NLDI Site ID:</strong>{' '}
+              <a href={uri} target="_blank" rel="noopener noreferrer">
+                {identifier}{' '}
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+              </a>
+            </div>
+            {/* Close button likely handled by MapPopupCard; include if needed */}
+            <button
+              type="button"
+              onClick={onClosePopup}
+              className="btn-close map-popup-close-btn"
+            ></button>
           </div>
-          <button type="button" onClick={onClosePopup} className="btn-close map-popup-close-btn"></button>
-        </div>
-      </Card.Header>
-      <Card.Body>
-        <div className="mb-2"><strong>Source:</strong> {sourceName}</div>
-        <div className="mb-2"><strong>Name:</strong> {name}</div>
-        {isTimeSeries && <div className="mb-2 text-warning"><strong>Time Series Available</strong></div>}
-      </Card.Body>
-    </Card>
+        ),
+        body: (
+          <div className="map-popup-card-water-rights-body">
+            <div className="mb-2">
+              <div>
+                <strong>Source:</strong>
+              </div>
+              {sourceName}
+            </div>
+            <div className="mb-2">
+              <div>
+                <strong>Name:</strong>
+              </div>
+              {name}
+            </div>
+            {isTimeSeries && (
+              <div className="mb-2 text-warning">
+                <strong>Time Series Available</strong>
+              </div>
+            )}
+            <div className="mb-2">
+              <div className="map-popup-card-water-rights-native-id-row">
+                <strong>Identifier:</strong>
+              </div>
+              <div>
+                <a href={`/details/site/${identifier}`} target="_blank" rel="noopener noreferrer">
+                  {identifier}{' '}
+                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                </a>
+              </div>
+            </div>
+          </div>
+        ),
+      }}
+    </MapPopupCard>
   );
 }
 
