@@ -352,7 +352,7 @@ const mapsJson: {
       filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
       paint: {
         'line-color': '#000000',
-        'line-width': 3,
+        'line-width': 2,
       },
     },
     {
@@ -364,7 +364,7 @@ const mapsJson: {
       paint: {
         'circle-color': 'rgba(0,0,0,0)',
         'circle-stroke-color': '#000000',
-        'circle-stroke-width': 3,
+        'circle-stroke-width': 2,
         'circle-radius': defaultPointCircleRadius,
       },
     },

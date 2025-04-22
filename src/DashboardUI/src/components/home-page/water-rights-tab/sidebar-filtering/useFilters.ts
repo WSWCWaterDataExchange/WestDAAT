@@ -56,7 +56,7 @@ export function useFilters() {
       {
         layer: mapLayerNames.timeSeriesPolygonsLayer,
         filter: combinedTimeSeriesFilter,
-      },
+      }
     ]);
   }, [combinedWaterRightsFilter, overlaysMapFilters, combinedTimeSeriesFilter, setLayerFilters]);
 }
