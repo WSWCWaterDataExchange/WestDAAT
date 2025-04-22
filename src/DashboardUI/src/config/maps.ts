@@ -351,7 +351,7 @@ const mapsJson: {
           'top',
           'bottom',
         ],
-        'text-radial-offset': 0.5,
+        'text-radial-offset': 0.5, // how far outward from the center the text is placed
         'text-size': 20,
         'text-justify': 'center',
         'text-letter-spacing': 0.05, // default is 0
