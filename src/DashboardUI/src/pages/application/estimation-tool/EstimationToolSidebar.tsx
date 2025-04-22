@@ -194,7 +194,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
         >
-          {state.conservationApplication.conservationPayment ? (
+          {state.conservationApplication.conservationPayment !== undefined ? (
             <>
               <div>
                 <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
@@ -205,7 +205,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
 
                   <span className="fs-5 fw-bold">
-                    ${formatNumber(Math.max(0, state.conservationApplication.conservationPayment), 0)}
+                    ${formatNumber(state.conservationApplication.conservationPayment, 0)}
                   </span>
                 </span>
               </div>
