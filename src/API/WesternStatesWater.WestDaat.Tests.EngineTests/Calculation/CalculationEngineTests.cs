@@ -16,6 +16,17 @@ public class CalculationEngineTests : EngineTestBase
     private const string arbitraryValidPolygonWkt2 = "POLYGON ((0 0, 5 0, 5 5, 0 5, 0 0))";
     private const string arbitraryValidPointWKt = "POINT (0 0)";
 
+
+    private const double areaOfAFootballFieldInAcres = 1.32;
+
+    private const string memorialStadium = "POLYGON ((" +
+                                           "-96.70537000 40.82014318, " +
+                                           "-96.70537429129318 40.82112749428667, " +
+                                           "-96.70595069212823 40.82113037830751, " +
+                                           "-96.70595263797125 40.82014685607426, " +
+                                           "-96.70537000 40.82014318 " +
+                                           "))";
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -34,7 +45,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<RasterTimeSeriesPolygonRequest>()))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 1.0,
@@ -48,7 +60,8 @@ public class CalculationEngineTests : EngineTestBase
             _openEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<RasterTimeSeriesPointRequest>()))
                 .ReturnsAsync(new RasterTimeSeriesPointResponse
                 {
-                    Data = [
+                    Data =
+                    [
                         new()
                         {
                             Evapotranspiration = 1.0,
@@ -117,7 +130,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.Is<RasterTimeSeriesPolygonRequest>(req => req.Geometry.AsText() == arbitraryValidPolygonWkt1)))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 1.0,
@@ -139,7 +153,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.Is<RasterTimeSeriesPolygonRequest>(req => req.Geometry.AsText() == arbitraryValidPolygonWkt2)))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 0.33,
@@ -173,7 +188,8 @@ public class CalculationEngineTests : EngineTestBase
             _openEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<RasterTimeSeriesPointRequest>()))
                 .ReturnsAsync(new RasterTimeSeriesPointResponse
                 {
-                    Data = [
+                    Data =
+                    [
                         new()
                         {
                             Evapotranspiration = 1.0,
@@ -262,7 +278,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.Is<RasterTimeSeriesPolygonRequest>(req => req.Geometry.AsText() == arbitraryValidPolygonWkt1)))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 1.0,
@@ -284,7 +301,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.Is<RasterTimeSeriesPolygonRequest>(req => req.Geometry.AsText() == arbitraryValidPolygonWkt2)))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 0.33,
@@ -345,7 +363,8 @@ public class CalculationEngineTests : EngineTestBase
             DateRangeStart = DateOnly.MinValue,
             DateRangeEnd = DateOnly.MaxValue,
             Model = RasterTimeSeriesModel.SSEBop,
-            Polygons = [
+            Polygons =
+            [
                 new()
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
@@ -423,7 +442,8 @@ public class CalculationEngineTests : EngineTestBase
         _openEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<RasterTimeSeriesPolygonRequest>()))
             .ReturnsAsync(new RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new()
                     {
                         Evapotranspiration = 1.0,
@@ -466,17 +486,6 @@ public class CalculationEngineTests : EngineTestBase
     public async Task Calculate_EstimateConservationPayment_Success(CompensationRateUnits units, bool useNetEt)
     {
         // Arrange
-        var firstCorner = "-96.70537000 40.82014318";
-        var memorialStadium = "POLYGON ((" +
-            firstCorner + ", " +
-            "-96.70537429129318 40.82112749428667, " +
-            "-96.70595069212823 40.82113037830751, " +
-            "-96.70595263797125 40.82014685607426, " +
-            firstCorner +
-            "))";
-
-        var areaOfAFootballFieldInAcres = 1.32;
-
         var totalEtInInches = 60;
         var totalEtInFeet = totalEtInInches / 12; // 5 feet
         var totalEtVolumeInAcreFeet = areaOfAFootballFieldInAcres * totalEtInFeet;
@@ -491,7 +500,8 @@ public class CalculationEngineTests : EngineTestBase
         {
             CompensationRateDollars = compensationRateDollars,
             CompensationRateUnits = units,
-            DataCollections = [
+            DataCollections =
+            [
                 new()
                 {
                     PolygonWkt = memorialStadium,
@@ -535,15 +545,6 @@ public class CalculationEngineTests : EngineTestBase
     [DataRow(true)]
     public async Task Calculate_EstimateConservationPayment_MultiplePolygons_MultipleETs_Success(bool useNetEt)
     {
-        var firstCorner = "-96.70537000 40.82014318";
-        var memorialStadium = "POLYGON ((" +
-            firstCorner + ", " +
-            "-96.70537429129318 40.82112749428667, " +
-            "-96.70595069212823 40.82113037830751, " +
-            "-96.70595263797125 40.82014685607426, " +
-            firstCorner +
-            "))";
-
         var zeroToOneSquare = "POLYGON ((0 0, 0.1 0, 0.1 0.1, 0 0.1, 0 0))";
 
         var compensationRateDollars = 350;
@@ -552,7 +553,8 @@ public class CalculationEngineTests : EngineTestBase
         {
             CompensationRateDollars = compensationRateDollars,
             CompensationRateUnits = CompensationRateUnits.AcreFeet,
-            DataCollections = [
+            DataCollections =
+            [
                 new()
                 {
                     PolygonWkt = memorialStadium,
@@ -604,5 +606,45 @@ public class CalculationEngineTests : EngineTestBase
             ? totalEtExpectedCompensation / 2
             : totalEtExpectedCompensation;
         ((double)response.EstimatedCompensationDollars).Should().BeWithinPercentOf(expectedCompensation, 1);
+    }
+
+    [TestMethod]
+    public async Task Calculate_EstimateConservationPayment_NegativeNetEt_ShouldReturnZeroDollars()
+    {
+        // Arrange
+
+        var compensationRateDollars = 1000;
+
+        var request = new EstimateConservationPaymentRequest
+        {
+            CompensationRateDollars = compensationRateDollars,
+            CompensationRateUnits = CompensationRateUnits.AcreFeet,
+            DataCollections =
+            [
+                new()
+                {
+                    PolygonWkt = memorialStadium,
+                    AverageYearlyTotalEtInInches = 5,
+                    AverageYearlyNetEtInInches = -3,
+                    Datapoints =
+                    [
+                        new ()
+                        {
+                            Year = 2020,
+                            TotalEtInInches = 5,
+                            EffectivePrecipitationInInches = 8,
+                            NetEtInInches = -3
+                        }
+                    ]
+                },
+            ]
+        };
+
+        // Act
+        var response = (EstimateConservationPaymentResponse)await _calculationEngine.Calculate(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.EstimatedCompensationDollars.Should().Be(0);
     }
 }

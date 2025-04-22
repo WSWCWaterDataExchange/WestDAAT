@@ -64,7 +64,7 @@ internal class CalculationEngine : ICalculationEngine
 
         return new EstimateConservationPaymentResponse
         {
-            EstimatedCompensationDollars = (int)estimatedCompensation
+            EstimatedCompensationDollars = Math.Max(0, (int)estimatedCompensation)
         };
     }
 
