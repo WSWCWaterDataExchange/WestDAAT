@@ -230,6 +230,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control type="email" maxLength={255} ref={agentEmailRef} defaultValue={stateForm.agentEmail} />
+          <Form.Control.Feedback type="invalid">Valid email is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentPhoneNumber">
@@ -314,6 +315,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             ref={canalOrIrrigationEntityEmailRef}
             defaultValue={stateForm.canalOrIrrigationEntityEmail}
           />
+          <Form.Control.Feedback type="invalid">Valid email is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="canalOrIrrigationEntityPhoneNumber">

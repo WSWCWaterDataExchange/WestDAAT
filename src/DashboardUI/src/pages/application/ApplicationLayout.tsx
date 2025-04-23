@@ -4,7 +4,6 @@ import SiteFooter from '../../components/SiteFooter';
 import { ConservationApplicationProvider } from '../../contexts/ConservationApplicationProvider';
 import MapProvider from '../../contexts/MapProvider';
 import './ApplicationLayout.scss';
-import { ToastContainer } from 'react-toastify';
 
 export function ApplicationLayout() {
   return (
