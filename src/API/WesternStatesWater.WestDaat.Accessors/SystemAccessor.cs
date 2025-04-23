@@ -27,7 +27,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 AllocationTypes = await db.WaterAllocationType.GetControlledVocabularyNames(),
                 BeneficialUses = await GetBeneficialUseNames(db),
                 LegalStatuses = await db.LegalStatus.GetControlledVocabularyNames(),
-                Overlays = await db.RegulatoryOverlayType.GetControlledVocabularyNames(),
+                Overlays = await db.OverlayTypeCv.GetControlledVocabularyNames(),
                 OwnerClassifications = await db.OwnerClassificationCv.GetControlledVocabularyNames(),
                 RiverBasins = RiverBasinConstants.RiverBasinNames.ToArray(),
                 SiteTypes = await db.SiteType.GetControlledVocabularyNames(),
