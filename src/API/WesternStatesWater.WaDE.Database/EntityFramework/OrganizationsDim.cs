@@ -6,7 +6,7 @@
         {
             AggregatedAmountsFact = new HashSet<AggregatedAmountsFact>();
             AllocationAmountsFact = new HashSet<AllocationAmountsFact>();
-            RegulatoryReportingUnitsFact = new HashSet<RegulatoryReportingUnitsFact>();
+            OverlayReportingUnitsFact = new HashSet<OverlayReportingUnitsFact>();
             SiteVariableAmountsFact = new HashSet<SiteVariableAmountsFact>();
         }
 
@@ -22,7 +22,7 @@
 
         public virtual ICollection<AggregatedAmountsFact> AggregatedAmountsFact { get; set; }
         public virtual ICollection<AllocationAmountsFact> AllocationAmountsFact { get; set; }
-        public virtual ICollection<RegulatoryReportingUnitsFact> RegulatoryReportingUnitsFact { get; set; }
+        public virtual ICollection<OverlayReportingUnitsFact> OverlayReportingUnitsFact { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFact { get; set; }
     }
 }

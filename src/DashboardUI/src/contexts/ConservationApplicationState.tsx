@@ -893,9 +893,10 @@ const onApplicationLoaded = (
       fieldName: generateFieldName(index + 1),
       datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
-      // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
-      averageYearlyTotalEtInAcreFeet: undefined,
-      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInInches: location.averageYearlyTotalEtInInches,
+      averageYearlyTotalEtInAcreFeet: location.averageYearlyTotalEtInAcreFeet,
+      averageYearlyNetEtInInches: location.averageYearlyNetEtInInches,
+      averageYearlyNetEtInAcreFeet: location.averageYearlyNetEtInAcreFeet,
     }),
   );
   draftApplication.doPolygonsOverlap = false;

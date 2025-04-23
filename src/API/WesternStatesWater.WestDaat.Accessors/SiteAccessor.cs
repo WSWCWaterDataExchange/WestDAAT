@@ -84,8 +84,8 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _databaseContextFactory.Create();
             return await db.AllocationAmountsFact
                 .Where(aaf => aaf.AllocationBridgeSitesFact.Any(absf =>
-                    absf.Site.RegulatoryOverlayBridgeSitesFact.Any(robsf =>
-                        robsf.RegulatoryOverlay.RegulatoryReportingUnitsFact.Any(rruf =>
+                    absf.Site.OverlayBridgeSitesFact.Any(robsf =>
+                        robsf.Overlay.OverlayReportingUnitsFact.Any(rruf =>
                             rruf.ReportingUnit.ReportingUnitUuid == reportingUnitUuid))))
                 .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)
                 .ToListAsync();

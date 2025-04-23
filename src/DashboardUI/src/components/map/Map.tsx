@@ -34,6 +34,7 @@ import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
+import truncate from '@turf/truncate';
 
 import './map.scss';
 
@@ -208,7 +209,14 @@ function Map({
 
     const callback = () => {
       if (handleMapDrawnPolygonChange) {
-        handleMapDrawnPolygonChange(dc.getAll().features);
+        const allFeatures = dc.getAll().features;
+
+        for (const feature of allFeatures) {
+          // limit decimal precision
+          feature.geometry = truncate(feature.geometry, { precision: 6 });
+        }
+
+        handleMapDrawnPolygonChange(allFeatures);
       }
     };
 

@@ -339,7 +339,7 @@ public static class MapboxTileset
             var properties = new Dictionary<string, object>
             {
                 { "uuid", overlay.ReportingUnitUUID },
-                { "oType", PipeDelimiterToDistinctList(overlay.RegulatoryOverlayTypeWaDEName) },
+                { "oType", PipeDelimiterToDistinctList(overlay.OverlayTypeWaDEName) },
                 { "state", overlay.State },
                 { "wsType", PipeDelimiterToDistinctList(overlay.WaterSourceTypeWaDEName) }
             };
