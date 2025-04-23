@@ -29,7 +29,11 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
   const desiredUnitsRef = useRef<HTMLSelectElement>(null);
 
   const onEstimationFormChanged = () => {
-    const desiredDollars = Number(desiredDollarsRef.current?.value);
+    let desiredDollars: number | undefined = Number(desiredDollarsRef.current!.value);
+    if (desiredDollars === 0 || isNaN(desiredDollars)) {
+      desiredDollars = undefined;
+    }
+
     const desiredUnitsAsEnum: CompensationRateUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
     const desiredUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined =
       desiredUnitsAsEnum === CompensationRateUnits.None ? undefined : desiredUnitsAsEnum;
