@@ -4,7 +4,8 @@
     "LogLevel": {
       "Default": "Debug",
       "Microsoft": "Warning",
-      "System": "Warning"
+      "System": "Warning",
+      "Azure.Messaging.ServiceBus": "Warning"
     },
     "applicationInsights": {
       "samplingSettings": {
