@@ -300,7 +300,7 @@ const mapsJson: {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
-      {
+    {
       id: mapLayerNames.timeSeriesPolygonsLayer,
       friendlyName: 'Time Series Polygons',
       'source-layer': 'polygons',
@@ -344,9 +344,14 @@ const mapsJson: {
       type: 'symbol',
       source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       layout: {
-        'text-field': ['get', 'title'],
+        'text-field': ['get', 'title'], // displays the `title` property
         'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
-        'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-variable-anchor': [
+          // locations where the text can be placed
+          'top',
+          'bottom',
+        ],
+        'text-radial-offset': 0.5, // how far outward from the center the text is placed
         'text-size': 20,
         'text-justify': 'center',
         'text-letter-spacing': 0.05, // default is 0
