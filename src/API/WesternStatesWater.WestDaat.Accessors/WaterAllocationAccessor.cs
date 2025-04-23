@@ -513,11 +513,11 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
-            var allRegulatoryTask = GetRegulatoryOverlayForSites(searchCriteria);
+            var allOverlayTask = GetOverlayForSites(searchCriteria);
 
             var allWaterSourceUUIDS = await GetWaterSourcesForSites(searchCriteria);
             // run both calls, then await first call before continuing
-            var allRegulatory = await allRegulatoryTask;
+            var allOverlay = await allOverlayTask;
 
             var sites = filteredSites
                 .ProjectTo<SitesHelper>(DtoMapper.Configuration)
@@ -526,7 +526,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await foreach (var site in sites)
             {
                 site.WaterSourceUuids = string.Join(",", allWaterSourceUUIDS.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
-                site.RegulatoryOverlayUuids = string.Join(",", allRegulatory.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
+                site.OverlayUuids = string.Join(",", allOverlay.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
                 yield return site.Map<Sites>();
             }
         }
@@ -679,23 +679,23 @@ namespace WesternStatesWater.WestDaat.Accessors
             return allSiteAllocations;
         }
 
-        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetRegulatoryOverlayForSites(WaterRightsSearchCriteria searchCriteria)
+        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetOverlayForSites(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, sites) = GetFilteredSites(searchCriteria);
-            var matchingRegulatoryUUIDS = db.RegulatoryOverlayBridgeSitesFact
+            var matchingOverlayUUIDS = db.OverlayBridgeSitesFact
                 .AsNoTracking()
                 .Where(a => sites.Any(b => b.SiteId == a.SiteId))
-                .Select(a => new { a.SiteId, a.RegulatoryOverlay.RegulatoryOverlayUuid })
+                .Select(a => new { a.SiteId, a.Overlay.OverlayUuid })
                 .AsAsyncEnumerable();
 
-            var allRegulatoryUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
-            await Parallel.ForEachAsync(matchingRegulatoryUUIDS, (regulatoryUUID, ct) =>
+            var allOverlayUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            await Parallel.ForEachAsync(matchingOverlayUUIDS, (overlayUuid, ct) =>
             {
-                allRegulatoryUuids.GetOrAdd(regulatoryUUID.SiteId, new ConcurrentBag<string>())
-                    .Add(regulatoryUUID.RegulatoryOverlayUuid);
+                allOverlayUuids.GetOrAdd(overlayUuid.SiteId, new ConcurrentBag<string>())
+                    .Add(overlayUuid.OverlayUuid);
                 return ValueTask.CompletedTask;
             });
-            return allRegulatoryUuids;
+            return allOverlayUuids;
         }
 
         public async Task<OverlayDetails> GetOverlayDetails(string overlayUuid)
@@ -704,7 +704,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await db.Database.OpenConnectionAsync();
 
             var overlay = await db.ReportingUnitsDim
-                .Include(r => r.RegulatoryReportingUnitsFact)
+                .Include(r => r.OverlayReportingUnitsFact)
                 .ThenInclude(rr => rr.Organization)
                 .AsNoTracking()
                 .Where(r => r.ReportingUnitUuid == overlayUuid)
@@ -719,20 +719,20 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
 
-            var query = db.RegulatoryOverlayDim
+            var query = db.OverlayDim
                 .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCriteria.ReportingUnitUUID))
             {
                 query = query
-                    .Where(ro => ro.RegulatoryReportingUnitsFact
+                    .Where(ro => ro.OverlayReportingUnitsFact
                         .Any(rr => rr.ReportingUnit.ReportingUnitUuid == searchCriteria.ReportingUnitUUID));
             }
             else if (!string.IsNullOrEmpty(searchCriteria.AllocationUUID))
             {
                 query = query
-                    .Where(ro => ro.RegulatoryOverlayBridgeSitesFact
+                    .Where(ro => ro.OverlayBridgeSitesFact
                         .Any(robsf => robsf.Site.AllocationBridgeSitesFact
                             .Any(absf => absf.AllocationAmount.AllocationUuid == searchCriteria.AllocationUUID)
                         )
@@ -753,14 +753,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Select(a => new { a.SiteId, a.WaterSource.WaterSourceUuid })
                 .AsAsyncEnumerable();
 
-            var allRegulatoryUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            var allOverlayUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
             await Parallel.ForEachAsync(matchingWaterSourceUUIDs, (waterSource, ct) =>
             {
-                allRegulatoryUuids.GetOrAdd(waterSource.SiteId, new ConcurrentBag<string>())
+                allOverlayUuids.GetOrAdd(waterSource.SiteId, new ConcurrentBag<string>())
                     .Add(waterSource.WaterSourceUuid);
                 return ValueTask.CompletedTask;
             });
-            return allRegulatoryUuids;
+            return allOverlayUuids;
         }
 
         public async Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByUuid(string allocationUuid)

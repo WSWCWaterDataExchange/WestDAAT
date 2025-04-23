@@ -129,17 +129,17 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
                 .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source =>
-                    source.RegulatoryReportingUnitsFact
-                        .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
+                    source.OverlayReportingUnitsFact
+                        .Select(rr => rr.Overlay.OverlayTypeCV)
                         .Distinct().ToList()))
                 .ForMember(dest => dest.NativeReportingAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(source => source.StateCv))
                 .ForMember(dest => dest.AreaLastUpdatedDate, opt => opt.MapFrom(source => source.ReportingUnitUpdateDate))
-                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(source => source.OverlayReportingUnitsFact
                     .Select(rr => rr.Organization.OrganizationName).FirstOrDefault()))
-                .ForMember(dest => dest.OrganizationState, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                .ForMember(dest => dest.OrganizationState, opt => opt.MapFrom(source => source.OverlayReportingUnitsFact
                     .Select(rr => rr.Organization.State).FirstOrDefault()))
-                .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.OverlayReportingUnitsFact
                     .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
 
@@ -154,28 +154,28 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
 
-            CreateMap<EF.RegulatoryOverlayDim, OverlayTableEntry>()
-                .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
-                .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
-                .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
+            CreateMap<EF.OverlayDim, OverlayTableEntry>()
+                .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.OverlayUuid))
+                .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.OverlayNativeId))
+                .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.OverlayName))
                 .ForMember(dest => dest.OverlayType,
-                    opt => opt.MapFrom(source => source.RegulatoryOverlayType.WaDEName.Length > 0 ? source.RegulatoryOverlayType.WaDEName : source.RegulatoryOverlayTypeCV))
+                    opt => opt.MapFrom(source => source.OverlayType.WaDEName.Length > 0 ? source.OverlayType.WaDEName : source.OverlayTypeCV))
                 .ForMember(dest => dest.WaterSourceType,
                     opt => opt.MapFrom(source => source.WaterSourceType.WaDEName.Length > 0 ? source.WaterSourceType.WaDEName : source.WaterSourceTypeCV))
                 .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.RegulatoryStatusCv))
-                .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.RegulatoryStatute))
-                .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.RegulatoryStatuteLink))
+                .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.Statute))
+                .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.StatuteLink))
                 .ForMember(dest => dest.StatutoryEffectiveDate, opt => opt.MapFrom(source => source.StatutoryEffectiveDate))
                 .ForMember(dest => dest.StatutoryEndDate, opt => opt.MapFrom(source => source.StatutoryEndDate))
-                .ForMember(dest => dest.OverlayStatusDesc, opt => opt.MapFrom(source => source.RegulatoryDescription));
+                .ForMember(dest => dest.OverlayStatusDesc, opt => opt.MapFrom(source => source.OverlayDescription));
 
             CreateMap<EF.ReportingUnitsDim, OverlayDigest>()
                 .ForMember(dest => dest.WaDeAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeId, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
                 .ForMember(dest => dest.ReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
                 .ForMember(dest => dest.WaDeOverlayAreaType, opt => opt.MapFrom(source =>
-                    source.RegulatoryReportingUnitsFact
-                        .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
+                    source.OverlayReportingUnitsFact
+                        .Select(rr => rr.Overlay.OverlayTypeCV)
                         .Distinct()
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
@@ -481,7 +481,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>()
                 .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.ControlLocations.SingleOrDefault()));
 
-            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>()
+                .ForMember(dest => dest.AverageYearlyTotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.TotalEtInInches)))
+                .ForMember(dest => dest.AverageYearlyTotalEtInAcreFeet, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.TotalEtInInches / 12) * src.PolygonAreaInAcres))
+                .ForMember(dest => dest.AverageYearlyNetEtInInches, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.NetEtInInches)))
+                .ForMember(dest => dest.AverageYearlyNetEtInAcreFeet, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.NetEtInInches / 12) * src.PolygonAreaInAcres));
 
             CreateMap<EFWD.LocationWaterMeasurement, LocationWaterMeasurementDetails>();
 

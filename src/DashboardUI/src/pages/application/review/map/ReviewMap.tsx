@@ -27,6 +27,7 @@ import {
   conservationApplicationMaxPolygonCount,
 } from '../../../../config/constants';
 import { formatNumber } from '../../../../utilities/valueFormatters';
+import { OverlayTooltip } from '../../../../components/OverlayTooltip';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -114,6 +115,7 @@ function ReviewMap(props: ReviewMapProps) {
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
       padding: 25,
       maxZoom: 16,
+      duration: 2000,
     });
 
     setHasInitializedMap(true);
@@ -197,19 +199,25 @@ function ReviewMap(props: ReviewMapProps) {
     });
   };
 
-  const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
+  const estimateButtonEnabled = state.canReviewerEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
-  const allLabelFeatures = userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
+  const allLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
+    return userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
+  }, [userDrawnPolygonFeatures, controlLocationLabelFeature]);
 
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
         <Dropdown style={{ zIndex: 1000 }}>
-          <Dropdown.Toggle variant="success" disabled={!estimateButtonEnabled}>
-            {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
-            Estimate Consumptive Use
-          </Dropdown.Toggle>
+          <div className="d-flex align-items-center gap-2">
+            <Dropdown.Toggle variant="success" disabled={!estimateButtonEnabled}>
+              {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
+              Estimate Consumptive Use
+            </Dropdown.Toggle>
+
+            <OverlayTooltip text="You must provide a control point to estimate consumptive use." placement="bottom" />
+          </div>
 
           <Dropdown.Menu>
             <Dropdown.Item

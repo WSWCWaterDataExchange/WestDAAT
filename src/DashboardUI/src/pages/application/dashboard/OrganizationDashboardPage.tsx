@@ -119,7 +119,7 @@ export function OrganizationDashboardPage() {
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
     const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
 
-    const canReview = hasPermission(user, Permission.ApplicationReview);
+    const canUpdate = hasPermission(user, Permission.ApplicationUpdate);
     const canApprove = hasPermission(user, Permission.ApplicationApprove);
 
     let navLinkPageSlug = 'approve';
@@ -130,7 +130,7 @@ export function OrganizationDashboardPage() {
         navLinkPageSlug = 'approve';
         break;
       case ConservationApplicationStatus.InTechnicalReview:
-        navLinkPageSlug = canReview ? 'review' : 'approve';
+        navLinkPageSlug = canUpdate ? 'review' : 'approve';
         break;
       case ConservationApplicationStatus.InFinalReview:
         navLinkPageSlug = canApprove ? 'approve' : 'review';

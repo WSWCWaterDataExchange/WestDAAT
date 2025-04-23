@@ -15,32 +15,21 @@ interface EstimationToolTableViewProps {
 }
 
 function EstimationToolTableView(props: EstimationToolTableViewProps) {
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
   const polygons = state.conservationApplication.estimateLocations;
+  const show = state.displayDataTable;
 
-  const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>();
-  const [hasPerformedInitialTableShow, setHasPerformedInitialTableShow] = useState(false);
 
-  const toggleShow = () => setShow(!show);
+  const toggleShow = () => dispatch({ type: 'DATA_TABLE_TOGGLED' });
 
   useEffect(() => {
-    if (hasPerformedInitialTableShow) {
+    if (!show) {
       return;
     }
 
-    const hasPerformedEstimation = polygons.some((p) => !!p.waterConservationApplicationEstimateLocationId);
-    if (!hasPerformedEstimation) {
-      return;
-    }
-
-    setTimeout(() => {
-      // wait a few seconds to allow the user to notice the map zooming in
-      setActiveTab(polygons[0].fieldName);
-      setShow(true);
-      setHasPerformedInitialTableShow(true);
-    }, 1000);
-  }, [polygons]);
+    setActiveTab(polygons[0].fieldName);
+  }, [show, polygons]);
 
   return (
     <div
