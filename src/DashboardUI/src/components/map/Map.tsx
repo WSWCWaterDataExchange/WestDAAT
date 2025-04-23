@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -23,7 +23,6 @@ import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
-import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
@@ -35,6 +34,7 @@ import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
+import truncate from '@turf/truncate';
 
 import './map.scss';
 
@@ -209,7 +209,14 @@ function Map({
 
     const callback = () => {
       if (handleMapDrawnPolygonChange) {
-        handleMapDrawnPolygonChange(dc.getAll().features);
+        const allFeatures = dc.getAll().features;
+
+        for (const feature of allFeatures) {
+          // limit decimal precision
+          feature.geometry = truncate(feature.geometry, { precision: 6 });
+        }
+
+        handleMapDrawnPolygonChange(allFeatures);
       }
     };
 
