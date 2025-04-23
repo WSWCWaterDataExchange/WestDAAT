@@ -654,10 +654,7 @@ const onGISFileAddedToMap = (
   { payload }: GISFileAddedToMapAction,
 ): ConservationApplicationState => {
   // append new polygons to existing polygons
-  draftState.conservationApplication.estimateLocations = [
-    ...draftState.conservationApplication.estimateLocations,
-    ...payload.polygons,
-  ];
+  draftState.conservationApplication.estimateLocations.push(...payload.polygons);
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
   draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
     payload.doesControlLocationOverlapWithPolygons;
