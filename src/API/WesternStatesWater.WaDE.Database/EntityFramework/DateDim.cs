@@ -11,7 +11,7 @@
             AllocationAmountsFactAllocationExpirationDateNavigation = new HashSet<AllocationAmountsFact>();
             AllocationAmountsFactAllocationPriorityDateNavigation = new HashSet<AllocationAmountsFact>();
             AllocationAmountsFactDataPublicationDate = new HashSet<AllocationAmountsFact>();
-            RegulatoryReportingUnitsFact = new HashSet<RegulatoryReportingUnitsFact>();
+            OverlayReportingUnitsFact = new HashSet<OverlayReportingUnitsFact>();
             SiteVariableAmountsFactDataPublicationDateNavigation = new HashSet<SiteVariableAmountsFact>();
             SiteVariableAmountsFactTimeframeEndNavigation = new HashSet<SiteVariableAmountsFact>();
             SiteVariableAmountsFactTimeframeStartNavigation = new HashSet<SiteVariableAmountsFact>();
@@ -28,7 +28,7 @@
         public virtual ICollection<AllocationAmountsFact> AllocationAmountsFactAllocationExpirationDateNavigation { get; set; }
         public virtual ICollection<AllocationAmountsFact> AllocationAmountsFactAllocationPriorityDateNavigation { get; set; }
         public virtual ICollection<AllocationAmountsFact> AllocationAmountsFactDataPublicationDate { get; set; }
-        public virtual ICollection<RegulatoryReportingUnitsFact> RegulatoryReportingUnitsFact { get; set; }
+        public virtual ICollection<OverlayReportingUnitsFact> OverlayReportingUnitsFact { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFactDataPublicationDateNavigation { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFactTimeframeEndNavigation { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFactTimeframeStartNavigation { get; set; }

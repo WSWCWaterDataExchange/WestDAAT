@@ -40,8 +40,6 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public double? IrrigatedAcreage { get; set; }
         public string AllocationCommunityWaterSupplySystem { get; set; }
         public string SdwisidentifierCV { get; set; }
-        public string AllocationAssociatedWithdrawalSiteIds { get; set; }
-        public string AllocationAssociatedConsumptiveUseSiteIds { get; set; }
         public string AllocationChangeApplicationIndicator { get; set; }
         public string LegacyAllocationIds { get; set; }
         public string WaterAllocationNativeUrl { get; set; }

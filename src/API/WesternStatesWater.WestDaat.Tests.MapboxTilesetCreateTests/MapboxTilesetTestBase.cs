@@ -9,7 +9,15 @@ public class MapboxTilesetTestBase
 {
     private TransactionScope _transactionScopeFixture = null!;
     protected DatabaseContext Db = null!;
-    protected string GeoJsonDir = null!; 
+    protected string GeoJsonDir = null!;
+
+    private static Dictionary<string, string> DefaultTestConfiguration => new()
+    {
+        {
+            $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}",
+            "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+        }
+    };
     
     [TestInitialize]
     public void TestInitialize()
@@ -33,6 +41,7 @@ public class MapboxTilesetTestBase
 
         var config = new ConfigurationBuilder()
             .SetBasePath(Environment.CurrentDirectory)
+            .AddInMemoryCollection(DefaultTestConfiguration!)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
