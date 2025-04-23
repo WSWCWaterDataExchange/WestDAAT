@@ -12,5 +12,13 @@ public class LocationDetails
 
     public string AdditionalDetails { get; set; } = null!;
 
+    public double AverageYearlyTotalEtInInches { get; set; }
+
+    public double AverageYearlyTotalEtInAcreFeet { get; set; }
+
+    public double? AverageYearlyNetEtInInches { get; set; }
+
+    public double? AverageYearlyNetEtInAcreFeet { get; set; }
+
     public LocationWaterMeasurementDetails[] WaterMeasurements { get; set; } = null!;
 }
