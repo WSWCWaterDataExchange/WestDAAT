@@ -419,6 +419,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().NotBeNull();
         reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().Be(estimate.CumulativeNetEtInAcreFeet);
 
+        // verify Locations have ET metrics
+        reviewerResponse.Application.Estimate.Locations.All(l =>
+            l.AverageYearlyTotalEtInInches != default &&
+            l.AverageYearlyTotalEtInAcreFeet != default &&
+            l.AverageYearlyNetEtInInches != default &&
+            l.AverageYearlyNetEtInAcreFeet != default)
+            .Should().BeTrue();
+
         // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
         {

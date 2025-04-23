@@ -481,7 +481,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>()
                 .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.ControlLocations.SingleOrDefault()));
 
-            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>()
+                .ForMember(dest => dest.AverageYearlyTotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.TotalEtInInches)))
+                .ForMember(dest => dest.AverageYearlyTotalEtInAcreFeet, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.TotalEtInInches / 12) * src.PolygonAreaInAcres))
+                .ForMember(dest => dest.AverageYearlyNetEtInInches, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.NetEtInInches)))
+                .ForMember(dest => dest.AverageYearlyNetEtInAcreFeet, opt => opt.MapFrom(src => src.WaterMeasurements.Average(wm => wm.NetEtInInches / 12) * src.PolygonAreaInAcres));
 
             CreateMap<EFWD.LocationWaterMeasurement, LocationWaterMeasurementDetails>();
 
