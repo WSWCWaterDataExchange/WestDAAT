@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -23,7 +23,6 @@ import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
-import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
