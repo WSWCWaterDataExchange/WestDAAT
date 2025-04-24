@@ -39,12 +39,12 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
         <div className="d-flex flex-column flex-grow-1 h-100">
           <Tab.Container
             activeKey={activeTab}
-            onSelect={(tab) => setActiveTab(tab || (polygons.length > 0 ? polygons[0].fieldName : undefined))}
+            onSelect={(tab) => setActiveTab(tab || (polygons.length > 0 ? polygons[0].polygonWkt : undefined))}
           >
             <Nav variant="tabs" className="py-2 px-3">
               {polygons.map((field) => (
-                <Nav.Item key={field.fieldName}>
-                  <Nav.Link eventKey={field.fieldName}>{field.fieldName}</Nav.Link>
+                <Nav.Item key={field.polygonWkt}>
+                  <Nav.Link eventKey={field.polygonWkt}>{field.fieldName}</Nav.Link>
                 </Nav.Item>
               ))}
             </Nav>
@@ -57,8 +57,8 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
               )}
 
               {polygons.map((field) => (
-                <Tab.Pane eventKey={field.fieldName} key={field.polygonWkt} className="h-100">
-                  {show && activeTab === field.fieldName && (
+                <Tab.Pane eventKey={field.polygonWkt} key={field.polygonWkt} className="h-100">
+                  {show && activeTab === field.polygonWkt && (
                     <EstimationToolFieldDataTable
                       perspective={props.perspective}
                       data={{
