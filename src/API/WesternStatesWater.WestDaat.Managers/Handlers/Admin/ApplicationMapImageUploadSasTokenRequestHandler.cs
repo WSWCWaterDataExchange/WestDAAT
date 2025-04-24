@@ -29,7 +29,7 @@ public class ApplicationMapImageUploadSasTokenRequestHandler : IRequestHandler<A
             SasToken = new SasTokenDetails
             {
                 Blobname = blobName,
-                SasToken = sasUri.ToString(),
+                SasToken = sasUri.Values.Single().ToString(),
                 Hostname = hostname
             }
         };
