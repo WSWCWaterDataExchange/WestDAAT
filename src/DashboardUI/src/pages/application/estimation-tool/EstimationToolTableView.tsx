@@ -28,7 +28,7 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
       return;
     }
 
-    setActiveTab(polygons[0].fieldName);
+    setActiveTab(polygons[0].polygonWkt);
   }, [show, polygons]);
 
   return (
