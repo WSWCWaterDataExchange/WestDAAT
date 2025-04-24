@@ -120,7 +120,7 @@ export function EstimationToolPage() {
           </div>
 
           <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
-            <EstimationToolMapHeader perspective="applicant" />
+            <EstimationToolMapHeader />
             <EstimationToolMap
               waterRightNativeId={waterRightNativeId}
               handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}

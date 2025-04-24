@@ -87,6 +87,7 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setUserDrawnPolygonData,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -501,9 +502,24 @@ function Map({
     const newPolygons = userDrawnPolygonData.filter(
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
+    console.log('map `userDrawnPolygons` changed. any new polygons?', existingPolygons, newPolygons);
 
-    map.once('styledata', () => {
-      newPolygons.forEach((polygon) => drawControl.add(polygon));
+    if (!newPolygons) {
+      console.log('no new polygons');
+      return;
+    }
+
+    map.once('idle', () => {
+      while (!map.isStyleLoaded()) {
+        continue;
+      }
+      console.log('adding new polygons to map', newPolygons);
+      for (const newPolygon of newPolygons) {
+        drawControl.add(newPolygon);
+      }
+      console.log('clear user drawn polygons');
+      // clear the polygons from the state
+      setUserDrawnPolygonData([]);
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 

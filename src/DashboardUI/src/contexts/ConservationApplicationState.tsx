@@ -22,7 +22,6 @@ import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
-import { ApplicationReviewPerspective } from '../data-contracts/ApplicationReviewPerspective';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -47,6 +46,7 @@ export interface ConservationApplicationState {
     controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
     doesControlLocationOverlapWithPolygons: boolean;
+    polygonsAddedByFileUpload: PartialPolygonData[];
     // derived/computed state
     isDirty: boolean;
     isApplicationSubmissionFormValid: boolean;
@@ -101,6 +101,7 @@ export const defaultState = (): ConservationApplicationState => ({
     controlLocation: undefined,
     doPolygonsOverlap: false,
     doesControlLocationOverlapWithPolygons: false,
+    polygonsAddedByFileUpload: [],
     isDirty: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
@@ -133,7 +134,8 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
-  | GISFileAddedToMapAction
+  | GISFilePolygonsUploadedAction
+  | GISFilePolygonsProcessedAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
@@ -195,14 +197,15 @@ export interface FundingOrganizationLoadErrored {
   type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
 }
 
-export interface GISFileAddedToMapAction {
-  type: 'GIS_FILE_ADDED_TO_MAP';
+export interface GISFilePolygonsUploadedAction {
+  type: 'GIS_FILE_POLYGONS_UPLOADED';
   payload: {
     polygons: MapSelectionPolygonData[];
-    doPolygonsOverlap: boolean;
-    doesControlLocationOverlapWithPolygons: boolean;
-    perspective: ApplicationReviewPerspective;
   };
+}
+
+export interface GISFilePolygonsProcessedAction {
+  type: 'GIS_FILE_POLYGONS_PROCESSED';
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -367,8 +370,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
-    case 'GIS_FILE_ADDED_TO_MAP':
-      return onGISFileAddedToMap(draftState, action);
+    case 'GIS_FILE_POLYGONS_UPLOADED':
+      return onGISFilePolygonsUploaded(draftState, action);
+    case 'GIS_FILE_POLYGONS_PROCESSED':
+      return onGISFilePolygonsProcessed(draftState);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
@@ -649,34 +654,19 @@ const onReviewerMapPolygonsUpdated = (
   return draftState;
 };
 
-const onGISFileAddedToMap = (
+const onGISFilePolygonsUploaded = (
   draftState: ConservationApplicationState,
-  { payload }: GISFileAddedToMapAction,
+  { payload }: GISFilePolygonsUploadedAction,
 ): ConservationApplicationState => {
-  // append new polygons to existing polygons
-  draftState.conservationApplication.estimateLocations.push(...payload.polygons);
-  draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
-  draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
-    payload.doesControlLocationOverlapWithPolygons;
+  // push new polygons to a separate queue to be processed
+  draftState.conservationApplication.polygonsAddedByFileUpload.push(...payload.polygons);
 
-  resetConsumptiveUseEstimation(draftState);
-  updatePolygonAcreageSum(draftState);
-  switch (payload.perspective) {
-    case 'applicant': {
-      checkCanApplicantEstimateConsumptiveUse(draftState);
-      break;
-    }
-    case 'reviewer': {
-      checkCanReviewerEstimateConsumptiveUse(draftState);
-      break;
-    }
-    default: {
-      throw new Error(`Unknown perspective: ${payload.perspective}`);
-    }
-  }
+  return draftState;
+};
 
-  console.log('GIS file added. done. ', JSON.parse(JSON.stringify(draftState)));
-
+const onGISFilePolygonsProcessed = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.polygonsAddedByFileUpload = [];
+  console.log('file polygons reset');
   return draftState;
 };
 
