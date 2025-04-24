@@ -1,3 +1,5 @@
+import './gisFileParser.mock';
+
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { geometryCollectionMock } from '../mocks/GeoJsonGeometries.mock';
 import { parseGISFileToGeoJSON } from './gisFileParser';
