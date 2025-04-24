@@ -22,6 +22,7 @@ import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -659,7 +660,24 @@ const onGISFilePolygonsUploaded = (
   { payload }: GISFilePolygonsUploadedAction,
 ): ConservationApplicationState => {
   // push new polygons to a separate queue to be processed
-  draftState.conservationApplication.polygonsAddedByFileUpload.push(...payload.polygons);
+  const newPolygons = payload.polygons.map(
+    (polygon): PartialPolygonData => ({
+      waterConservationApplicationEstimateLocationId: undefined,
+      polygonWkt: polygon.polygonWkt,
+      acreage: polygon.acreage,
+      drawToolType: DrawToolType.Freeform,
+      fieldName: undefined,
+      additionalDetails: undefined,
+      centerPoint: truncate(center(convertWktToGeometry(polygon.polygonWkt)), { precision: 6 }).geometry,
+      datapoints: [],
+      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyNetEtInAcreFeet: undefined,
+      averageYearlyNetEtInInches: undefined,
+    }),
+  );
+
+  draftState.conservationApplication.polygonsAddedByFileUpload.push(...newPolygons);
 
   return draftState;
 };
