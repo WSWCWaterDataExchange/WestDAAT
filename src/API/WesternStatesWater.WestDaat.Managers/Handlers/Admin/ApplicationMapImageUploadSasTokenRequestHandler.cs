@@ -17,7 +17,7 @@ public class ApplicationMapImageUploadSasTokenRequestHandler : IRequestHandler<A
 
     public async Task<ApplicationMapImageUploadSasTokenResponse> Handle(ApplicationMapImageUploadSasTokenRequest request)
     {
-        var blobName = request.ApplicationId.ToString();
+        var blobName = request.WaterConservationApplicationId.ToString();
 
         var sasUri = await _blobStorageSdk.GetSasUris(Containers.ApplicationMapImages, [blobName],
             TimeSpan.FromMinutes(10), Azure.Storage.Sas.BlobContainerSasPermissions.Create);
