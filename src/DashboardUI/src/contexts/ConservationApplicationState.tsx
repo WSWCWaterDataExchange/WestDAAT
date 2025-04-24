@@ -659,7 +659,33 @@ const onGISFilePolygonsUploaded = (
   { payload }: GISFilePolygonsUploadedAction,
 ): ConservationApplicationState => {
   // push new polygons to a separate queue to be processed
-  draftState.conservationApplication.polygonsAddedByFileUpload.push(...payload.polygons);
+  // give them field names ahead of time // todo: is this necessary?
+  const existingFieldNameIndices = draftState.conservationApplication.estimateLocations
+    .filter((location) => !!location.fieldName)
+    .map((location): number => {
+      // validate field name was generated in expected format
+      if (!location.fieldName!.startsWith('Field ')) {
+        console.error(`Field name ${location.fieldName} is not in expected format`);
+      }
+
+      // handle field number being in unexpected format
+      let fieldNumber: number = Number(location.fieldName!.split(' ')[1]);
+      if (isNaN(fieldNumber)) {
+        fieldNumber = conservationApplicationMaxPolygonCount;
+      }
+      return fieldNumber;
+    });
+  const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
+
+  const assignedFieldNameIndex = maxFieldNameIndex + 1;
+
+  const newPolygons = payload.polygons.map(
+    (polygon, index): PartialPolygonData => ({
+      ...polygon,
+      fieldName: `Field ${assignedFieldNameIndex + index}`,
+    }),
+  );
+  draftState.conservationApplication.polygonsAddedByFileUpload.push(...newPolygons);
 
   return draftState;
 };
