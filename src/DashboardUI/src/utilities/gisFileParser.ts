@@ -2,6 +2,9 @@ import { Feature, FeatureCollection } from 'geojson';
 import shp from 'shpjs';
 import * as shapefile from 'shapefile';
 
+// logic copied/adapted from `UploadModal.tsx`
+// todo: can anything be done to reduce the duplication?
+
 export const parseGISFileToGeoJSON = async (file: File): Promise<FeatureCollection> => {
   const fileName = file.name.toLocaleLowerCase();
   const fileExtension = fileName.split('.').pop() as string;
