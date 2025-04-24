@@ -57,7 +57,7 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
               )}
 
               {polygons.map((field) => (
-                <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
+                <Tab.Pane eventKey={field.fieldName} key={field.polygonWkt} className="h-100">
                   {show && activeTab === field.fieldName && (
                     <EstimationToolFieldDataTable
                       perspective={props.perspective}
