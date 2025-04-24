@@ -514,9 +514,7 @@ function Map({
         continue;
       }
       console.log('adding new polygons to map', newPolygons);
-      for (const newPolygon of newPolygons) {
-        drawControl.add(newPolygon);
-      }
+      newPolygons.forEach(drawControl.add);
       console.log('clear user drawn polygons');
       // clear the polygons from the state
       setUserDrawnPolygonData([]);
