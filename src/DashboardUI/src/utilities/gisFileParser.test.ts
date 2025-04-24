@@ -16,7 +16,6 @@ const featureCollectionMock: FeatureCollection<Polygon, GeoJsonProperties> = {
 };
 
 // todo: write tests for each supported file extension
-// currently the test fails to run and I don't understand the error :/
 describe('GIS File Parser', () => {
   describe('parseGISFileToGeoJSON', () => {
     describe('JSON file', () => {
