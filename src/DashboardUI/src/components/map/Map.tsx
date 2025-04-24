@@ -37,6 +37,9 @@ import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
 
 import './map.scss';
+import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
+import { fromPartialPolygonDataToPolygonFeature } from '../../utilities/mapUtility';
+import { getLatsLongsFromFeatureCollection } from '../../utilities/geometryHelpers';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -88,9 +91,12 @@ function Map({
     setMapClickedFeatures,
     setIsMapRendering,
     setUserDrawnPolygonData,
+    setMapBoundSettings,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
+  const { state: conservationApplicationState, dispatch: conservationApplicationDispatch } =
+    useConservationApplicationContext();
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
@@ -251,6 +257,48 @@ function Map({
       uploadGeoJsonToMapbox(uploadedGeoJSON);
     }
   }, [map, uploadedGeoJSON]);
+
+  const addFileUploadGeometriesToMap = (geoJsonData: Feature<Geometry, GeoJsonProperties>[]) => {
+    if (drawControl && geoJsonData.length > 0) {
+      geoJsonData.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
+        drawControl.add(feature);
+      });
+
+      const allFeatures = drawControl.getAll().features;
+      if (allFeatures.length > 0) {
+        handleMapDrawnPolygonChange?.(allFeatures);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const data = conservationApplicationState.conservationApplication.polygonsAddedByFileUpload;
+    if (!map || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addFileUploadGeometriesToMap(newFeatures);
+
+    // zoom to fit all data
+    const allFeatures = drawControl?.getAll().features ?? [];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    console.log('dispatch polygons processed');
+    conservationApplicationDispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [map, conservationApplicationState.conservationApplication.polygonsAddedByFileUpload]);
 
   useEffect(() => {
     setIsMapRendering(true);
