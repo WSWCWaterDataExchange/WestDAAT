@@ -35,7 +35,7 @@ describe('useAuthenticationContext', () => {
       // Arrange
       const orgRoles: OrganizationRole[] = [
         { organizationId: '1', roles: [Role.GlobalAdmin, Role.TechnicalReviewer] },
-        { organizationId: '2', roles: [Role.Member] },
+        { organizationId: '2', roles: [Role.OrganizationMember] },
       ];
       const token = buildToken({ orgRoles });
 

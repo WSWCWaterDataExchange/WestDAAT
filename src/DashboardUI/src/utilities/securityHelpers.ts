@@ -31,5 +31,13 @@ export const hasPermission = (user: User | null, permission: Permission): boolea
   const orgRoles = user.organizationRoles?.flatMap((orgRole) => orgRole.roles) ?? [];
   const userRoles = [...nonOrgRoles, ...orgRoles];
 
-  return userRoles.some((role) => RolePermissions[role].includes(permission));
+  return userRoles.some((role) => {
+    const rolePermissions = RolePermissions[role];
+    if (rolePermissions === undefined) {
+      console.error(`Role '${role}' not found in RolePermissions`);
+      return false;
+    }
+
+    return rolePermissions.includes(permission);
+  });
 };

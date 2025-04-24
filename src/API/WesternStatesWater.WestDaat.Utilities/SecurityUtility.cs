@@ -88,7 +88,7 @@ internal class SecurityUtility : ISecurityUtility
     private static readonly Dictionary<string, string[]> RolePermissions = new()
     {
         {
-            Roles.Member,
+            Roles.OrganizationMember,
             [
                 Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,

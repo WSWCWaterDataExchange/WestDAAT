@@ -89,7 +89,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member)]
+    [DataRow(Roles.OrganizationMember)]
     [DataRow(Roles.TechnicalReviewer)]
     [DataRow(Roles.OrganizationAdmin)]
     [DataRow("Fake role")]
@@ -254,7 +254,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
 
     [DataTestMethod]
-    [DataRow(true, Roles.Member, false, DisplayName = "Member should not be allowed to add members")]
+    [DataRow(true, Roles.OrganizationMember, false, DisplayName = "Member should not be allowed to add members")]
     [DataRow(true, Roles.TechnicalReviewer, false, DisplayName = "Technical reviewer should not be allowed to add members")]
     [DataRow(true, Roles.OrganizationAdmin, true, DisplayName = "Organization admin should be allowed to add members")]
     [DataRow(false, Roles.GlobalAdmin, true, DisplayName = "Global admin should be allowed to add members")]
@@ -293,7 +293,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             OrganizationId = organization.Id,
             UserId = userToBeAdded.Id,
-            Role = Roles.Member
+            Role = Roles.OrganizationMember
         });
 
         // Assert
@@ -307,7 +307,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
                 );
             insertedUserOrg.Should().NotBeNull();
             insertedUserOrg!.UserOrganizationRoles.Should().HaveCount(1);
-            insertedUserOrg.UserOrganizationRoles.First().Role.Should().Be(Roles.Member);
+            insertedUserOrg.UserOrganizationRoles.First().Role.Should().Be(Roles.OrganizationMember);
         }
         else
         {
@@ -319,7 +319,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user member role")]
+    [DataRow(Roles.OrganizationMember, true, DisplayName = "Should be able to assign a user member role")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Should be able to assign a user technical reviewer role")]
     [DataRow(Roles.OrganizationAdmin, true, DisplayName = "Should be able to assign a user organization admin role")]
     [DataRow(Roles.GlobalAdmin, false, DisplayName = "Should not be able to assign a user global admin role")]
@@ -400,7 +400,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             OrganizationId = organization.Id,
             UserId = user.Id,
-            Role = Roles.Member
+            Role = Roles.OrganizationMember
         });
 
         // Assert
@@ -435,7 +435,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             OrganizationId = organizationOne.Id,
             UserId = userToBeAdded.Id,
-            Role = Roles.Member
+            Role = Roles.OrganizationMember
         });
 
         // Assert
@@ -468,7 +468,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             OrganizationId = organization.Id,
             UserId = user.Id,
-            Role = Roles.Member
+            Role = Roles.OrganizationMember
         });
 
         // Assert
@@ -522,7 +522,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "Members should not be allowed to remove other users")]
+    [DataRow(Roles.OrganizationMember, true, DisplayName = "Members should not be allowed to remove other users")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Technical Reviewers should not be allowed to remove other users")]
     [DataRow(Roles.OrganizationAdmin, false, DisplayName = "Organization Admins should not be allowed to remove users that belong to a different organization")]
     public async Task Store_OrganizationMemberRemoveRequest_InsufficientPermissions_ShouldNotAllow(string role, bool isPartOfSameOrg)
@@ -685,7 +685,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }  
     
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "Members should not be allowed to edit other users")]
+    [DataRow(Roles.OrganizationMember, true, DisplayName = "Members should not be allowed to edit other users")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Technical Reviewers should not be allowed to edit other users")]
     [DataRow(Roles.OrganizationAdmin, false, DisplayName = "Organization Admins should not be allowed to edit users that belong to a different organization")]
     public async Task Store_OrganizationMemberUpdateRequest_InsufficientPermissions_ShouldNotAllow(string role, bool isPartOfSameOrg)
@@ -697,7 +697,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         var userToEdit = new UserFaker(userToEditProfile).Generate();
         var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
         var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
-            .RuleFor(x => x.Role, () => Roles.Member).Generate();
+            .RuleFor(x => x.Role, () => Roles.OrganizationMember).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
         await _dbContext.Users.AddAsync(userToEdit);
@@ -744,7 +744,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         var userToEdit = new UserFaker(userToEditProfile).Generate();
         var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
         var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
-            .RuleFor(x => x.Role, () => Roles.Member).Generate();
+            .RuleFor(x => x.Role, () => Roles.OrganizationMember).Generate();
         var anotherOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
             .RuleFor(x => x.Role, () => Roles.TechnicalReviewer).Generate();
         var requestingUser = new UserFaker().Generate();
@@ -880,7 +880,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         var userToEdit = new UserFaker(userToEditProfile).Generate();
         var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
         var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
-            .RuleFor(x => x.Role, () => Roles.Member).Generate();
+            .RuleFor(x => x.Role, () => Roles.OrganizationMember).Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.Users.AddAsync(userToEdit);
