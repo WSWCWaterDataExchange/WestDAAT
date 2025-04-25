@@ -15,6 +15,12 @@ export function EstimationToolMapHeader() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const parseFile = async (file: File): Promise<FeatureCollection> => {
     let data: FeatureCollection = {
       type: 'FeatureCollection',
@@ -69,8 +75,10 @@ export function EstimationToolMapHeader() {
   };
 
   const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('file input changed', event);
     const files = event.target.files;
     if (!files || files.length === 0) {
+      resetFileInput();
       return;
     }
 
@@ -89,6 +97,7 @@ export function EstimationToolMapHeader() {
     const areAllNewFeaturesUnique = validateUploadedFeaturesUniqueness(uploadedFileFeatures);
     if (!areAllNewFeaturesUnique) {
       toast.error('Uploaded polygons must be unique. Please check your file and try again.');
+      resetFileInput();
       return;
     }
 
@@ -103,10 +112,7 @@ export function EstimationToolMapHeader() {
       },
     });
 
-    // reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    resetFileInput();
   };
 
   return (
