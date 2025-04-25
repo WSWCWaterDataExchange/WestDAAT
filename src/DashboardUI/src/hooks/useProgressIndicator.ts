@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Id, toast, ToastContent } from 'react-toastify';
 
 function useProgressIndicator(progress: number | boolean[], content: ToastContent) {
-  let toastId: Id | null = null;
+  const [toastId, setToastId] = useState<Id | null>(null);
 
   const calculatedProgress = useMemo(() => {
     if (Array.isArray(progress)) {
@@ -11,9 +11,17 @@ function useProgressIndicator(progress: number | boolean[], content: ToastConten
     return progress;
   }, [progress]);
 
+
   useEffect(() => {
     if (toastId === null) {
-      toastId = toast.info(content);
+      if (calculatedProgress < 1) {
+        const id = toast.info(content, {
+          autoClose: false,
+          type: 'info',
+          theme: 'colored'
+        });
+        setToastId(id);
+      }
     } else {
       if (calculatedProgress < 1) {
         toast.update(toastId, {
@@ -26,6 +34,6 @@ function useProgressIndicator(progress: number | boolean[], content: ToastConten
         toast.dismiss(toastId);
       }
     }
-  }, [calculatedProgress, content, toastId]);
+  }, [progress, content]);
 }
 export default useProgressIndicator;
