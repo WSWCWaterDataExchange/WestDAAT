@@ -750,6 +750,7 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
             ApplicationDocumentDownloadSasTokenRequest req => await ValidateApplicationDocumentDownloadSasTokenRequest(req, context),
+            ApplicationMapImageUploadSasTokenRequest req => await ValidateApplicationMapImageUploadSasTokenRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -801,6 +802,45 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicationMapImageUploadSasTokenRequest(ApplicationMapImageUploadSasTokenRequest request, ContextBase context)
+    {
+        // User must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // Verify the application exists
+        var applicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            ApplicationId = request.WaterConservationApplicationId,
+        };
+
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(applicationExistsRequest);
+
+        if (!applicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // Current user owns the application, so allow file upload
+        if (userContext.UserId == applicationExistsResponse.ApplicantUserId)
+        {
+            return null;
+        }
+
+        // Check if current user is a member of the application funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = applicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
     private async Task<ErrorBase> ValidateApplicationNoteCreateRequest(WaterConservationApplicationNoteCreateRequest request, ContextBase context)
     {
         // verify user is logged in
@@ -818,7 +858,7 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
         }
-        
+
         // verify user belongs to the funding organization
         var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
@@ -833,7 +873,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,

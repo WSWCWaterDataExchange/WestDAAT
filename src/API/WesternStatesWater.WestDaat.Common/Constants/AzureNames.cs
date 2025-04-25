@@ -21,4 +21,5 @@ public static class Queues
 public static class Containers
 {
     public const string ApplicationDocuments = "application-documents";
+    public const string ApplicationMapImages = "application-map-images";
 }
