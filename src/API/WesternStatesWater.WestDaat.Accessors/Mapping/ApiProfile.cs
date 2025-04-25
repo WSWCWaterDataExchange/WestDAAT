@@ -476,6 +476,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     src.Submission.DeniedDate
                 )))
                 // Mapped in accessor
+                .ForMember(dest => dest.MapImageUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.ReviewPipeline, opt => opt.Ignore());
 
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>()
