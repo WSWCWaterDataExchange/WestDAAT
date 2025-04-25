@@ -138,6 +138,75 @@ function ReviewMap(props: ReviewMapProps) {
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
 
+  /*
+   useEffect(() => {
+    if (!isMapLoaded || state.conservationApplication.polygonsAddedByFileUpload.length === 0) {
+      return;
+    }
+
+    console.log('file upload polygons detected', state.conservationApplication.polygonsAddedByFileUpload);
+    // add new polygons to map
+    const newPolygons = state.conservationApplication.polygonsAddedByFileUpload.map(
+      fromPartialPolygonDataToPolygonFeature,
+    );
+    setUserDrawnPolygonData(newPolygons);
+
+    // zoom map in to focus on polygons
+    const allFeatures = [
+      ...userDrawnPolygonFeatures,
+      ...newPolygons,
+      ...(controlLocationFeature ? [controlLocationFeature] : []),
+    ];
+
+    console.log('zoom to fit first polygon');
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    console.log('dispatch polygons processed');
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [state.conservationApplication.polygonsAddedByFileUpload, isMapLoaded]);
+S
+  */
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addFileUploadGeometriesToMap(newFeatures);
+
+    // zoom to fit all data
+    const allFeatures = drawControl?.getAll().features ?? [];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    console.log('dispatch polygons processed');
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
+
   const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
     console.log('map change detection triggered. accumulating polygons to store in state');
     // irrigated field locations
