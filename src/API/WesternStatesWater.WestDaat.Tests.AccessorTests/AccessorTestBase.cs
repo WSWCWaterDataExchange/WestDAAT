@@ -2,15 +2,20 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
     public abstract class AccessorTestBase : IDisposable
     {
+        protected IServiceProvider Services { get; private set; }
+
         static AccessorTestBase()
         {
             Configuration = new ConfigurationBuilder()
@@ -61,6 +66,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 a.AddConfiguration(Configuration.GetSection("Logging"));
                 a.AddConsole();
             });
+
+            var serviceCollection = new ServiceCollection();
+
+            RegisterServices(serviceCollection);
+
+            Services = serviceCollection.BuildServiceProvider();
         }
 
         [TestCleanup]
@@ -73,6 +84,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         protected ILogger<T> CreateLogger<T>()
         {
             return _loggerFactory.CreateLogger<T>();
+        }
+
+        private void RegisterServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
+            serviceCollection.AddScoped(_ => Configuration.GetBlobStorageConfiguration());
         }
 
         internal IDatabaseContextFactory CreateDatabaseContextFactory()
