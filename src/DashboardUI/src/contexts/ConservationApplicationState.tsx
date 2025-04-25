@@ -684,7 +684,8 @@ const onGISFilePolygonsUploaded = (
 
 const onGISFilePolygonsProcessed = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.conservationApplication.polygonsAddedByFileUpload = [];
-  console.log('file polygons reset');
+  console.group('State - GIS File Polygons Processed');
+  console.groupEnd();
   return draftState;
 };
 
