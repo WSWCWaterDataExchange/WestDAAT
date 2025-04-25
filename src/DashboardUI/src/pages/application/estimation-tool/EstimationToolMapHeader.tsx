@@ -39,6 +39,7 @@ export function EstimationToolMapHeader() {
     const uploadedFeaturesDuplicateFeaturesArePresent = uploadedFeatures.features.length !== uploadedFeatureWkts.size;
 
     if (uploadedFeaturesDuplicateFeaturesArePresent) {
+      console.log('uploaded file contains multiple polygons that are duplicates of each other');
       return false;
     }
 
@@ -47,14 +48,19 @@ export function EstimationToolMapHeader() {
       state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
     );
 
+    console.log('uploaded polygons');
+    console.log('existing polygons:', existingPolygonWkts);
+
     for (const wkt of existingPolygonWkts) {
       if (uploadedFeatureWkts.has(wkt)) {
+        console.log('uploaded file contains polygons that are duplicates of existing polygons');
         return false;
       }
     }
 
     for (const wkt of uploadedFeatureWkts) {
       if (existingPolygonWkts.has(wkt)) {
+        console.log('uploaded file contains polygons that are duplicates of existing polygons');
         return false;
       }
     }
@@ -78,6 +84,7 @@ export function EstimationToolMapHeader() {
       const fileData = await parseFile(file);
       uploadedFileFeatures.features.push(...fileData.features);
     }
+    console.log('parsed files. result:', uploadedFileFeatures);
 
     const areAllNewFeaturesUnique = validateUploadedFeaturesUniqueness(uploadedFileFeatures);
     if (!areAllNewFeaturesUnique) {
@@ -85,6 +92,7 @@ export function EstimationToolMapHeader() {
       return;
     }
 
+    console.log('dispatch file upload polygons:', uploadedFileFeatures.features);
     dispatch({
       type: 'GIS_FILE_POLYGONS_UPLOADED',
       payload: {
