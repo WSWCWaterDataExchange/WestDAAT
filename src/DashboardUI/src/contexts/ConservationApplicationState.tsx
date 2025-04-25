@@ -346,7 +346,12 @@ export const reducer = (
   // Wrap reducer in immer's produce function so we can
   // mutate the draft state without mutating the original state.
   return produce(state, (draftState) => {
-    return reduce(draftState, action);
+    const newState = reduce(draftState, action);
+    console.group('State - Reducer');
+    console.log('Action:', action);
+    console.log('New State:', JSON.parse(JSON.stringify(newState)));
+    console.groupEnd();
+    return newState;
   });
 };
 
@@ -536,6 +541,7 @@ const onReviewerMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerMapDataUpdatedAction,
 ): ConservationApplicationState => {
+  console.group('State - Reviewer Map Data Updated');
   // this action handles these scenarios:
   // * map polygons updated
   // * map control location updated
@@ -544,8 +550,11 @@ const onReviewerMapPolygonsUpdated = (
   // because this method is fired every time the user adjusts a feature on the map
 
   const mergePolygonChanges = () => {
+    console.group('State - Merge Polygon Changes');
     const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
     const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
+    console.log('Existing polygons:', existingPolygonWkts);
+    console.log('New polygons:', newPolygonWkts);
 
     const anyPolygonsAddedOrRemoved = existingPolygonWkts.size !== newPolygonWkts.size;
 
@@ -560,6 +569,8 @@ const onReviewerMapPolygonsUpdated = (
     const anyChangeInPolygons = anyPolygonsAddedOrRemoved || anyPolygonsPositionChanged;
 
     if (!anyChangeInPolygons) {
+      console.log('No changes to polygons');
+      console.groupEnd();
       return;
     }
 
@@ -568,6 +579,7 @@ const onReviewerMapPolygonsUpdated = (
         // polygon added
         const newPolygon = payload.polygons.find((p) => !existingPolygonWkts.has(p.polygonWkt!))!;
 
+        console.log('Polygon added:', newPolygon);
         draftState.conservationApplication.estimateLocations.push({
           ...newPolygon,
         });
@@ -581,6 +593,8 @@ const onReviewerMapPolygonsUpdated = (
           draftState.conservationApplication.estimateLocations.filter(
             (p) => p.polygonWkt !== removedPolygon.polygonWkt,
           );
+
+        console.log('Polygon removed:', removedPolygon);
 
         // important - may also need to update the ApplicationSubmission form
         if (removedPolygon.waterConservationApplicationEstimateLocationId) {
@@ -613,10 +627,16 @@ const onReviewerMapPolygonsUpdated = (
         );
       }
 
+      console.log(
+        'Polygon modified:',
+        JSON.parse(JSON.stringify(estimateLocation)),
+        JSON.parse(JSON.stringify(modifiedPolygon)),
+      );
       // update the state data
       Object.assign(estimateLocation, modifiedPolygon);
     }
 
+    console.groupEnd();
     draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
   };
 
@@ -652,6 +672,7 @@ const onReviewerMapPolygonsUpdated = (
   updatePolygonAcreageSum(draftState);
   checkCanEstimateConsumptiveUse(draftState);
 
+  console.groupEnd();
   return draftState;
 };
 
