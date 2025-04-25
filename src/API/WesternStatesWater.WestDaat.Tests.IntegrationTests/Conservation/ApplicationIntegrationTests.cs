@@ -405,6 +405,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.MapImageUrl.ToString().Should().Contain($"http://127.0.0.1:10000/devstoreaccount1/{Containers.ApplicationMapImages}/{application.Id}");
 
         // sanity checks: these should all be covered by the `BeEquivalentTo` comparisons, but we're performing them just in case
 
