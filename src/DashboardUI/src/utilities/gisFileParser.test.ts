@@ -33,5 +33,33 @@ describe('GIS File Parser', () => {
         expect(result.features.length).toBe(featureCount);
       });
     });
+
+    describe('GeoJSON file', () => {
+      it('should parse a valid file', async () => {
+        // Arrange
+        const file = new File([JSON.stringify(featureCollectionMock)], 'test.geojson', { type: 'application/json' });
+
+        // Act
+        const result = await parseGISFileToGeoJSON(file);
+
+        // Assert
+        expect(result).toBeTruthy();
+
+        const featureCount = featureCollectionMock.features.length;
+        expect(result.features.length).toBe(featureCount);
+      });
+    });
+
+    describe('unsupported file extension', () => {
+      it('should throw an error', async () => {
+        // Arrange
+        const file = new File([''], 'test.txt', { type: 'text/plain' });
+
+        // Act & Assert
+        await expect(parseGISFileToGeoJSON(file)).rejects.toThrow(
+          'Unsupported file type. Please upload a GeoJSON file or a Shapefile.',
+        );
+      });
+    });
   });
 });
