@@ -1,5 +1,3 @@
-import './mapboxTestSetup.mock';
-
 import { Feature, FeatureCollection, GeoJsonProperties, Polygon } from 'geojson';
 import { polygonMock } from '../mocks/GeoJsonGeometries.mock';
 import { parseGISFileToGeoJSON } from './gisFileParser';

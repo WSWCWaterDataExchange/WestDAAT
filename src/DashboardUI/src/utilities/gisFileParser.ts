@@ -1,5 +1,3 @@
-import './mapboxTestSetup.mock';
-
 import { Feature, FeatureCollection } from 'geojson';
 import shp from 'shpjs';
 import * as shapefile from 'shapefile';
