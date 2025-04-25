@@ -99,8 +99,7 @@ function ApplicationSubmissionFormDisplay() {
           </ApplicationFormSection>
 
           <div className="col-lg-6 col-12">
-            Static map here
-            <NotImplementedPlaceholder />
+            <img src={state.conservationApplication.mapImageUrl} alt="Map" className="w-100" />
           </div>
         </div>
 
