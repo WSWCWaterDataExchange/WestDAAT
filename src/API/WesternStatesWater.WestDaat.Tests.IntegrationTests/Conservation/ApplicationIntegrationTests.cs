@@ -1480,7 +1480,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataRow(true, false, false, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
     [DataRow(true, true, false, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
     [DataRow(true, true, true, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
-    [DataRow(true, true, true, Roles.Member, false, nameof(ForbiddenError), DisplayName = "Member cannot edit an Application Submission")]
+    [DataRow(true, true, true, Roles.OrganizationMember, false, nameof(ForbiddenError), DisplayName = "Member cannot edit an Application Submission")]
     [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "Technical Reviewer has permission to edit an Application Submission")]
     [DataRow(true, true, true, Roles.OrganizationAdmin, true, "", DisplayName = "Organization Admin has permission to edit an Application Submission")]
     [DataRow(true, true, true, Roles.GlobalAdmin, true, "", DisplayName = "Globa Admin has permission to edit an Application Submission")]
@@ -1627,7 +1627,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "A Member of the same Funding Organization should not be able to submit a recommendation")]
+    [DataRow(Roles.OrganizationMember, true, DisplayName = "A Member of the same Funding Organization should not be able to submit a recommendation")]
     [DataRow(Roles.TechnicalReviewer, false, DisplayName = "A Technical Reviewer of a different Funding Organization should not be able to submit a recommendation")]
     [DataRow(Roles.OrganizationAdmin, false, DisplayName = "An Organization Admin of a different Funding Organization should not be able to submit a recommendation")]
     public async Task Store_SubmitApplicationRecommendation_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
@@ -1780,7 +1780,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, false, DisplayName = "A Member should not be able to approve a different funding organization's application")]
+    [DataRow(Roles.OrganizationMember, false, DisplayName = "A Member should not be able to approve a different funding organization's application")]
     [DataRow(Roles.OrganizationAdmin, false, DisplayName = "An Organization Admin should not be able to approve a different funding organization's application")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "A Technical Reviewer should not be able to approve their own funding organization's applications")]
     public async Task Store_SubmitApplicationApproval_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
@@ -1874,7 +1874,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new OrganizationRole
                 {
                     OrganizationId = organization.Id,
-                    RoleNames = [Roles.Member]
+                    RoleNames = [Roles.OrganizationMember]
                 }
             ]
         });
@@ -1960,7 +1960,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new OrganizationRole
                 {
                     OrganizationId = organization.Id,
-                    RoleNames = [Roles.Member]
+                    RoleNames = [Roles.OrganizationMember]
                 }
             ]
         });
@@ -2029,7 +2029,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new OrganizationRole
                 {
                     OrganizationId = organization.Id,
-                    RoleNames = [Roles.Member]
+                    RoleNames = [Roles.OrganizationMember]
                 }
             ]
         });
@@ -2083,7 +2083,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, DisplayName = "Members of a different funding organization should not be able to create notes on an application")]
+    [DataRow(Roles.OrganizationMember, DisplayName = "Members of a different funding organization should not be able to create notes on an application")]
     [DataRow(Roles.TechnicalReviewer, DisplayName = "Technical Reviewers of a different funding organization should not be able to create notes on an application")]
     [DataRow(Roles.OrganizationAdmin, DisplayName = "Organization Admins of a different funding organization should not be able to create notes on an application")]
     public async Task Store_CreateApplicationNote_InvalidPermissions_ShouldThrow(string role)
@@ -2157,7 +2157,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new OrganizationRole
                 {
                     OrganizationId = submission.WaterConservationApplication.FundingOrganizationId,
-                    RoleNames = [Roles.Member]
+                    RoleNames = [Roles.OrganizationMember]
                 }
             ]
         });
@@ -2212,7 +2212,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 {
                     new()
                     {
-                        Role = Roles.Member,
+                        Role = Roles.OrganizationMember,
                     }
                 }).Generate()
         ];
@@ -2332,7 +2332,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 {
                     new()
                     {
-                        Role = Roles.Member,
+                        Role = Roles.OrganizationMember,
                     }
                 }).Generate()
         ];
