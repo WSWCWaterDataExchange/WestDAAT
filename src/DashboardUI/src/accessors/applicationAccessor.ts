@@ -284,7 +284,7 @@ export const submitApplicationApproval = async (
     waterConservationApplicationId: string;
     approvalDecision: ApprovalDecision;
     approvalNotes: string;
-  }
+  },
 ): Promise<void> => {
   const api = await westDaatApi(context);
 
@@ -292,11 +292,11 @@ export const submitApplicationApproval = async (
     $type: 'WaterConservationApplicationApprovalRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     approvalDecision: data.approvalDecision,
-    approvalNotes: data.approvalNotes
-  }
+    approvalNotes: data.approvalNotes,
+  };
 
   await api.post<void>('Applications/Submit', request);
-}
+};
 
 export const getApplication = async (
   context: IMsalContext,
@@ -367,4 +367,4 @@ export const createApplicationReviewerNote = async (
   );
 
   return response;
-}
+};
