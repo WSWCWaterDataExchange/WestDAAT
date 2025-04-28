@@ -255,22 +255,16 @@ function Map({
 
   const addGeometriesToMapCallback = useCallback(
     (geoJsonData: Feature<Geometry, GeoJsonProperties>[]) => {
-      console.group('Map.tsx - addFileUploadGeometriesToMap');
-      console.log('features to be added:', geoJsonData);
-
       if (drawControl && geoJsonData.length > 0) {
         geoJsonData.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
           drawControl.add(feature);
-          console.log('added feature to map:', feature);
         });
 
         const allFeatures = drawControl.getAll().features;
         if (allFeatures.length > 0) {
-          console.log('trigger handleMapDrawnPolygonChange with all features:', allFeatures);
           handleMapDrawnPolygonChange?.(allFeatures);
         }
       }
-      console.groupEnd();
     },
     [drawControl, handleMapDrawnPolygonChange],
   );
@@ -529,27 +523,19 @@ function Map({
     const newPolygons = userDrawnPolygonData.filter(
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
-    console.group('Map.tsx - userDrawnPolygonData useEffect');
-    console.log('`userDrawnPolygons` changed. existing:', existingPolygons, 'new:', newPolygons);
 
     if (newPolygons.length === 0) {
-      console.log('no new polygons. early return');
-      console.groupEnd();
       return;
     }
 
     map.once('idle', () => {
-      console.log('map idle; waiting for style to load');
       while (!map.isStyleLoaded()) {
         continue;
       }
-      console.log('adding new polygons to map', newPolygons);
       newPolygons.forEach(drawControl.add);
 
-      console.log('clear user drawn polygons');
       // clear the polygons from the state
       setUserDrawnPolygonData([]);
-      console.groupEnd();
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 

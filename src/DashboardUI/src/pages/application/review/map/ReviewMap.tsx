@@ -145,15 +145,11 @@ function ReviewMap(props: ReviewMapProps) {
       return;
     }
 
-    console.group('ReviewMap - File Upload Polygons useEffect');
-
     // put new polygons onto map
     const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
-    console.log('place new polygons on map. addGeometries:', addGeometriesToMap, 'new features:', newFeatures);
     addGeometriesToMap.current!(newFeatures);
 
     // zoom to fit all data
-    console.log('zoom to fit all data');
     const allFeatures = [
       ...userDrawnPolygonFeatures,
       ...newFeatures,
@@ -170,15 +166,12 @@ function ReviewMap(props: ReviewMapProps) {
       duration: 5000,
     });
 
-    console.log('dispatch polygons processed');
     dispatch({
       type: 'GIS_FILE_POLYGONS_PROCESSED',
     });
-    console.groupEnd();
   }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
-    console.log('map change detection triggered. accumulating polygons to store in state');
     // irrigated field locations
     const polygonFeatures: Feature<Polygon, GeoJsonProperties>[] = mapGeometries
       .filter((feature) => feature.geometry.type === 'Polygon')

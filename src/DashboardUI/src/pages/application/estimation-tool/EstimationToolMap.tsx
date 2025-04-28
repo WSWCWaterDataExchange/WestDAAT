@@ -120,18 +120,14 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       return;
     }
 
-    console.group('EstimationToolMap - File Upload Polygons useEffect');
-
     // put new polygons onto map
     const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
-    console.log('place new polygons on map. addGeometries:', addGeometriesToMap, 'new features:', newFeatures);
     addGeometriesToMap.current!(newFeatures);
 
     const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] =
       state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
 
     // zoom to fit all data
-    console.log('zoom to fit all data');
     const allFeatures = [...userDrawnPolygonFeatures, ...newFeatures];
     const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
@@ -144,11 +140,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       duration: 5000,
     });
 
-    console.log('dispatch polygons processed');
     dispatch({
       type: 'GIS_FILE_POLYGONS_PROCESSED',
     });
-    console.groupEnd();
   }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
