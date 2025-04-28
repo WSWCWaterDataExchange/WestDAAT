@@ -7,10 +7,9 @@ import { fromGeometryFeatureToMapSelectionPolygonData } from '../../../utilities
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Modal from 'react-bootstrap/esm/Modal';
 import { EstimationToolHelpVideo } from './EstimationToolHelpVideo';
-import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
 
 export function EstimationToolMapHeader() {
-  const { state, dispatch } = useConservationApplicationContext();
+  const { dispatch } = useConservationApplicationContext();
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,38 +36,6 @@ export function EstimationToolMapHeader() {
     return data;
   };
 
-  const validateUploadedFeaturesUniqueness = (uploadedFeatures: FeatureCollection): boolean => {
-    // verify that every polygon has a unique wkt
-    // 1. check if the uploaded features are all unique compared to each other
-    const uploadedFeatureWkts = new Set<string>(
-      uploadedFeatures.features.map((feature) => convertGeometryToWkt(feature.geometry)),
-    );
-    const uploadedFeaturesDuplicateFeaturesArePresent = uploadedFeatures.features.length !== uploadedFeatureWkts.size;
-
-    if (uploadedFeaturesDuplicateFeaturesArePresent) {
-      return false;
-    }
-
-    // 2. check if the uploaded features are all unique compared with the polygons already in state
-    const existingPolygonWkts = new Set<string>(
-      state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
-    );
-
-    for (const wkt of existingPolygonWkts) {
-      if (uploadedFeatureWkts.has(wkt)) {
-        return false;
-      }
-    }
-
-    for (const wkt of uploadedFeatureWkts) {
-      if (existingPolygonWkts.has(wkt)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
   const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
@@ -85,13 +52,6 @@ export function EstimationToolMapHeader() {
       const file = files[i];
       const fileData = await parseFile(file);
       uploadedFileFeatures.features.push(...fileData.features);
-    }
-
-    const areAllNewFeaturesUnique = validateUploadedFeaturesUniqueness(uploadedFileFeatures);
-    if (!areAllNewFeaturesUnique) {
-      toast.error('Uploaded polygons must be unique. Please check your file and try again.');
-      resetFileInput();
-      return;
     }
 
     dispatch({
