@@ -43,7 +43,6 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle,
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
-    exportToPngFn,
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);

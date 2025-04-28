@@ -38,7 +38,6 @@ import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
 
 import './map.scss';
-import bboxPolygon from '@turf/bbox-polygon';
 
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
