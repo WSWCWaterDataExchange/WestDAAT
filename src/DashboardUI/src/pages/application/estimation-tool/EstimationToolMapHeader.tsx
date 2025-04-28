@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import { parseGISFileToGeoJSON } from '../../../utilities/gisFileParser';
-import { FeatureCollection } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { toast } from 'react-toastify';
 import { fromGeometryFeatureToMapSelectionPolygonData } from '../../../utilities/mapUtility';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -44,23 +44,17 @@ export function EstimationToolMapHeader() {
     }
 
     // combine files' data into a single collection
-    const uploadedFileFeatures: FeatureCollection = {
-      type: 'FeatureCollection',
-      features: [],
-    };
+    const uploadedFileFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileData = await parseFile(file);
-      uploadedFileFeatures.features.push(...fileData.features);
+      uploadedFileFeatures.push(...fileData.features);
     }
 
     dispatch({
       type: 'GIS_FILE_POLYGONS_UPLOADED',
       payload: {
-        polygons: uploadedFileFeatures.features.map(fromGeometryFeatureToMapSelectionPolygonData).map((polygon, i) => ({
-          ...polygon,
-          fieldName: 'test ' + i,
-        })),
+        polygons: uploadedFileFeatures.map(fromGeometryFeatureToMapSelectionPolygonData),
       },
     });
 
