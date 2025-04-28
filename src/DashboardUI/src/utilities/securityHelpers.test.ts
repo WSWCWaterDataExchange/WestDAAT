@@ -19,18 +19,18 @@ describe('securityHelpers', () => {
     });
 
     it('should return true when user has the permission', () => {
-      const user = { roles: [Role.Member] } as User;
+      const user = { roles: [Role.OrganizationMember] } as User;
 
-      const result = hasPermission(user, RolePermissions[Role.Member][0]);
+      const result = hasPermission(user, RolePermissions[Role.OrganizationMember][0]);
 
       expect(result).toBe(true);
     });
 
     it('should return false when user does not have the permission', () => {
-      const user = { roles: [Role.Member] } as User;
+      const user = { roles: [Role.OrganizationMember] } as User;
 
       const adminOnlyPermissions = RolePermissions[Role.OrganizationAdmin].filter(permission => {
-        return !RolePermissions[Role.Member].includes(permission)
+        return !RolePermissions[Role.OrganizationMember].includes(permission)
       });
 
       const result = hasPermission(user, adminOnlyPermissions[0]);
