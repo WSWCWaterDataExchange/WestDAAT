@@ -193,7 +193,6 @@ export function useReviewerEstimateConsumptiveUseMutation() {
             .then((blob) => {
               const applicationId = state.conservationApplication.waterConservationApplicationId;
               if (blob && applicationId) {
-                console.log('Exported map to PNG', blob);
                 const file = new File([blob], `${applicationId}.png`, { type: blob.type });
                 uploadApplicationStaticMap(msalContext, file, applicationId);
               }

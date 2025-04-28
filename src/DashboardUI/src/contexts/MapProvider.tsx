@@ -192,7 +192,6 @@ const defaultState: MapContextState = {
   exportToPngFn: null,
   setExportToPngFn: () => (options: MapExportOptions) => {
     return new Promise<Blob | null>((resolve) => {
-      console.log('Default implementation', options);
       resolve(null);
     });
   },

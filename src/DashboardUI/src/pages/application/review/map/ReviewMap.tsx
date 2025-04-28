@@ -119,7 +119,6 @@ function ReviewMap(props: ReviewMapProps) {
       duration: 2000,
     });
 
-    console.log('setUserDrawnPolygonData');
     if (exportToPngFn) {
       exportToPngFn!({
         height: 600,
