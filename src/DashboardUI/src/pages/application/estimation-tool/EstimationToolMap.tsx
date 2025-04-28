@@ -31,8 +31,15 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
-    useMapContext();
+  const {
+    isMapLoaded,
+    setMapBoundSettings,
+    setMapStyle,
+    setVisibleLayers,
+    setGeoJsonData,
+    setUserDrawnPolygonData,
+    addGeometriesToMap,
+  } = useMapContext();
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -106,6 +113,43 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     });
     return labelFeatures;
   }, [state.conservationApplication.estimateLocations]);
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    console.group('EstimationToolMap - File Upload Polygons useEffect');
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    console.log('place new polygons on map. addGeometries:', addGeometriesToMap, 'new features:', newFeatures);
+    addGeometriesToMap.current!(newFeatures);
+
+    const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] =
+      state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
+
+    // zoom to fit all data
+    console.log('zoom to fit all data');
+    const allFeatures = [...userDrawnPolygonFeatures, ...newFeatures];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    console.log('dispatch polygons processed');
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+    console.groupEnd();
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > conservationApplicationMaxPolygonCount) {
