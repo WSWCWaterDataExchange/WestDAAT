@@ -140,7 +140,7 @@ public class UserIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(Roles.GlobalAdmin, true)]
     [DataRow(Roles.OrganizationAdmin, true)]
-    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.OrganizationMember, false)]
     [DataRow(Roles.TechnicalReviewer, false)]
     public async Task Load_UserSearchRequest_InvalidRole_ShouldThrow(string role, bool isAllowed)
     {
@@ -286,7 +286,7 @@ public class UserIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(Roles.GlobalAdmin, true)]
     [DataRow(Roles.OrganizationAdmin, false)]
-    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.OrganizationMember, false)]
     [DataRow(Roles.TechnicalReviewer, false)]
     public async Task Load_UserListRequest_ShouldThrowIfInsufficientPermissions(string role, bool isAllowed)
     {
@@ -338,7 +338,7 @@ public class UserIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(Roles.GlobalAdmin, true)]
     [DataRow(Roles.OrganizationAdmin, true)]
-    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.OrganizationMember, false)]
     [DataRow(Roles.TechnicalReviewer, false)]
     public async Task Load_OrganizationUserListRequest_ShouldThrowIfInsufficientPermissions(string role, bool isAllowed)
     {
@@ -467,7 +467,7 @@ public class UserIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member)]
+    [DataRow(Roles.OrganizationMember)]
     [DataRow(Roles.TechnicalReviewer)]
     [DataRow(Roles.OrganizationAdmin)]
     [DataRow(Roles.GlobalAdmin)]

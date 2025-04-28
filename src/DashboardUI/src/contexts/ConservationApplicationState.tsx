@@ -54,6 +54,7 @@ export interface ConservationApplicationState {
     reviewerNotes: ApplicationReviewNote[];
     reviewPipeline: ReviewPipeline;
     status: ConservationApplicationStatus;
+    mapImageUrl: string | undefined;
   };
   displayDataTable: boolean;
   isCreatingApplication: boolean;
@@ -109,6 +110,7 @@ export const defaultState = (): ConservationApplicationState => ({
       reviewSteps: [],
     },
     status: ConservationApplicationStatus.Unknown,
+    mapImageUrl: undefined,
   },
   displayDataTable: false,
   isCreatingApplication: false,
@@ -935,6 +937,7 @@ const onApplicationLoaded = (
 
   draftApplication.reviewPipeline = payload.reviewPipeline;
   draftApplication.status = application.status;
+  draftApplication.mapImageUrl = application.mapImageUrl;
 
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
