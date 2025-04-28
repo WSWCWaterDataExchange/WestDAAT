@@ -47,12 +47,14 @@ function ReviewMap(props: ReviewMapProps) {
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
 
+  const isPageLoading = state.isLoadingApplication || state.isLoadingFundingOrganization;
+
   useEffect(() => {
-    if (!isMapLoaded) {
+    if (isPageLoading || !isMapLoaded) {
       return;
     }
     setMapStyle(MapStyle.Satellite);
-  }, [isMapLoaded, setMapStyle]);
+  }, [isPageLoading, isMapLoaded, setMapStyle]);
 
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
     return state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
@@ -93,7 +95,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [controlLocationFeature, controlLocationFeature?.geometry]);
 
   useEffect(() => {
-    if (!userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
+    if (isPageLoading || !userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
       return;
     }
 
@@ -120,6 +122,7 @@ function ReviewMap(props: ReviewMapProps) {
 
     setHasInitializedMap(true);
   }, [
+    isPageLoading,
     userDrawnPolygonFeatures,
     controlLocationFeature,
     isMapLoaded,
