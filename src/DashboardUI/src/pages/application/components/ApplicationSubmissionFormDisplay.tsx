@@ -7,6 +7,7 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import ApplicationStaticMap from './ApplicationStaticMap';
 import FormElementDisplay from './FormElementDisplay';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
@@ -99,7 +100,7 @@ function ApplicationSubmissionFormDisplay() {
           </ApplicationFormSection>
 
           <div className="col-lg-6 col-12">
-            <img src={state.conservationApplication.mapImageUrl} alt="Map" className="w-100" />
+            <ApplicationStaticMap mapImageUrl={state.conservationApplication.mapImageUrl} />
           </div>
         </div>
 
