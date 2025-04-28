@@ -38,6 +38,7 @@ import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
 
 import './map.scss';
+import bboxPolygon from '@turf/bbox-polygon';
 
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -656,6 +657,7 @@ function Map({
               return;
             }
 
+            // resize component for standard size screenshot
             mapContainer.style.width = options.width + 'px';
             mapContainer.style.height = options.height + 'px';
             const mapContainerContainsHeightClass = mapContainer.classList.contains('h-100');
@@ -664,6 +666,31 @@ function Map({
             }
 
             map.resize();
+
+            // fit map to bounding box set by the displayed features
+            const displayedFeatures = drawControl!.getAll().features;
+            if (displayedFeatures.length === 0) {
+              reject(new Error('No features to display'));
+              return;
+            }
+
+            const bounds = new mapboxgl.LngLatBounds();
+            displayedFeatures.forEach((feature) => {
+              // only supports these geometries
+              if (feature.geometry.type === 'Point') {
+                bounds.extend(feature.geometry.coordinates as [number, number]);
+              } else if (feature.geometry.type === 'Polygon') {
+                feature.geometry.coordinates[0].forEach((coord) => {
+                  bounds.extend(coord as [number, number]);
+                });
+              }
+            });
+
+            map.fitBounds(bounds, {
+              padding: 25,
+              maxZoom: 16,
+              duration: 0,
+            });
 
             map.once('idle', async () => {
               const canvas = map.getCanvas();
