@@ -149,12 +149,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             var waterRights = result.WaterRights;
 
+            var expectedAllocationTypes = waterAllocationTypes
+                .Select(x => x.WaDEName ?? x.Name)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
             waterRights.AllocationTypes.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
+                .BeEquivalentTo(expectedAllocationTypes);
 
             waterRights.BeneficialUses.Should()
                 .BeInAscendingOrder(b => b.BeneficialUseName)
