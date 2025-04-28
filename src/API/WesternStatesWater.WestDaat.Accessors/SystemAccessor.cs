@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.Extensions;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
@@ -16,214 +18,128 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
-            async Task<string[]> GetOverlayTypes()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.OverlaysViews
-                    .AsNoTracking()
-                    .Select(o => o.OverlayTypeWaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
 
-            async Task<string[]> GetOverlayWaterSources()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.OverlaysViews
-                    .AsNoTracking()
-                    .Select(o => o.WaterSourceTypeWaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
+            // Overlays
+            var overlayTypes = await db.OverlaysViews
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.OverlayTypeWaDEName))
+                .Select(x => x.OverlayTypeWaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
 
-            async Task<string[]> GetOverlayStates()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.OverlaysViews
-                    .AsNoTracking()
-                    .Select(o => o.State)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
+            var overlayWaterSources = await db.OverlaysViews
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.WaterSourceTypeWaDEName))
+                .Select(x => x.WaterSourceTypeWaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
 
-            async Task<List<(string Name, string Category)>> GetBeneficialUses()
-            {
-                await using var db = _databaseContextFactory.Create();
-                var results = await db.BeneficialUsesCV
-                    .AsNoTracking()
-                    .Where(cv => db.AllocationBridgeBeneficialUsesFact.Any(b => b.BeneficialUseCV == cv.Name)
-                              || db.SitesBridgeBeneficialUsesFact.Any(s => s.BeneficialUseCV == cv.Name))
-                    .Select(cv => new
-                    {
-                        Name = cv.WaDEName,
-                        Category = cv.ConsumptionCategoryType != null
-                            ? cv.ConsumptionCategoryType.ToString()
-                            : Common.ConsumptionCategory.Unspecified.ToString()
-                    })
-                    .ToListAsync();
-                return results.Select(x => (x.Name, x.Category)).ToList();
-            }
+            var overlayStatesRaw = await db.OverlaysViews
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.State))
+                .Select(x => x.State)
+                .Distinct()
+                .ToArrayAsync();
+            var overlayStates = SplitAndDistinct(overlayStatesRaw);
 
-            async Task<string[]> GetOwnerClassifications()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.OwnerClassifications)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
+            // Water Rights (Allocations)
+            var beneficialUses = await GetBeneficialUseItems(db);
 
-            async Task<string[]> GetAllocationTypes()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.AllocationType)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
+            var ownerClassificationsRaw = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.OwnerClassifications))
+                .Select(x => x.OwnerClassifications)
+                .Distinct()
+                .ToArrayAsync();
+            var ownerClassifications = SplitAndDistinct(ownerClassificationsRaw);
 
-            async Task<string[]> GetLegalStatuses()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.LegalStatus)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
+            var allocationTypes = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.AllocationType))
+                .Select(x => x.AllocationType)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
 
-            async Task<string[]> GetSiteTypes()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.SiteType)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetWaterSources()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.WaterSources)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetWrStates()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Select(a => a.States)
-                    .Distinct()
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetTsSiteTypes()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Select(f => f.Site.SiteTypeCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetTsPrimaryUses()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Select(f => f.PrimaryBeneficialUse.WaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetTsVariableTypes()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Select(f => f.VariableSpecific.VariableCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetTsWaterSources()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Select(f => f.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
-
-            async Task<string[]> GetTsStates()
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Select(f => f.Site.StateCv)
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArrayAsync();
-            }
-
-            var overlayTypes = await GetOverlayTypes();
-            var overlayWaterSources = await GetOverlayWaterSources();
-            var overlayStates = await GetOverlayStates();
-            var rawUses = await GetBeneficialUses();
-            var ownerClassesRaw = await GetOwnerClassifications();
-            var allocationTypesRaw = await GetAllocationTypes();
-            var legalStatusesRaw = await GetLegalStatuses();
-            var siteTypesRaw = await GetSiteTypes();
-            var waterSourcesRaw = await GetWaterSources();
-            var wrStatesRaw = await GetWrStates();
-            var tsSiteTypes = await GetTsSiteTypes();
-            var tsPrimaryUses = await GetTsPrimaryUses();
-            var tsVariableTypes = await GetTsVariableTypes();
-            var tsWaterSources = await GetTsWaterSources();
-            var tsStates = await GetTsStates();
-
-            var wrBeneficialUses = rawUses
-                .GroupBy(x => x.Name)
-                .Select(g => new BeneficialUseItem
-                {
-                    BeneficialUseName = g.Key,
-                    ConsumptionCategory = g.Max(x => Enum.TryParse<Common.ConsumptionCategory>(x.Category, out var category) ? category : Common.ConsumptionCategory.Unspecified)
-                })
-                .OrderBy(x => x.BeneficialUseName)
-                .ToArray();
-
-            string[] SplitAndDistinct(string[] raw) =>
-                raw?
-                    .Where(s => !string.IsNullOrEmpty(s))
-                    .SelectMany(s => s.Split("||", StringSplitOptions.RemoveEmptyEntries))
-                    .Distinct()
-                    .OrderBy(n => n)
-                    .ToArray()
-                ?? Array.Empty<string>();
-
-            var ownerClasses = SplitAndDistinct(ownerClassesRaw);
-            var allocationTypes = SplitAndDistinct(allocationTypesRaw);
+            var legalStatusesRaw = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.LegalStatus))
+                .Select(x => x.LegalStatus)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
             var legalStatuses = SplitAndDistinct(legalStatusesRaw);
+
+            var siteTypesRaw = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.SiteType))
+                .Select(x => x.SiteType)
+                .Distinct()
+                .ToArrayAsync();
             var siteTypes = SplitAndDistinct(siteTypesRaw);
+
+            var waterSourcesRaw = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.WaterSources))
+                .Select(x => x.WaterSources)
+                .Distinct()
+                .ToArrayAsync();
             var waterSources = SplitAndDistinct(waterSourcesRaw);
+
+            var wrStatesRaw = await db.AllocationAmountsView
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.States))
+                .Select(x => x.States)
+                .Distinct()
+                .ToArrayAsync();
             var wrStates = SplitAndDistinct(wrStatesRaw);
-            
+
+            var riverBasins = RiverBasinConstants.RiverBasinNames.ToArray();
+
+            // Time Series
+            var tsSiteTypes = await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.Site.SiteTypeCvNavigation != null)
+                .Select(x => x.Site.SiteTypeCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
+
+            var tsPrimaryUses = await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.PrimaryBeneficialUse != null)
+                .Select(x => x.PrimaryBeneficialUse.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
+
+            var tsVariableTypes = await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.VariableSpecific != null)
+                .Select(x => x.VariableSpecific.VariableCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
+
+            var tsWaterSources = await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.WaterSource != null && x.WaterSource.WaterSourceTypeCvNavigation != null)
+                .Select(x => x.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
+
+            var tsStatesRaw = await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.Site.StateCv))
+                .Select(x => x.Site.StateCv)
+                .Distinct()
+                .ToArrayAsync();
+            var tsStates = SplitAndDistinct(tsStatesRaw);
+
             return new DashboardFilters
             {
                 Overlays = new OverlayFilterSet
@@ -234,13 +150,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 },
                 WaterRights = new WaterRightsFilterSet
                 {
-                    BeneficialUses = wrBeneficialUses,
-                    OwnerClassifications = ownerClasses,
+                    BeneficialUses = beneficialUses,
+                    OwnerClassifications = ownerClassifications,
                     AllocationTypes = allocationTypes,
                     LegalStatuses = legalStatuses,
                     SiteTypes = siteTypes,
                     WaterSourceTypes = waterSources,
                     States = wrStates,
+                    RiverBasins = riverBasins
                 },
                 TimeSeries = new TimeSeriesFilterSet
                 {
@@ -251,6 +168,43 @@ namespace WesternStatesWater.WestDaat.Accessors
                     States = tsStates
                 }
             };
+        }
+
+        private static async Task<BeneficialUseItem[]> GetBeneficialUseItems(EF.DatabaseContext db)
+        {
+            var rawUses = await db.BeneficialUsesCV
+                .AsNoTracking()
+                .Where(cv => db.AllocationBridgeBeneficialUsesFact.Any(b => b.BeneficialUseCV == cv.Name)
+                          || db.SitesBridgeBeneficialUsesFact.Any(s => s.BeneficialUseCV == cv.Name))
+                .Select(cv => new
+                {
+                    Name = cv.WaDEName.Length > 0 ? cv.WaDEName : cv.Name,
+                    Category = cv.ConsumptionCategoryType != null
+                        ? cv.ConsumptionCategoryType.ToString()
+                        : Common.ConsumptionCategory.Unspecified.ToString()
+                })
+                .ToListAsync();
+
+            return rawUses
+                .GroupBy(x => x.Name)
+                .Select(g => new BeneficialUseItem
+                {
+                    BeneficialUseName = g.Key,
+                    ConsumptionCategory = g.Max(x => Enum.TryParse<Common.ConsumptionCategory>(x.Category, out var category) ? category : Common.ConsumptionCategory.Unspecified)
+                })
+                .OrderBy(x => x.BeneficialUseName)
+                .ToArray();
+        }
+
+        private static string[] SplitAndDistinct(string[] rawValues)
+        {
+            return rawValues?
+                .Where(x => !string.IsNullOrEmpty(x))
+                .SelectMany(x => x.Split("||", StringSplitOptions.RemoveEmptyEntries))
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArray()
+                ?? Array.Empty<string>();
         }
     }
 }
