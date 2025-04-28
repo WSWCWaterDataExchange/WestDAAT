@@ -657,13 +657,26 @@ function Map({
             }
 
             mapContainer.style.width = options.width + 'px';
-            mapContainer!.style.height = options.height + 'px';
-            mapContainer?.classList.remove('h-100');
+            mapContainer.style.height = options.height + 'px';
+            const mapContainerContainsHeightClass = mapContainer.classList.contains('h-100');
+            if (mapContainerContainsHeightClass) {
+              mapContainer.classList.remove('h-100');
+            }
+
             map.resize();
 
             map.once('idle', async () => {
               const canvas = map.getCanvas();
               canvas.toBlob((blob: Blob | null) => {
+                // reset style changes
+                mapContainer.style.width = '';
+                mapContainer.style.height = '';
+                if (mapContainerContainsHeightClass) {
+                  mapContainer.classList.add('h-100');
+                }
+                map.resize();
+
+                // return result
                 resolve(blob);
               });
             });
