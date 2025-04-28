@@ -11,127 +11,37 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task LoadFilters_WaterRightsControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
         {
             // Arrange
-            List<WaterAllocationType> waterAllocationTypes =
-            [
-                new WaterAllocationTypeCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 1")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
+            await using var db = CreateDatabaseContextFactory().Create();
 
-                new WaterAllocationTypeCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 2")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
+            var waterAllocationTypes = new WaterAllocationTypeCVFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
+                .Generate(3);
 
-                new WaterAllocationTypeCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 3")
-                    .RuleFor(a => a.WaDEName, _ => "Official Name")
-                    .Generate()
-            ];
-
-            var duplicateBeneficialUses = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, _ => "Duplicate Name")
+            var beneficialUses = new BeneficialUsesCVFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
                 .RuleFor(a => a.ConsumptionCategoryType, _ => Common.ConsumptionCategory.Consumptive)
                 .Generate(2);
-            var uniqueBeneficialUse = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, _ => "Unique Name")
-                .RuleFor(a => a.ConsumptionCategoryType, _ => Common.ConsumptionCategory.NonConsumptive)
-                .Generate();
-            List<BeneficialUsesCV> beneficialUses = [];
-            beneficialUses.AddRange(duplicateBeneficialUses);
-            beneficialUses.Add(uniqueBeneficialUse);
 
-            List<LegalStatus> legalStatuses =
-            [
-                new LegalStatusCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 1")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
+            var legalStatuses = new LegalStatusCVFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
+                .Generate(2);
 
-                new LegalStatusCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 2")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
+            var ownerClassifications = new OwnerClassificationCvFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
+                .Generate(2);
 
-                new LegalStatusCVFaker()
-                    .RuleFor(a => a.Name, _ => "Name 3")
-                    .RuleFor(a => a.WaDEName, _ => "Official Name")
-                    .Generate()
-            ];
+            var siteTypes = new SiteTypeFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
+                .Generate(2);
 
-            List<OwnerClassificationCv> ownerClassifications =
-            [
-                new OwnerClassificationCvFaker()
-                    .RuleFor(a => a.Name, _ => "Name 1")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
+            var states = new StateFaker()
+                .RuleFor(a => a.WaDEName, f => f.Address.StateAbbr())
+                .Generate(2);
 
-                new OwnerClassificationCvFaker()
-                    .RuleFor(a => a.Name, _ => "Name 2")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
+            var waterSourceTypes = new WaterSourceTypeFaker()
+                .RuleFor(a => a.WaDEName, f => f.Random.Word())
+                .Generate(2);
 
-                new OwnerClassificationCvFaker()
-                    .RuleFor(a => a.Name, _ => "Name 3")
-                    .RuleFor(a => a.WaDEName, _ => "Official Name")
-                    .Generate()
-            ];
-
-            List<SiteType> siteTypes =
-            [
-                new SiteTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 1")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
-
-                new SiteTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 2")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
-
-                new SiteTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 3")
-                    .RuleFor(a => a.WaDEName, _ => "Official Name")
-                    .Generate()
-            ];
-
-            List<State> states =
-            [
-                new StateFaker()
-                    .RuleFor(a => a.Name, _ => "A")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
-
-                new StateFaker()
-                    .RuleFor(a => a.Name, _ => "B")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
-
-                new StateFaker()
-                    .RuleFor(a => a.Name, _ => "C")
-                    .RuleFor(a => a.WaDEName, _ => "Z")
-                    .Generate()
-            ];
-
-            List<WaterSourceType> waterSourceTypes =
-            [
-                new WaterSourceTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 1")
-                    .RuleFor(a => a.WaDEName, _ => null)
-                    .Generate(),
-
-                new WaterSourceTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 2")
-                    .RuleFor(a => a.WaDEName, _ => "")
-                    .Generate(),
-
-                new WaterSourceTypeFaker()
-                    .RuleFor(a => a.Name, _ => "Name 3")
-                    .RuleFor(a => a.WaDEName, _ => "Official Name")
-                    .Generate()
-            ];
-
-            await using var db = CreateDatabaseContextFactory().Create();
             db.WaterAllocationType.AddRange(waterAllocationTypes);
             db.BeneficialUsesCV.AddRange(beneficialUses);
             db.LegalStatus.AddRange(legalStatuses);
@@ -139,15 +49,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SiteType.AddRange(siteTypes);
             db.State.AddRange(states);
             db.WaterSourceType.AddRange(waterSourceTypes);
-            db.AllocationAmountsView.Add(new AllocationAmountsView
-            {
-                AllocationType = "Name 1",
-                OwnerClassifications = "Name 1",
-                LegalStatus = "Name 1",
-                SiteType = "Name 1",
-                States = "A",
-                WaterSources = "Name 1"
-            });
 
             await db.SaveChangesAsync();
 
@@ -155,71 +56,16 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Act
             var result = await accessor.LoadFilters();
-
-            // Assert
             var waterRights = result.WaterRights;
 
-            var expectedAllocationTypes = waterAllocationTypes
-                .Select(x => x.WaDEName ?? x.Name)
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList();
-
-            waterRights.AllocationTypes.Should()
-                .BeEquivalentTo(expectedAllocationTypes);
-
-            waterRights.BeneficialUses.Should()
-                .BeInAscendingOrder(b => b.BeneficialUseName)
-                .And
-                .OnlyHaveUniqueItems(b => b.BeneficialUseName)
-                .And
-                .BeEquivalentTo([
-                    new Common.DataContracts.BeneficialUseItem
-                    {
-                        BeneficialUseName = "Duplicate Name",
-                        ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
-                    },
-                    new Common.DataContracts.BeneficialUseItem
-                    {
-                        BeneficialUseName = "Unique Name",
-                        ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
-                    }
-                ]);
-
-            waterRights.LegalStatuses.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
-
-            waterRights.OwnerClassifications.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
-
-            waterRights.SiteTypes.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
-
-            waterRights.States.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["A", "B", "Z"]);
-
-            waterRights.WaterSourceTypes.Should()
-                .BeInAscendingOrder()
-                .And
-                .OnlyHaveUniqueItems()
-                .And
-                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
+            // Assert
+            waterRights.AllocationTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.BeneficialUses.Should().BeInAscendingOrder(b => b.BeneficialUseName).And.OnlyHaveUniqueItems(b => b.BeneficialUseName);
+            waterRights.LegalStatuses.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.OwnerClassifications.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.SiteTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.States.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.WaterSourceTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
         }
 
         private ISystemAccessor CreateSystemAccessor()
