@@ -42,7 +42,7 @@ interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
-  conservationApplicationPointLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeature?: Feature<Point, GeoJsonProperties> | undefined;
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
@@ -56,7 +56,7 @@ function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
   conservationApplicationPolygonLabelFeatures,
-  conservationApplicationPointLabelFeatures,
+  conservationApplicationPointLabelFeature,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
@@ -595,11 +595,10 @@ function Map({
   useEffect(() => {
     const polygonLabelsAvailable =
       !!conservationApplicationPolygonLabelFeatures && conservationApplicationPolygonLabelFeatures.length > 0;
-    const pointLabelsAvailable =
-      !!conservationApplicationPointLabelFeatures && conservationApplicationPointLabelFeatures.length > 0;
+    const pointLabelsAvailable = !!conservationApplicationPointLabelFeature;
     const anyLabelsAvailable = polygonLabelsAvailable || pointLabelsAvailable;
 
-    if (!map || !anyLabelsAvailable) {
+    if (!map || isMapRendering || !anyLabelsAvailable) {
       return;
     }
 
@@ -619,12 +618,12 @@ function Map({
 
       pointSource?.setData({
         type: 'FeatureCollection',
-        features: conservationApplicationPointLabelFeatures,
+        features: [conservationApplicationPointLabelFeature],
       });
       // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
       map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
     }
-  }, [map, conservationApplicationPolygonLabelFeatures, conservationApplicationPointLabelFeatures]);
+  }, [map, isMapRendering, conservationApplicationPolygonLabelFeatures, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

@@ -234,7 +234,7 @@ function ReviewMap(props: ReviewMapProps) {
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
         conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
-        conservationApplicationPointLabelFeatures={controlLocationLabelFeature ? [controlLocationLabelFeature] : []}
+        conservationApplicationPointLabelFeature={controlLocationLabelFeature}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
