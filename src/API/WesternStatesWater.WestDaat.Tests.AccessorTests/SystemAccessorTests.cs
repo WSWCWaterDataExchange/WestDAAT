@@ -139,6 +139,16 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SiteType.AddRange(siteTypes);
             db.State.AddRange(states);
             db.WaterSourceType.AddRange(waterSourceTypes);
+            db.AllocationAmountsView.Add(new AllocationAmountsView
+            {
+                AllocationType = "Name 1",
+                OwnerClassifications = "Name 1",
+                LegalStatus = "Name 1",
+                SiteType = "Name 1",
+                States = "A",
+                WaterSources = "Name 1"
+            });
+
             await db.SaveChangesAsync();
 
             var accessor = CreateSystemAccessor();
