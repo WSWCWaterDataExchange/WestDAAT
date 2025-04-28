@@ -124,11 +124,12 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
     addGeometriesToMap.current!(newFeatures);
 
-    const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] =
-      state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
+    const existingFeatures: Feature<Polygon, GeoJsonProperties>[] = state.conservationApplication.estimateLocations.map(
+      fromPartialPolygonDataToPolygonFeature,
+    );
 
     // zoom to fit all data
-    const allFeatures = [...userDrawnPolygonFeatures, ...newFeatures];
+    const allFeatures = [...existingFeatures, ...newFeatures];
     const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
       features: allFeatures,
