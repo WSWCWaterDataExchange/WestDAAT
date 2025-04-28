@@ -169,6 +169,7 @@ resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@20
 // List of containers to create
 var containers = [
   'application-documents'
+  'application-map-images'
 ]
 
 resource storage_account_containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [

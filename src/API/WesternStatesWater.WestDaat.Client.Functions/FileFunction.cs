@@ -31,10 +31,12 @@ public class FileFunction : FunctionBase
         var fileSasTokenRequest = await ParseRequestBody<FileSasTokenRequestBase>(req);
         FileSasTokenResponseBase result = fileSasTokenRequest switch
         {
-            ApplicationDocumentUploadSasTokenRequest request => await _fileManager
-                .GenerateUploadFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request),
             ApplicationDocumentDownloadSasTokenRequest request => await _fileManager
                 .GenerateDownloadFileSasToken<ApplicationDocumentDownloadSasTokenRequest, ApplicationDocumentDownloadSasTokenResponse>(request),
+            ApplicationDocumentUploadSasTokenRequest request => await _fileManager
+                .GenerateUploadFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request),
+            ApplicationMapImageUploadSasTokenRequest request => await _fileManager
+                .GenerateUploadFileSasToken<ApplicationMapImageUploadSasTokenRequest, ApplicationMapImageUploadSasTokenResponse>(request),
             _ => throw new NotImplementedException($"Request type {fileSasTokenRequest.GetType().FullName} is not implemented.")
         };
         return await CreateResponse(req, result);
