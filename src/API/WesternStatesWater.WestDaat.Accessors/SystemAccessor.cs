@@ -230,11 +230,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             string[] SplitAndDistinct(string[] raw) =>
                 raw?
                     .Where(s => !string.IsNullOrEmpty(s))
-                    .SelectMany(s => s.Split("||", System.StringSplitOptions.RemoveEmptyEntries))
+                    .SelectMany(s => s.Split("||", StringSplitOptions.RemoveEmptyEntries))
                     .Distinct()
                     .OrderBy(n => n)
                     .ToArray()
-                ?? System.Array.Empty<string>();
+                ?? Array.Empty<string>();
 
             var ownerClasses = SplitAndDistinct(ownerClassesRaw);
             var allocationTypes = SplitAndDistinct(allocationTypesRaw);
