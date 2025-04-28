@@ -119,13 +119,6 @@ function ReviewMap(props: ReviewMapProps) {
       duration: 2000,
     });
 
-    if (exportToPngFn) {
-      exportToPngFn!({
-        height: 600,
-        width: 800,
-      });
-    }
-
     setHasInitializedMap(true);
   }, [
     userDrawnPolygonFeatures,
