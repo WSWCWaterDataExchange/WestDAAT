@@ -11,6 +11,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
 import {
   defaultMapLocationData,
+  MapExportOptions,
   MapSettings,
   MapStyle,
   RenderedFeatureType,
@@ -38,7 +39,7 @@ import truncate from '@turf/truncate';
 
 import './map.scss';
 
-interface mapProps {
+interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
@@ -58,7 +59,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
-}: mapProps) {
+}: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -87,6 +88,7 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setExportToPngFn,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -641,6 +643,46 @@ function Map({
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (!isMapRendering && map) {
+      map.once('idle', () => {
+        setExportToPngFn(() => (options: MapExportOptions) => {
+          console.log('Export to PNG function called', options);
+
+          const originalMapContainer = document.getElementById('map');
+
+          const mapContainer = originalMapContainer!.cloneNode(true) as HTMLElement;
+          document.body.appendChild(mapContainer);
+
+          if (!mapContainer) {
+            throw new Error('Map container not found');
+          }
+
+          mapContainer!.style.width = options.width + 'px';
+          mapContainer!.style.height = options.height + 'px';
+          mapContainer?.classList.remove('h-100');
+          map.resize();
+
+          map.once('idle', async () => {
+            const canvas = map.getCanvas();
+            canvas.toBlob((blob: Blob | null) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'map.png';
+                a.click();
+              }
+
+              // Remove from dom
+              mapContainer.remove();
+            });
+          });
+        });
+      });
+    }
+  }, [isMapRendering]);
 
   return (
     <div className="position-relative h-100">
