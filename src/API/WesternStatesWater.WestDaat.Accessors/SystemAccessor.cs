@@ -22,7 +22,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
-            // Define tasks with separate DbContext instances
             async Task<string[]> GetOverlayTypes()
             {
                 await using var db = _databaseContextFactory.Create();
@@ -187,7 +186,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .ToArrayAsync();
             }
 
-            // Run all tasks concurrently using a list
             var tasks = new List<Task>
             {
                 GetOverlayTypes(),
@@ -209,7 +207,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             await Task.WhenAll(tasks);
 
-            // Process results
             var overlayTypes = await (Task<string[]>)tasks[0];
             var overlayWaterSources = await (Task<string[]>)tasks[1];
             var overlayStates = await (Task<string[]>)tasks[2];
@@ -251,11 +248,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             var siteTypes = SplitAndDistinct(siteTypesRaw);
             var waterSources = SplitAndDistinct(waterSourcesRaw);
             var wrStates = SplitAndDistinct(wrStatesRaw);
-
-            var wrRiverBasins = RiverBasinConstants.RiverBasinNames
-                .OrderBy(n => n)
-                .ToArray();
-
+            
             return new DashboardFilters
             {
                 Overlays = new OverlayFilterSet
@@ -273,7 +266,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                     SiteTypes = siteTypes,
                     WaterSourceTypes = waterSources,
                     States = wrStates,
-                    RiverBasins = wrRiverBasins
                 },
                 TimeSeries = new TimeSeriesFilterSet
                 {
