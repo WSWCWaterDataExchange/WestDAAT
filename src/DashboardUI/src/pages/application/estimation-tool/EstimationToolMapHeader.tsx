@@ -16,6 +16,7 @@ export function EstimationToolMapHeader() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resetFileInput = () => {
+    // resetting the file input allows the user to upload more files
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
