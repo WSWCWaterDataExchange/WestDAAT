@@ -449,18 +449,19 @@ public static class MapboxTileset
 
     private static Feature CreateSiteTimeSeriesFeature(List<TimeSeries> siteTimeSeries)
     {
+        var first = siteTimeSeries.First()!;
+
         var properties = new Dictionary<string, object>
         {
-            { "uuid", siteTimeSeries.First().SiteUuid },
-            { "state", siteTimeSeries.First().State },
-            { "siteType", siteTimeSeries.First().SiteType },
-            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))! },
-            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))! },
+            { "uuid", first.SiteUuid },
+            { "state", first.State },
+            { "siteType", first.SiteType },
+            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))!.Value },
+            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))!.Value },
             { "primaryUseCategory", siteTimeSeries.Select(x => x.PrimaryUseCagtegory).Distinct().ToArray() },
             { "variableType", siteTimeSeries.Select(x => x.VariableType).Distinct().ToArray() },
             { "waterSourceType", siteTimeSeries.Select(x => x.WaterSourceType).Distinct().ToArray() }
         };
-
         var geometry = siteTimeSeries.First().Location.AsGeoJsonGeometry();
         return new Feature(geometry, properties);
     }
