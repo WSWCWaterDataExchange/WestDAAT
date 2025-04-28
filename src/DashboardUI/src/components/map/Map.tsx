@@ -608,14 +608,14 @@ function Map({
   }, [map, conservationApplicationPolygonLabelFeatures]);
 
   useEffect(() => {
-    if (!map || !conservationApplicationPointLabelFeature) {
+    if (!map) {
       return;
     }
 
     const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
     pointSource?.setData({
       type: 'FeatureCollection',
-      features: [conservationApplicationPointLabelFeature],
+      features: conservationApplicationPointLabelFeature ? [conservationApplicationPointLabelFeature] : [],
     });
 
     // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
