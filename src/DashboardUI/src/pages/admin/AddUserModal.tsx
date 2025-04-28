@@ -20,7 +20,7 @@ interface AddUserModalProps extends ModalProps {
 
 function AddUserModal(props: AddUserModalProps) {
   const roleOptions = [
-    { value: Role.Member, label: RoleDisplayNames[Role.Member] },
+    { value: Role.OrganizationMember, label: RoleDisplayNames[Role.OrganizationMember] },
     { value: Role.TechnicalReviewer, label: RoleDisplayNames[Role.TechnicalReviewer] },
     { value: Role.OrganizationAdmin, label: RoleDisplayNames[Role.OrganizationAdmin] },
   ];

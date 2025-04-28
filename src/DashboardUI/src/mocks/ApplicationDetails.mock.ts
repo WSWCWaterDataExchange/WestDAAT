@@ -97,4 +97,5 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     },
   ],
   status: ConservationApplicationStatus.InTechnicalReview,
+  mapImageUrl: 'https://example.com/map-image.png',
 });

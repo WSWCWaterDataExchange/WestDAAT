@@ -16,6 +16,7 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import ApplicationStaticMap from './ApplicationStaticMap';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
@@ -282,10 +283,9 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         </ApplicationFormSection>
 
         <div className="col-lg-6 col-12">
-          Static map here
-          <NotImplementedPlaceholder />
+          <ApplicationStaticMap mapImageUrl={state.conservationApplication.mapImageUrl} />
           {perspective === 'reviewer' && (
-            <Button variant="outline-primary" onClick={navigateToReviewPageMap}>
+            <Button className="mt-3" variant="outline-primary" onClick={navigateToReviewPageMap}>
               Edit in Estimator
             </Button>
           )}
