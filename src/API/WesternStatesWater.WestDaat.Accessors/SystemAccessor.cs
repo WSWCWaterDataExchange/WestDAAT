@@ -59,7 +59,9 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .Select(cv => new
                     {
                         Name = cv.WaDEName,
-                        Category = cv.ConsumptionCategoryType != null ? cv.ConsumptionCategoryType.ToString() : Common.ConsumptionCategory.Unspecified.ToString()
+                        Category = cv.ConsumptionCategoryType != null
+                            ? cv.ConsumptionCategoryType.ToString()
+                            : Common.ConsumptionCategory.Unspecified.ToString()
                     })
                     .ToListAsync();
                 return results.Select(x => (x.Name, x.Category)).ToList();
@@ -180,42 +182,21 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .ToArrayAsync();
             }
 
-            var tasks = new List<Task>
-            {
-                GetOverlayTypes(),
-                GetOverlayWaterSources(),
-                GetOverlayStates(),
-                GetBeneficialUses(),
-                GetOwnerClassifications(),
-                GetAllocationTypes(),
-                GetLegalStatuses(),
-                GetSiteTypes(),
-                GetWaterSources(),
-                GetWrStates(),
-                GetTsSiteTypes(),
-                GetTsPrimaryUses(),
-                GetTsVariableTypes(),
-                GetTsWaterSources(),
-                GetTsStates()
-            };
-
-            await Task.WhenAll(tasks);
-
-            var overlayTypes = await (Task<string[]>)tasks[0];
-            var overlayWaterSources = await (Task<string[]>)tasks[1];
-            var overlayStates = await (Task<string[]>)tasks[2];
-            var rawUses = await (Task<List<(string Name, string Category)>>)tasks[3];
-            var ownerClassesRaw = await (Task<string[]>)tasks[4];
-            var allocationTypesRaw = await (Task<string[]>)tasks[5];
-            var legalStatusesRaw = await (Task<string[]>)tasks[6];
-            var siteTypesRaw = await (Task<string[]>)tasks[7];
-            var waterSourcesRaw = await (Task<string[]>)tasks[8];
-            var wrStatesRaw = await (Task<string[]>)tasks[9];
-            var tsSiteTypes = await (Task<string[]>)tasks[10];
-            var tsPrimaryUses = await (Task<string[]>)tasks[11];
-            var tsVariableTypes = await (Task<string[]>)tasks[12];
-            var tsWaterSources = await (Task<string[]>)tasks[13];
-            var tsStates = await (Task<string[]>)tasks[14];
+            var overlayTypes = await GetOverlayTypes();
+            var overlayWaterSources = await GetOverlayWaterSources();
+            var overlayStates = await GetOverlayStates();
+            var rawUses = await GetBeneficialUses();
+            var ownerClassesRaw = await GetOwnerClassifications();
+            var allocationTypesRaw = await GetAllocationTypes();
+            var legalStatusesRaw = await GetLegalStatuses();
+            var siteTypesRaw = await GetSiteTypes();
+            var waterSourcesRaw = await GetWaterSources();
+            var wrStatesRaw = await GetWrStates();
+            var tsSiteTypes = await GetTsSiteTypes();
+            var tsPrimaryUses = await GetTsPrimaryUses();
+            var tsVariableTypes = await GetTsVariableTypes();
+            var tsWaterSources = await GetTsWaterSources();
+            var tsStates = await GetTsStates();
 
             var wrBeneficialUses = rawUses
                 .GroupBy(x => x.Name)
