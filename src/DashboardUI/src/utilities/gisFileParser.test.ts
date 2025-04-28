@@ -25,7 +25,6 @@ const base64ToUint8Array = (base64: string): Uint8Array => {
   return bytes;
 };
 
-// todo: write tests for each supported file extension
 describe('GIS File Parser', () => {
   describe('parseGISFileToGeoJSON', () => {
     describe('JSON file', () => {

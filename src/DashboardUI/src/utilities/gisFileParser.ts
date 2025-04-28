@@ -3,7 +3,6 @@ import shp from 'shpjs';
 import * as shapefile from 'shapefile';
 
 // logic copied/adapted from `UploadModal.tsx`
-// todo: can anything be done to reduce the duplication?
 
 export const parseGISFileToGeoJSON = async (file: File): Promise<FeatureCollection> => {
   const fileName = file.name.toLocaleLowerCase();
@@ -60,11 +59,7 @@ const validateFeatureCollection = (data: FeatureCollection): void => {
   if (
     !!data &&
     data.features.length > 0 &&
-    !data.features.every(
-      (feature: Feature) =>
-        // todo: do we need to support any other geometry types (i.e. multipolygon)?
-        feature.geometry && feature.geometry.type === 'Polygon',
-    )
+    !data.features.every((feature: Feature) => feature.geometry && feature.geometry.type === 'Polygon')
   ) {
     throw new Error(
       'File is missing data or includes unsupported geometry types. Please upload a file with only Polygon or MultiPolygon geometries.',
