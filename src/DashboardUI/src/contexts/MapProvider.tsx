@@ -137,8 +137,8 @@ interface MapContextState {
   setIsMapRendering: React.Dispatch<React.SetStateAction<boolean>>;
   drawPolygon: GeoJSON.Feature<GeoJSON.Polygon> | null;
   setDrawPolygon: React.Dispatch<React.SetStateAction<GeoJSON.Feature<GeoJSON.Polygon> | null>>;
-  exportToPngFn: ((options: MapExportOptions) => void) | null;
-  setExportToPngFn: React.Dispatch<React.SetStateAction<((options: MapExportOptions) => void) | null>>;
+  exportToPngFn: ((options: MapExportOptions) => Promise<Blob | null>) | null;
+  setExportToPngFn: React.Dispatch<React.SetStateAction<((options: MapExportOptions) => Promise<Blob | null>) | null>>;
 }
 
 const defaultState: MapContextState = {
@@ -191,7 +191,10 @@ const defaultState: MapContextState = {
   setDrawPolygon: () => {},
   exportToPngFn: null,
   setExportToPngFn: () => (options: MapExportOptions) => {
-    console.log('Default implementation', options);
+    return new Promise<Blob | null>((resolve) => {
+      console.log('Default implementation', options);
+      resolve(null);
+    });
   },
 };
 
@@ -418,7 +421,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
 
   const [isMapRendering, setIsMapRendering] = useState<boolean>(false);
 
-  const [exportToPngFn, setExportToPngFn] = useState<((options: MapExportOptions) => void) | null>(null);
+  const [exportToPngFn, setExportToPngFn] = useState<((options: MapExportOptions) => Promise<Blob | null>) | null>(null);
 
   const mapContextProviderValue: MapContextState = {
     isMapLoaded,

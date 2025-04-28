@@ -648,37 +648,30 @@ function Map({
     if (!isMapRendering && map) {
       map.once('idle', () => {
         setExportToPngFn(() => (options: MapExportOptions) => {
-          console.log('Export to PNG function called', options);
+          const promise = new Promise<Blob | null>((resolve, reject) => {
+            const originalMapContainer = document.getElementById('map');
 
-          const originalMapContainer = document.getElementById('map');
+            const mapContainer = originalMapContainer!.cloneNode(true) as HTMLElement;
+            document.body.appendChild(mapContainer);
 
-          const mapContainer = originalMapContainer!.cloneNode(true) as HTMLElement;
-          document.body.appendChild(mapContainer);
+            if (!mapContainer) {
+              throw new Error('Map container not found');
+              reject();
+            }
 
-          if (!mapContainer) {
-            throw new Error('Map container not found');
-          }
+            mapContainer!.style.width = options.width + 'px';
+            mapContainer!.style.height = options.height + 'px';
+            mapContainer?.classList.remove('h-100');
+            map.resize();
 
-          mapContainer!.style.width = options.width + 'px';
-          mapContainer!.style.height = options.height + 'px';
-          mapContainer?.classList.remove('h-100');
-          map.resize();
-
-          map.once('idle', async () => {
-            const canvas = map.getCanvas();
-            canvas.toBlob((blob: Blob | null) => {
-              if (blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'map.png';
-                a.click();
-              }
-
-              // Remove from dom
-              mapContainer.remove();
+            map.once('idle', async () => {
+              const canvas = map.getCanvas();
+              canvas.toBlob((blob: Blob | null) => {
+                resolve(blob);
+              });
             });
           });
+          return promise;
         });
       });
     }

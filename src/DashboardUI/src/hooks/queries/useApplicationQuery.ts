@@ -6,6 +6,7 @@ import {
   createWaterConservationApplication,
   getApplication,
   reviewerEstimateConsumptiveUse,
+  uploadApplicationStaticMap,
 } from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
@@ -15,6 +16,7 @@ import { parseDateOnly } from '../../utilities/dateHelpers';
 import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
 import { MapPolygon } from '../../data-contracts/MapPolygon';
 import { ReviewerEstimateConsumptiveUseResponse } from '../../data-contracts/ReviewerEstimateConsumptiveUseResponse';
+import { useMapContext } from '../../contexts/MapProvider';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
@@ -140,6 +142,7 @@ export function useGetApplicationQuery(
 export function useReviewerEstimateConsumptiveUseMutation() {
   const msalContext = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
+  const mapContext = useMapContext();
 
   const mutation = useMutation({
     mutationFn: async (options: { updateEstimate: boolean }) => {
@@ -166,7 +169,7 @@ export function useReviewerEstimateConsumptiveUseMutation() {
       const result = await reviewerEstimateConsumptiveUse(msalContext, apiCallFields);
       return { result, estimateWasSaved: options.updateEstimate };
     },
-    onSuccess: (data: { result: ReviewerEstimateConsumptiveUseResponse, estimateWasSaved: boolean }) => {
+    onSuccess: (data: { result: ReviewerEstimateConsumptiveUseResponse; estimateWasSaved: boolean }) => {
       const { result, estimateWasSaved } = data;
       if (result) {
         dispatch({
@@ -177,9 +180,25 @@ export function useReviewerEstimateConsumptiveUseMutation() {
             conservationPayment: result.conservationPayment,
             dataCollections: result.dataCollections,
             controlDataCollection: result.controlDataCollection,
-            estimateWasSaved
+            estimateWasSaved,
           },
         });
+
+        if (estimateWasSaved && mapContext.exportToPngFn) {
+          mapContext
+            .exportToPngFn({
+              height: 400,
+              width: 600,
+            })
+            .then((blob) => {
+              const applicationId = state.conservationApplication.waterConservationApplicationId;
+              if (blob && applicationId) {
+                console.log('Exported map to PNG', blob);
+                const file = new File([blob], `${applicationId}.png`, { type: blob.type });
+                uploadApplicationStaticMap(msalContext, file, applicationId);
+              }
+            });
+        }
       }
     },
     onError: (error: Error) => {

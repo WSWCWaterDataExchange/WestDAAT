@@ -43,6 +43,7 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle,
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
+    exportToPngFn,
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
@@ -117,6 +118,14 @@ function ReviewMap(props: ReviewMapProps) {
       maxZoom: 16,
       duration: 2000,
     });
+
+    console.log('setUserDrawnPolygonData');
+    if (exportToPngFn) {
+      exportToPngFn!({
+        height: 600,
+        width: 800,
+      });
+    }
 
     setHasInitializedMap(true);
   }, [
