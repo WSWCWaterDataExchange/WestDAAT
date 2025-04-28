@@ -649,10 +649,7 @@ function Map({
       map.once('idle', () => {
         setExportToPngFn(() => (options: MapExportOptions) => {
           const promise = new Promise<Blob | null>((resolve, reject) => {
-            const originalMapContainer = document.getElementById('map');
-
-            const mapContainer = originalMapContainer!.cloneNode(true) as HTMLElement;
-            document.body.appendChild(mapContainer);
+            const mapContainer = document.getElementById('map');
 
             if (!mapContainer) {
               throw new Error('Map container not found');
@@ -671,6 +668,7 @@ function Map({
               });
             });
           });
+          
           return promise;
         });
       });
