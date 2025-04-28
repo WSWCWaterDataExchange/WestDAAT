@@ -13,6 +13,18 @@ const featureCollectionMock: FeatureCollection<Polygon, GeoJsonProperties> = {
   ),
 };
 
+const base64ToUint8Array = (base64: string): Uint8Array => {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
+};
+
 // todo: write tests for each supported file extension
 describe('GIS File Parser', () => {
   describe('parseGISFileToGeoJSON', () => {
@@ -47,6 +59,27 @@ describe('GIS File Parser', () => {
         expect(result.features.length).toBe(featureCount);
       });
     });
+
+    describe('Shapefile', () => {
+      it('should parse a valid file', async () => {
+        // Arrange
+        // this encoded shapefile contains a single, 5-sided polygon centered around New Mexico
+        const base64EncodedShapeFile =
+          'AAAnCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfugDAAAFAAAAxejymooKW8BkXwLajS9AQJk+SBYk51nAxrrnBhC+QUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAABIBQAAAMXo8pqKClvAZF8C2o0vQECZPkgWJOdZwMa65wYQvkFAAQAAAAYAAAAAAAAAS6sN2VCqWsDGuucGEL5BQMXo8pqKClvAGsBGi48DQUDPHhhc++FawGRfAtqNL0BAmT5IFiTnWcAcY2NpYNBAQKEp2ZuDE1rAnlNNjO2YQUBLqw3ZUKpawMa65wYQvkFA';
+        const uint8Array = base64ToUint8Array(base64EncodedShapeFile);
+
+        const file = new File([uint8Array], 'test.shp', { type: 'application/octet-stream' });
+
+        // Act
+        const result = await parseGISFileToGeoJSON(file);
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result.features.length).toBe(1);
+      });
+    });
+
+    // cannot test shapefile zip - `shpjs` uses `butUnzip` to stream the file, which works in a browser environment but not in a Node environment
 
     describe('unsupported file extension', () => {
       it('should throw an error', async () => {
