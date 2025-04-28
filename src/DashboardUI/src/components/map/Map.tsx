@@ -41,7 +41,8 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
@@ -54,7 +55,8 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  polygonLabelFeatures,
+  conservationApplicationPolygonLabelFeatures,
+  conservationApplicationPointLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
@@ -591,20 +593,38 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) {
+    const polygonLabelsAvailable =
+      !!conservationApplicationPolygonLabelFeatures && conservationApplicationPolygonLabelFeatures.length > 0;
+    const pointLabelsAvailable =
+      !!conservationApplicationPointLabelFeatures && conservationApplicationPointLabelFeatures.length > 0;
+    const anyLabelsAvailable = polygonLabelsAvailable || pointLabelsAvailable;
+
+    if (!map || !anyLabelsAvailable) {
       return;
     }
 
-    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    if (polygonLabelsAvailable) {
+      const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
 
-    source?.setData({
-      type: 'FeatureCollection',
-      features: polygonLabelFeatures,
-    });
+      polygonSource?.setData({
+        type: 'FeatureCollection',
+        features: conservationApplicationPolygonLabelFeatures,
+      });
+      // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+      map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+    }
 
-    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
-    map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-  }, [map, polygonLabelFeatures]);
+    if (pointLabelsAvailable) {
+      const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+
+      pointSource?.setData({
+        type: 'FeatureCollection',
+        features: conservationApplicationPointLabelFeatures,
+      });
+      // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+      map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+    }
+  }, [map, conservationApplicationPolygonLabelFeatures, conservationApplicationPointLabelFeatures]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

@@ -237,7 +237,7 @@ function ReviewMap(props: ReviewMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={allLabelFeatures}
+        conservationApplicationPolygonLabelFeatures={allLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
