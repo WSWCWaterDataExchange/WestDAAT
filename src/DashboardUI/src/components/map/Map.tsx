@@ -652,11 +652,11 @@ function Map({
             const mapContainer = document.getElementById('map');
 
             if (!mapContainer) {
-              throw new Error('Map container not found');
-              reject();
+              reject(new Error('Map container not found'));
+              return;
             }
 
-            mapContainer!.style.width = options.width + 'px';
+            mapContainer.style.width = options.width + 'px';
             mapContainer!.style.height = options.height + 'px';
             mapContainer?.classList.remove('h-100');
             map.resize();
@@ -668,7 +668,7 @@ function Map({
               });
             });
           });
-          
+
           return promise;
         });
       });
