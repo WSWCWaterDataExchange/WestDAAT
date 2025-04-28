@@ -593,37 +593,34 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    const polygonLabelsAvailable =
-      !!conservationApplicationPolygonLabelFeatures && conservationApplicationPolygonLabelFeatures.length > 0;
-    const pointLabelsAvailable = !!conservationApplicationPointLabelFeature;
-    const anyLabelsAvailable = polygonLabelsAvailable || pointLabelsAvailable;
-
-    if (!map || isMapRendering || !anyLabelsAvailable) {
+    if (!map || !conservationApplicationPolygonLabelFeatures) {
       return;
     }
 
-    if (polygonLabelsAvailable) {
-      const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    polygonSource?.setData({
+      type: 'FeatureCollection',
+      features: conservationApplicationPolygonLabelFeatures,
+    });
 
-      polygonSource?.setData({
-        type: 'FeatureCollection',
-        features: conservationApplicationPolygonLabelFeatures,
-      });
-      // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
-      map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPolygonLabelFeatures]);
+
+  useEffect(() => {
+    if (!map || !conservationApplicationPointLabelFeature) {
+      return;
     }
 
-    if (pointLabelsAvailable) {
-      const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    pointSource?.setData({
+      type: 'FeatureCollection',
+      features: [conservationApplicationPointLabelFeature],
+    });
 
-      pointSource?.setData({
-        type: 'FeatureCollection',
-        features: [conservationApplicationPointLabelFeature],
-      });
-      // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
-      map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
-    }
-  }, [map, isMapRendering, conservationApplicationPolygonLabelFeatures, conservationApplicationPointLabelFeature]);
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
