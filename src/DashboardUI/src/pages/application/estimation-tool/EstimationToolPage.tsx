@@ -10,7 +10,7 @@ import {
 } from '../../../hooks/queries/useApplicationQuery';
 import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
-import { applicantEstimateConsumptiveUse } from '../../../accessors/applicationAccessor';
+import { applicantEstimateConsumptiveUse, uploadApplicationStaticMap } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { toast } from 'react-toastify';
@@ -18,12 +18,14 @@ import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 import './estimation-tool-page.scss';
 import { MapPolygon } from '../../../data-contracts/MapPolygon';
+import { useMapContext } from '../../../contexts/MapProvider';
 
 export function EstimationToolPage() {
   const context = useMsal();
   const navigate = useNavigate();
   const routeParams = useParams();
   const { state, dispatch } = useConservationApplicationContext();
+  const mapContext = useMapContext();
 
   const { waterRightNativeId } = routeParams;
 
@@ -61,7 +63,10 @@ export function EstimationToolPage() {
 
       return await applicantEstimateConsumptiveUse(context, apiCallFields);
     },
-    onSuccess: (result: ApplicantEstimateConsumptiveUseResponse) => {
+    onSuccess: (
+      result: ApplicantEstimateConsumptiveUseResponse,
+      data: Parameters<typeof applicantEstimateConsumptiveUse>[1],
+    ) => {
       if (result) {
         dispatch({
           type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
@@ -71,6 +76,20 @@ export function EstimationToolPage() {
             dataCollections: result.dataCollections,
           },
         });
+
+        const wasDataSavedToDatabase = data.compensationRateDollars && data.units;
+        if (wasDataSavedToDatabase) {
+          mapContext.exportToPngFn!({
+            height: 400,
+            width: 600,
+          }).then((blob) => {
+            const applicationId = state.conservationApplication.waterConservationApplicationId;
+            if (blob && applicationId) {
+              const file = new File([blob], `${applicationId}.png`, { type: blob.type });
+              uploadApplicationStaticMap(context, file, applicationId);
+            }
+          });
+        }
       }
     },
     onError: (error: Error) => {
@@ -78,8 +97,8 @@ export function EstimationToolPage() {
     },
   });
 
-  const handleEstimateConsumptiveUseClicked = async () => {
-    await estimateConsumptiveUseMutation.mutate({
+  const handleEstimateConsumptiveUseClicked = () => {
+    estimateConsumptiveUseMutation.mutate({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
       polygons: state.conservationApplication.estimateLocations.map(
