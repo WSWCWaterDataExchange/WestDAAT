@@ -35,7 +35,6 @@ function NldiSiteCard({
                 />
               </a>
             </div>
-            {/* no custom close button here—MapPopupCard will inject it */}
           </div>
         ),
         body: (
@@ -52,11 +51,6 @@ function NldiSiteCard({
               </div>
               {name}
             </div>
-            {isTimeSeries && (
-              <div className="mb-2 text-warning">
-                <strong>Time Series Available</strong>
-              </div>
-            )}
             <div className="mb-2">
               <div className="map-popup-card-water-rights-native-id-row">
                 <strong>Identifier:</strong>
