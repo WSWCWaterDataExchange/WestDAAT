@@ -1,6 +1,5 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
-using System.Transactions;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
@@ -57,11 +56,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Act
             DashboardFilters result;
-            using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                result = await accessor.LoadFilters();
-                scope.Complete();
-            }
+            result = await accessor.LoadFilters();
             var waterRights = result.WaterRights;
 
             // Assert
