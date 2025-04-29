@@ -85,7 +85,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 25,
+      padding: 200,
       maxZoom: 16,
     });
   }, [
@@ -136,7 +136,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 25,
+      padding: 200,
       maxZoom: 16,
       duration: 5000,
     });
