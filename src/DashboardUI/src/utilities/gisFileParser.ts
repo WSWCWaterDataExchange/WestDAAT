@@ -1,4 +1,4 @@
-import { Feature, FeatureCollection } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
 import shp from 'shpjs';
 import * as shapefile from 'shapefile';
 
@@ -70,8 +70,28 @@ const validateFeatureCollection = (data: FeatureCollection): void => {
 const parseGeoJSON = async (file: File): Promise<FeatureCollection> => {
   const fileContent = (await readFile(file, 'text')) as string;
 
-  const parsedData = JSON.parse(fileContent) as FeatureCollection;
-  return parsedData;
+  const initialParsedData = JSON.parse(fileContent);
+
+  const keys = Object.keys(initialParsedData);
+  if (!keys.includes('type')) {
+    throw new Error('Invalid GeoJSON file. Please upload a valid GeoJSON file.');
+  }
+
+  const geoJsonParsedData = initialParsedData as GeoJsonObject;
+  switch (geoJsonParsedData.type) {
+    case 'FeatureCollection': {
+      return geoJsonParsedData as FeatureCollection;
+    }
+    case 'Feature': {
+      return {
+        type: 'FeatureCollection',
+        features: [geoJsonParsedData],
+      } as FeatureCollection;
+    }
+    default: {
+      throw new Error(`Unsupported GeoJSON type "${geoJsonParsedData.type}". Please upload a valid GeoJSON file.`);
+    }
+  }
 };
 
 const parseShapefileZip = async (file: File): Promise<FeatureCollection> => {
