@@ -1,21 +1,42 @@
 import React from 'react';
 import Icon from '@mdi/react';
-import MapPopupCard from './MapPopupCard';
 import { mdiOpenInNew } from '@mdi/js';
+import MapPopupCard from './MapPopupCard';
 
-interface NldiSiteMapPopupProps {
+interface NldiSiteCardProps {
   sourceName: string;
   identifier: string;
   uri: string;
   name: string;
   onClosePopup: () => void;
+  isTimeSeries?: boolean;
 }
-function NldiSiteCard(props: NldiSiteMapPopupProps) {
-  const { sourceName, identifier, uri, name, onClosePopup } = props;
+
+function NldiSiteCard({
+                        sourceName,
+                        identifier,
+                        uri,
+                        name,
+                        onClosePopup,
+                        isTimeSeries = false,
+                      }: NldiSiteCardProps) {
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
-        header: <div>{identifier}</div>,
+        header: (
+          <div className="d-flex justify-content-between">
+            <div>
+              <strong>NLDI Site ID:</strong>{' '}
+              <a href={uri} target="_blank" rel="noopener noreferrer">
+                {identifier}{' '}
+                <Icon
+                  path={mdiOpenInNew}
+                  className="map-popup-card-water-rights-link-icon"
+                />
+              </a>
+            </div>
+          </div>
+        ),
         body: (
           <div className="map-popup-card-water-rights-body">
             <div className="mb-2">
@@ -35,8 +56,16 @@ function NldiSiteCard(props: NldiSiteMapPopupProps) {
                 <strong>Identifier:</strong>
               </div>
               <div>
-                <a href={`/details/site/${identifier}`} target="_blank" rel="noopener noreferrer">
-                  {identifier} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                <a
+                  href={`/details/site/${identifier}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {identifier}{' '}
+                  <Icon
+                    path={mdiOpenInNew}
+                    className="map-popup-card-water-rights-link-icon"
+                  />
                 </a>
               </div>
             </div>
@@ -46,4 +75,6 @@ function NldiSiteCard(props: NldiSiteMapPopupProps) {
     </MapPopupCard>
   );
 }
+
 export default NldiSiteCard;
+export type { NldiSiteCardProps };

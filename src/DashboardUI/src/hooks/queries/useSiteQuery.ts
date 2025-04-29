@@ -17,9 +17,12 @@ import { VariableInfoListItem } from '../../data-contracts/VariableInfoListItem'
 import { MethodInfoListItem } from '../../data-contracts/MethodInfoListItem';
 import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
 
-export function useSiteDigest(siteUuid: string) {
-  return useQuery(['site.siteDigest', siteUuid], async () => await getSiteDigest(siteUuid), {
+export function useSiteDigest(siteUuid: string | undefined, options = {}) {
+  return useQuery(['site.siteDigest', siteUuid], async () => {
+    return await getSiteDigest(siteUuid!);
+  }, {
     enabled: !!siteUuid,
+    ...options,
   });
 }
 
