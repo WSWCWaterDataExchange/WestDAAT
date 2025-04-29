@@ -45,8 +45,7 @@ export function EstimationToolMapHeader() {
 
     // combine files' data into a single collection
     const uploadedFileFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    for (const file of files) {
       const fileData = await parseFile(file);
       uploadedFileFeatures.push(...fileData.features);
     }
