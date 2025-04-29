@@ -918,6 +918,9 @@ const onApplicationLoaded = (
       ),
     };
     draftState.controlPointLocationHasBeenSaved = true;
+  } else {
+    draftApplication.controlLocation = undefined;
+    draftState.controlPointLocationHasBeenSaved = false;
   }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 
