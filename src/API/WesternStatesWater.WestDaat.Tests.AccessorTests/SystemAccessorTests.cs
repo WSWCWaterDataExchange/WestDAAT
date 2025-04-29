@@ -12,7 +12,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task LoadFilters_WaterRightsControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
         {
             // Arrange
-            await using var db = CreateAdjustedDatabaseContextFactory().Create();
+            await using var db = CreateEnlistFalseFactory().Create();
 
             var waterAllocationTypes = new WaterAllocationTypeCVFaker()
                 .RuleFor(a => a.WaDEName, f => f.Random.Word())
@@ -60,48 +60,49 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var waterRights = result.WaterRights;
 
             // Assert
-            waterRights.AllocationTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.BeneficialUses.Should().BeInAscendingOrder(b => b.BeneficialUseName).And.OnlyHaveUniqueItems(b => b.BeneficialUseName);
-            waterRights.LegalStatuses.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.OwnerClassifications.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.SiteTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.States.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.WaterSourceTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.AllocationTypes
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.BeneficialUses
+                .Should().BeInAscendingOrder(b => b.BeneficialUseName)
+                .And.OnlyHaveUniqueItems(b => b.BeneficialUseName);
+            waterRights.LegalStatuses
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.OwnerClassifications
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.SiteTypes
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.States
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+            waterRights.WaterSourceTypes
+                .Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
         }
 
         private ISystemAccessor CreateSystemAccessor()
+            => new SystemAccessor(
+                   CreateLogger<SystemAccessor>(),
+                   CreateEnlistFalseFactory());
+        private IDatabaseContextFactory CreateEnlistFalseFactory()
         {
-            return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateAdjustedDatabaseContextFactory());
-        }
-
-        private IDatabaseContextFactory CreateAdjustedDatabaseContextFactory()
-        {
-            var originalFactory = base.CreateDatabaseContextFactory();
-            return new DatabaseContextFactoryWithEnlistFalse(originalFactory);
+            var baseFactory = base.CreateDatabaseContextFactory();
+            return new DatabaseContextFactoryWithEnlistFalse(baseFactory);
         }
 
         private class DatabaseContextFactoryWithEnlistFalse : IDatabaseContextFactory
         {
-            private readonly IDatabaseContextFactory _innerFactory;
-
-            public DatabaseContextFactoryWithEnlistFalse(IDatabaseContextFactory innerFactory)
-            {
-                _innerFactory = innerFactory;
-            }
+            private readonly IDatabaseContextFactory _inner;
+            public DatabaseContextFactoryWithEnlistFalse(IDatabaseContextFactory inner)
+                => _inner = inner;
 
             public DatabaseContext Create()
             {
-                var context = _innerFactory.Create();
-                var connectionString = context.Database.GetConnectionString();
-                var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
-
-                if (builder.Enlist)
+                var ctx = _inner.Create();
+                var csb = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(
+                    ctx.Database.GetConnectionString())
                 {
-                    builder.Enlist = false;
-                    context.Database.SetConnectionString(builder.ToString());
-                }
-
-                return context;
+                    Enlist = false
+                };
+                ctx.Database.SetConnectionString(csb.ToString());
+                return ctx;
             }
         }
     }

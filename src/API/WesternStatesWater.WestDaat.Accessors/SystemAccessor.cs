@@ -26,12 +26,12 @@ namespace WesternStatesWater.WestDaat.Accessors
             var legalStatusesTask = GetLegalStatuses();
             var siteTypesTask = GetSiteTypes();
             var waterSourcesTask = GetWaterSources();
-            var wrStatesTask = GetWRStates();
-            var tsSiteTypesTask = GetTSSiteTypes();
-            var tsPrimaryUsesTask = GetTSPrimaryUses();
-            var tsVariableTypesTask = GetTSVariableTypes();
-            var tsWaterSourcesTask = GetTSWaterSources();
-            var tsStatesTask = GetTSStates();
+            var wrStatesTask = GetWrStates();
+            var tsSiteTypesTask = GetTsSiteTypes();
+            var tsPrimaryUsesTask = GetTsPrimaryUses();
+            var tsVariableTypesTask = GetTsVariableTypes();
+            var tsWaterSourcesTask = GetTsWaterSources();
+            var tsStatesTask = GetTsStates();
 
             await Task.WhenAll(
                 overlayTypesTask,
@@ -79,6 +79,17 @@ namespace WesternStatesWater.WestDaat.Accessors
                     States = tsStatesTask.Result
                 }
             };
+        }
+        
+        private static string[] SplitAndDistinct(string[] rawValues)
+        {
+            return rawValues?
+                       .Where(x => !string.IsNullOrEmpty(x))
+                       .SelectMany(x => x.Split("||", StringSplitOptions.RemoveEmptyEntries))
+                       .Distinct()
+                       .OrderBy(x => x)
+                       .ToArray()
+                   ?? Array.Empty<string>();
         }
 
         private async Task<string[]> GetOverlayTypes()
@@ -208,7 +219,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return SplitAndDistinct(raw);
         }
 
-        private async Task<string[]> GetWRStates()
+        private async Task<string[]> GetWrStates()
         {
             await using var db = _databaseContextFactory.Create();
             var raw = await db.AllocationAmountsView
@@ -220,7 +231,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return SplitAndDistinct(raw);
         }
 
-        private async Task<string[]> GetTSSiteTypes()
+        private async Task<string[]> GetTsSiteTypes()
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SiteVariableAmountsFact
@@ -232,7 +243,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToArrayAsync();
         }
 
-        private async Task<string[]> GetTSPrimaryUses()
+        private async Task<string[]> GetTsPrimaryUses()
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SiteVariableAmountsFact
@@ -244,7 +255,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToArrayAsync();
         }
 
-        private async Task<string[]> GetTSVariableTypes()
+        private async Task<string[]> GetTsVariableTypes()
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SiteVariableAmountsFact
@@ -256,7 +267,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToArrayAsync();
         }
 
-        private async Task<string[]> GetTSWaterSources()
+        private async Task<string[]> GetTsWaterSources()
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SiteVariableAmountsFact
@@ -268,7 +279,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToArrayAsync();
         }
 
-        private async Task<string[]> GetTSStates()
+        private async Task<string[]> GetTsStates()
         {
             await using var db = _databaseContextFactory.Create();
             var raw = await db.SiteVariableAmountsFact
@@ -278,17 +289,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Distinct()
                 .ToArrayAsync();
             return SplitAndDistinct(raw);
-        }
-        
-        private string[] SplitAndDistinct(string[] rawValues)
-        {
-            return rawValues?
-                       .Where(x => !string.IsNullOrEmpty(x))
-                       .SelectMany(x => x.Split("||", StringSplitOptions.RemoveEmptyEntries))
-                       .Distinct()
-                       .OrderBy(x => x)
-                       .ToArray()
-                   ?? Array.Empty<string>();
         }
     }
 }
