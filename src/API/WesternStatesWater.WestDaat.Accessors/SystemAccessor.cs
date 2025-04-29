@@ -74,13 +74,14 @@ namespace WesternStatesWater.WestDaat.Accessors
             var allocationTypesTask = Task.Run(async () =>
             {
                 await using var db = _databaseContextFactory.Create();
-                return await db.AllocationAmountsView
+                var raw = await db.AllocationAmountsView
                     .AsNoTracking()
                     .Where(x => !string.IsNullOrEmpty(x.AllocationType))
                     .Select(x => x.AllocationType)
                     .Distinct()
                     .OrderBy(x => x)
                     .ToArrayAsync();
+                return SplitAndDistinct(raw);
             });
 
             var legalStatusesTask = Task.Run(async () =>
