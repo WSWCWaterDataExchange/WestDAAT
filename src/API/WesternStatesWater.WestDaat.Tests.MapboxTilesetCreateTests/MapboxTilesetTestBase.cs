@@ -67,16 +67,16 @@ public class Maptiler<T>
 
 public class AllocationFeatureProperties
 {
-    public string uuid { get; set; } = null!;
-    public string o { get; set; } = null!;
-    public string[] oClass { get; set; } = null!;
-    public string[] bu { get; set; }
-    public string podPou { get; set; }
-    public string[] wsType { get; set; }
-    public string[] st { get; set; }
-    public string[] ls { get; set; }
-    public string[] sType { get; set; }
-    public string[] allocType { get; set; }
+    public string uuid { get; set; } = "";
+    public string o { get; set; } = "";
+    public string[] oClass { get; set; } = [];
+    public string[] bu { get; set; } = [];
+    public string podPou { get; set; } = "";
+    public string[] wsType { get; set; } = [];
+    public string[] st { get; set; } = [];
+    public string[] ls { get; set; } = [];
+    public string[] sType { get; set; } = [];
+    public string[] allocType { get; set; } = [];
     public bool xmpt { get; set; }
     public double? minFlow { get; set; }
     public double? maxFlow { get; set; }
@@ -88,18 +88,19 @@ public class AllocationFeatureProperties
 
 public class OverlayFeatureProperties
 {
-    public string uuid { get; set; } = null!;
-    public string[] oType { get; set; } = null!;
+    public string uuid { get; set; } = "";
+    public string[] oType { get; set; } = [];
 }
 
 public class TimeSeriesFeatureProperties
 {
-    public string uuid { get; set; } = null!;
-    public string state { get; set; } = null!;
-    public string siteType { get; set; } = null!;
+    public string uuid { get; set; } = "";
+    public string state { get; set; } = "";
+    public string siteType { get; set; } = "";
     public long startDate { get; set; }
     public long endDate { get; set; }
-    public string[] primaryUseCategory { get; set; } = null!;
-    public string[] variableType { get; set; } = null!;
-    public string[] waterSourceType { get; set; } = null!;
+    public string[] primaryUseCategory { get; set; } = [];
+    public string[] variableType { get; set; } = [];
+    public string[] waterSourceType { get; set; } = [];
 }
+
