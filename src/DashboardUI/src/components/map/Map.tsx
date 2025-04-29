@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -90,6 +90,8 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setUserDrawnPolygonData,
+    addGeometriesToMap,
     setExportToPngFn,
   } = useMapContext();
 
@@ -255,6 +257,26 @@ function Map({
     }
   }, [map, uploadedGeoJSON]);
 
+  const addGeometriesToMapCallback = useCallback(
+    (geoJsonData: Feature<Geometry, GeoJsonProperties>[]) => {
+      if (drawControl && geoJsonData.length > 0) {
+        geoJsonData.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
+          drawControl.add(feature);
+        });
+
+        const allFeatures = drawControl.getAll().features;
+        if (allFeatures.length > 0) {
+          handleMapDrawnPolygonChange?.(allFeatures);
+        }
+      }
+    },
+    [drawControl, handleMapDrawnPolygonChange],
+  );
+
+  useEffect(() => {
+    addGeometriesToMap.current = addGeometriesToMapCallback;
+  }, [addGeometriesToMapCallback]);
+
   useEffect(() => {
     setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -355,21 +377,25 @@ function Map({
   useEffect(() => {
     if (!map) return;
     setMapRenderedFeatures(map);
-    map.on('click', mapConfig.layers.map(m => m.id), (e) => {
-      if (e.features && e.features.length > 0) {
-        // prevent click event if one of the drawing tools are active
-        if (drawControl?.getMode().startsWith('draw')) {
-          return;
-        }
+    map.on(
+      'click',
+      mapConfig.layers.map((m) => m.id),
+      (e) => {
+        if (e.features && e.features.length > 0) {
+          // prevent click event if one of the drawing tools are active
+          if (drawControl?.getMode().startsWith('draw')) {
+            return;
+          }
 
-        setMapClickedFeatures({
-          latitude: e.lngLat.lat,
-          longitude: e.lngLat.lng,
-          layer: "",
-          features: e.features,
-        });
-      }
-    });
+          setMapClickedFeatures({
+            latitude: e.lngLat.lat,
+            longitude: e.lngLat.lng,
+            layer: '',
+            features: e.features,
+          });
+        }
+      },
+    );
 
     mapConfig.layers.forEach((a) => {
       map.on('mouseenter', a.id, (e) => {
@@ -383,7 +409,6 @@ function Map({
       });
     });
   }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
-
 
   useEffect(() => {
     if (!map) return;
@@ -507,8 +532,18 @@ function Map({
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
 
-    map.once('styledata', () => {
-      newPolygons.forEach((polygon) => drawControl.add(polygon));
+    if (newPolygons.length === 0) {
+      return;
+    }
+
+    map.once('idle', () => {
+      while (!map.isStyleLoaded()) {
+        continue;
+      }
+      newPolygons.forEach(drawControl.add);
+
+      // clear the polygons from the state
+      setUserDrawnPolygonData([]);
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
@@ -670,7 +705,6 @@ function Map({
 
             if (!mapContainer) {
               throw new Error('Map container not found');
-              reject();
             }
 
             mapContainer!.style.width = options.width + 'px';
@@ -685,7 +719,7 @@ function Map({
               });
             });
           });
-          
+
           return promise;
         });
       });
