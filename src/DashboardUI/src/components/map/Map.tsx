@@ -353,23 +353,23 @@ function Map({
   useEffect(() => {
     if (!map) return;
     setMapRenderedFeatures(map);
-    mapConfig.layers.forEach((a) => {
-      map.on('click', a.id, (e) => {
-        if (e.features && e.features.length > 0) {
-          // prevent click event if one of the drawing tools are active
-          if (drawControl?.getMode().startsWith('draw')) {
-            return;
-          }
-
-          setMapClickedFeatures({
-            latitude: e.lngLat.lat,
-            longitude: e.lngLat.lng,
-            layer: a.id,
-            features: e.features,
-          });
+    map.on('click', mapConfig.layers.map(m => m.id), (e) => {
+      if (e.features && e.features.length > 0) {
+        // prevent click event if one of the drawing tools are active
+        if (drawControl?.getMode().startsWith('draw')) {
+          return;
         }
-      });
 
+        setMapClickedFeatures({
+          latitude: e.lngLat.lat,
+          longitude: e.lngLat.lng,
+          layer: "",
+          features: e.features,
+        });
+      }
+    });
+
+    mapConfig.layers.forEach((a) => {
       map.on('mouseenter', a.id, (e) => {
         if (e.features && e.features.length > 0) {
           map.getCanvas().style.cursor = 'pointer';
@@ -381,6 +381,7 @@ function Map({
       });
     });
   }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
+
 
   useEffect(() => {
     if (!map) return;

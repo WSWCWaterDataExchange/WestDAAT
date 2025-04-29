@@ -152,6 +152,11 @@ const mapsJson: {
         features: [],
       },
     },
+    {
+      id: 'selected-feature',
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    },
   ],
   layers: [
     {
@@ -347,6 +352,30 @@ const mapsJson: {
         ],
         'circle-color': '#FF7F50',
         'circle-opacity': 0.75,
+      },
+    },
+    {
+      id: 'selected-feature-outline',
+      type: 'line',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+      paint: {
+        'line-color': '#000000',
+        'line-width': 2,
+      },
+    },
+    {
+      id: 'selected-feature-point-outline',
+      type: 'circle',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
+      paint: {
+        'circle-color': 'rgba(0,0,0,0)',
+        'circle-stroke-color': '#000000',
+        'circle-stroke-width': 2,
+        'circle-radius': defaultPointCircleRadius,
       },
     },
     {
