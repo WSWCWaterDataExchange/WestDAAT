@@ -108,14 +108,14 @@ function ReviewMap(props: ReviewMapProps) {
     ];
     setUserDrawnPolygonData(allFeatures);
 
-    // zoom map in to focus on polygons
-    const userDrawnPolygonFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+    // zoom map in to focus on polygons + control location
+    const allFeaturesCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonFeatures,
+      features: allFeatures,
     };
     setMapBoundSettings({
-      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 25,
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
+      padding: 200,
       maxZoom: 16,
       duration: 2000,
     });
@@ -169,7 +169,7 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 25,
+      padding: 200,
       maxZoom: 16,
       duration: 5000,
     });
