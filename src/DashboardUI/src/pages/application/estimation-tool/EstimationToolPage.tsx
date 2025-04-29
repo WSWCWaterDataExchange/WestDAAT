@@ -63,10 +63,7 @@ export function EstimationToolPage() {
 
       return await applicantEstimateConsumptiveUse(context, apiCallFields);
     },
-    onSuccess: (
-      result: ApplicantEstimateConsumptiveUseResponse,
-      data: Parameters<typeof applicantEstimateConsumptiveUse>[1],
-    ) => {
+    onSuccess: (result: ApplicantEstimateConsumptiveUseResponse, data: EstimateConsumptiveUseApiCallFields) => {
       if (result) {
         dispatch({
           type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
