@@ -114,7 +114,7 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
       duration: 2000,
     });
@@ -161,7 +161,7 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
       duration: 5000,
     });
