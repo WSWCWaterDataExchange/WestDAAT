@@ -908,7 +908,7 @@ const onApplicationLoaded = (
     draftApplication.controlLocation = {
       waterConservationApplicationEstimateControlLocationId: controlLocation.id,
       pointWkt: controlLocation.pointWkt,
-      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+      datapoints: controlLocation.waterMeasurements.map(
         (measurement): GeometryEtDatapoint => ({
           year: measurement.year,
           totalEtInInches: measurement.totalEtInInches,

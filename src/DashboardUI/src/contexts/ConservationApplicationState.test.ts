@@ -756,14 +756,14 @@ describe('ConservationApplicationState reducer', () => {
       // application estimate control location
       const controlLocation = application.controlLocation!;
       const expectedControlLocation = applicationDetails.estimate.controlLocation;
-      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
-      expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
-      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation!.id);
+      expect(controlLocation.pointWkt).toEqual(expectedControlLocation!.pointWkt);
+      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation!.waterMeasurements.length);
       expect(newState.controlPointLocationHasBeenSaved).toBe(true);
 
       // application estimate control location water measurements
       const controlLocationWaterMeasurement = controlLocation.datapoints![0];
-      const expectedControlLocationWaterMeasurement = expectedControlLocation.waterMeasurements[0];
+      const expectedControlLocationWaterMeasurement = expectedControlLocation!.waterMeasurements[0];
       expect(controlLocationWaterMeasurement.year).toEqual(expectedControlLocationWaterMeasurement.year);
       expect(controlLocationWaterMeasurement.totalEtInInches).toEqual(
         expectedControlLocationWaterMeasurement.totalEtInInches,
