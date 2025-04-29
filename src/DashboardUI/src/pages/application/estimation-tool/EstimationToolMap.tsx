@@ -193,7 +193,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={polygonLabelFeatures}
+        conservationApplicationPolygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />

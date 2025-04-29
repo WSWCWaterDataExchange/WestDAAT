@@ -41,7 +41,8 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeature?: Feature<Point, GeoJsonProperties> | undefined;
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
@@ -54,7 +55,8 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  polygonLabelFeatures,
+  conservationApplicationPolygonLabelFeatures,
+  conservationApplicationPointLabelFeature,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
@@ -623,20 +625,34 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) {
+    if (!map || !conservationApplicationPolygonLabelFeatures) {
       return;
     }
 
-    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
-
-    source?.setData({
+    const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    polygonSource?.setData({
       type: 'FeatureCollection',
-      features: polygonLabelFeatures,
+      features: conservationApplicationPolygonLabelFeatures,
     });
 
     // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
     map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-  }, [map, polygonLabelFeatures]);
+  }, [map, conservationApplicationPolygonLabelFeatures]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    pointSource?.setData({
+      type: 'FeatureCollection',
+      features: conservationApplicationPointLabelFeature ? [conservationApplicationPointLabelFeature] : [],
+    });
+
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
