@@ -3,13 +3,14 @@ import { BlobUpload } from '../data-contracts/BlobUpload';
 
 export enum ContainerName {
   ApplicationDocuments = 'application-documents',
+  ApplicationMapImages = 'application-map-images',
 }
 
 export const uploadFilesToBlobStorage = async (
   containerName: ContainerName,
   uploadDetails: BlobUpload[],
 ): Promise<BlockBlobUploadResponse[]> => {
-  let uploadPromises: Promise<BlockBlobUploadResponse>[] = [];
+  const uploadPromises: Promise<BlockBlobUploadResponse>[] = [];
 
   uploadDetails.forEach(async (upload) => {
     const sasQueryParam = upload.sasToken.split('?')[1];

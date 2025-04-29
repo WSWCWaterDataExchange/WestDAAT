@@ -4,8 +4,10 @@ import { ApplicationDocumentDownloadSasTokenResponse } from '../data-contracts/A
 import { ApplicationDocumentUploadSasTokenRequest } from '../data-contracts/ApplicationDocumentUploadSasTokenRequest';
 import { ApplicationDocumentUploadSasTokenResponse } from '../data-contracts/ApplicationDocumentUploadSasTokenResponse';
 import westDaatApi from './westDaatApi';
+import { ApplicationMapImageUploadSasTokenRequest } from '../data-contracts/ApplicationMapImageUploadSasTokenRequest';
+import { ApplicationMapImageUploadSasTokenResponse } from '../data-contracts/ApplicationMapImageUploadSasTokenResponse';
 
-export const generateUploadSasTokens = async (
+export const generateDocumentUploadSasTokens = async (
   msalContext: IMsalContext,
   fileCount: number,
 ): Promise<ApplicationDocumentUploadSasTokenResponse> => {
@@ -20,7 +22,22 @@ export const generateUploadSasTokens = async (
   return data;
 };
 
-export const generateDownloadSasToken = async (
+export const generateMapImageUploadSasToken = async (
+  msalContext: IMsalContext,
+  applicationId: string,
+): Promise<ApplicationMapImageUploadSasTokenResponse> => {
+  const api = await westDaatApi(msalContext);
+
+  const request: ApplicationMapImageUploadSasTokenRequest = {
+    $type: 'ApplicationMapImageUploadSasTokenRequest',
+    waterConservationApplicationId: applicationId,
+  };
+
+  const { data } = await api.post('Files/GenerateSasToken', request);
+  return data;
+};
+
+export const generateDocumentDownloadSasToken = async (
   msalContext: IMsalContext,
   documentId: string,
 ): Promise<ApplicationDocumentDownloadSasTokenResponse> => {
@@ -33,4 +50,4 @@ export const generateDownloadSasToken = async (
 
   const { data } = await api.post('Files/GenerateSasToken', request);
   return data;
-}
+};

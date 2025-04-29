@@ -11,6 +11,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
 import {
   defaultMapLocationData,
+  MapExportOptions,
   MapSettings,
   MapStyle,
   RenderedFeatureType,
@@ -38,7 +39,7 @@ import truncate from '@turf/truncate';
 
 import './map.scss';
 
-interface mapProps {
+interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
@@ -60,7 +61,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
-}: mapProps) {
+}: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -89,6 +90,7 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setExportToPngFn,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -658,6 +660,37 @@ function Map({
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (!isMapRendering && map) {
+      map.once('idle', () => {
+        setExportToPngFn(() => (options: MapExportOptions) => {
+          const promise = new Promise<Blob | null>((resolve, reject) => {
+            const mapContainer = document.getElementById('map');
+
+            if (!mapContainer) {
+              throw new Error('Map container not found');
+              reject();
+            }
+
+            mapContainer!.style.width = options.width + 'px';
+            mapContainer!.style.height = options.height + 'px';
+            mapContainer?.classList.remove('h-100');
+            map.resize();
+
+            map.once('idle', async () => {
+              const canvas = map.getCanvas();
+              canvas.toBlob((blob: Blob | null) => {
+                resolve(blob);
+              });
+            });
+          });
+          
+          return promise;
+        });
+      });
+    }
+  }, [isMapRendering]);
 
   return (
     <div className="position-relative h-100">
