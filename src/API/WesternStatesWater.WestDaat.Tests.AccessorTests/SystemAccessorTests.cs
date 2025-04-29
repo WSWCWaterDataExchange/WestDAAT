@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Act
             DashboardFilters result;
-            using (var scope = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
             {
                 result = await accessor.LoadFilters();
                 scope.Complete();
