@@ -22,23 +22,23 @@ namespace WesternStatesWater.WestDaat.Accessors
         async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
             var results = new ConcurrentDictionary<string,object>();
-            var factories = new List<(string Key,Func<Task<object>> Factory)>
+            var factories = new List<(string Key, Func<Task<object>> Factory)>
             {
-                ("OverlayTypes",        async () => await GetOverlayTypes()),
+                ("OverlayTypes", async () => await GetOverlayTypes()),
                 ("OverlayWaterSources", async () => await GetOverlayWaterSources()),
-                ("OverlayStates",       async () => await GetOverlayStates()),
-                ("BeneficialUses",      async () => await GetBeneficialUses()),
-                ("OwnerClassifications",async () => await GetOwnerClassifications()),
-                ("AllocationTypes",     async () => await GetAllocationTypes()),
-                ("LegalStatuses",       async () => await GetLegalStatuses()),
-                ("SiteTypes",           async () => await GetSiteTypes()),
-                ("WaterSources",        async () => await GetWaterSources()),
-                ("WrStates",            async () => await GetWrStates()),
-                ("TsSiteTypes",         async () => await GetTsSiteTypes()),
-                ("TsPrimaryUses",       async () => await GetTsPrimaryUses()),
-                ("TsVariableTypes",     async () => await GetTsVariableTypes()),
-                ("TsWaterSources",      async () => await GetTsWaterSources()),
-                ("TsStates",            async () => await GetTsStates())
+                ("OverlayStates", async () => await GetOverlayStates()),
+                ("BeneficialUses", async () => await GetBeneficialUses()),
+                ("OwnerClassifications", async () => await GetOwnerClassifications()),
+                ("AllocationTypes", async () => await GetAllocationTypes()),
+                ("LegalStatuses", async () => await GetLegalStatuses()),
+                ("SiteTypes", async () => await GetSiteTypes()),
+                ("WaterSources", async () => await GetWaterSources()),
+                ("WrStates", async () => await GetWrStates()),
+                ("TsSiteTypes", async () => await GetTsSiteTypes()),
+                ("TsPrimaryUses", async () => await GetTsPrimaryUses()),
+                ("TsVariableTypes", async () => await GetTsVariableTypes()),
+                ("TsWaterSources", async () => await GetTsWaterSources()),
+                ("TsStates", async () => await GetTsStates())
             };
 
             async ValueTask ProcessFactory((string Key,Func<Task<object>> Factory) item, CancellationToken ct)

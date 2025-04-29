@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 Timeout = TransactionManager.MaximumTimeout
             };
             _transactionScopeFixture = new TransactionScope(
-                TransactionScopeOption.Required,
+                TransactionScopeOption.Suppress,
                 transactionOptions,
                 TransactionScopeAsyncFlowOption.Enabled);
 
