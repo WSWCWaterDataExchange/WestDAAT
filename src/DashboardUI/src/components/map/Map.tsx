@@ -619,10 +619,15 @@ function Map({
 
   useEffect(() => {
     if (!map || !mapBoundSettings || mapBoundSettings.LngLatBounds.length === 0) return;
-    const bounds = new mapboxgl.LngLatBounds(mapBoundSettings.LngLatBounds[0], mapBoundSettings.LngLatBounds[0]);
+
+    // initialize the bounding box with the first point, then extend it with every point
+    const boundsStartingPoint = mapBoundSettings.LngLatBounds[0];
+    const bounds = new mapboxgl.LngLatBounds(boundsStartingPoint, boundsStartingPoint);
     mapBoundSettings.LngLatBounds.forEach((x) => {
       bounds.extend(x);
     });
+
+    // dev note - `fitBounds` throws an error if the padding is too high!
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
       maxZoom: mapBoundSettings.maxZoom,
