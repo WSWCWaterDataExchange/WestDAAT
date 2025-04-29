@@ -46,16 +46,23 @@ describe('GIS File Parser', () => {
     describe('GeoJSON file', () => {
       it('should parse a valid file', async () => {
         // Arrange
-        const file = new File([JSON.stringify(featureCollectionMock)], 'test.geojson', { type: 'application/json' });
+        const featureCollectionFile = new File([JSON.stringify(featureCollectionMock)], 'test.geojson', {
+          type: 'application/json',
+        });
+        const featureFile = new File([JSON.stringify(featureCollectionMock.features[0])], 'test.geojson', {
+          type: 'application/json',
+        });
 
         // Act
-        const result = await parseGISFileToGeoJSON(file);
+        const result1 = await parseGISFileToGeoJSON(featureCollectionFile);
+        const result2 = await parseGISFileToGeoJSON(featureFile);
 
         // Assert
-        expect(result).toBeTruthy();
+        expect(result1).toBeTruthy();
+        expect(result2).toBeTruthy();
 
-        const featureCount = featureCollectionMock.features.length;
-        expect(result.features.length).toBe(featureCount);
+        expect(result1.features.length).toBe(1);
+        expect(result2.features.length).toBe(1);
       });
     });
 
