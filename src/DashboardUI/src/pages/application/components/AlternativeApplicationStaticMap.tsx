@@ -9,14 +9,11 @@ import {
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../utilities/mapUtility';
 import { Feature, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
-import { ExtendedMapboxDraw } from '../../../components/map/ExtendedMapboxDraw';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 export function AlternativeApplicationStaticMap() {
   const { state } = useConservationApplicationContext();
 
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [drawControl, setDrawControl] = useState<ExtendedMapboxDraw | null>(null);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -27,22 +24,51 @@ export function AlternativeApplicationStaticMap() {
       zoom: 4,
       interactive: false,
     });
+    mapInstance.resize();
 
-    const dc = new ExtendedMapboxDraw({
-      props: {
-        displayControlsDefault: false,
-        controls: {},
-        modes: {
-          ...MapboxDraw.modes,
+    mapInstance.once('style.load', () => {
+      mapInstance.addSource('frozen-features', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
         },
-      },
-      buttons: [],
+      });
+
+      mapInstance.addLayer({
+        id: 'frozen-features-polygons-fill-layer',
+        type: 'fill',
+        source: 'frozen-features',
+        paint: {
+          'fill-color': '#3bb2d0',
+          'fill-opacity': 0.25,
+        },
+      });
+
+      mapInstance.addLayer({
+        id: 'frozen-features-polygons-border-layer',
+        type: 'line',
+        source: 'frozen-features',
+        paint: {
+          'line-color': '#3bb2d0',
+          'line-width': 2,
+        },
+      });
+
+      mapInstance.addLayer({
+        id: 'frozen-features-points-layer',
+        type: 'circle',
+        source: 'frozen-features',
+        filter: ['==', '$type', 'Point'], // only render Point data
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#3bb2d0',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff',
+        },
+      });
     });
 
-    mapInstance.addControl(dc);
-    setDrawControl(dc);
-
-    mapInstance.resize();
     setMap(mapInstance);
   }, [setMap]);
 
@@ -58,38 +84,54 @@ export function AlternativeApplicationStaticMap() {
   }, [state.conservationApplication.controlLocation]);
 
   useEffect(() => {
-    if (!map || !drawControl) {
+    if (!map) {
       return;
-    }
-
-    drawControl.deleteAll();
-
-    polygons.forEach(drawControl.add);
-    if (controlLocation) {
-      drawControl.add(controlLocation);
     }
 
     const allFeatures: Feature<Geometry, GeoJsonProperties>[] = [
       ...(polygons as Feature<Geometry, GeoJsonProperties>[]),
-    ].concat(controlLocation ? [controlLocation] : []);
+      ...(controlLocation ? [controlLocation] : []),
+    ];
+    if (allFeatures.length === 0) {
+      return;
+    }
 
-    const bounds = new mapboxgl.LngLatBounds();
-    allFeatures.forEach((feature) => {
-      if (feature.geometry.type === 'Polygon') {
-        feature.geometry.coordinates[0].forEach((coord) => {
-          bounds.extend(coord as [number, number]);
+    function addFeaturesToMap() {
+      const source = map!.getSource('frozen-features') as mapboxgl.GeoJSONSource | undefined;
+      if (source) {
+        source.setData({
+          type: 'FeatureCollection',
+          features: allFeatures,
         });
-      } else if (feature.geometry.type === 'Point') {
-        bounds.extend(feature.geometry.coordinates as [number, number]);
-      }
-    });
 
-    map.fitBounds(bounds, {
-      padding: 25,
-      maxZoom: 16,
-      duration: 0,
-    });
-  }, [map, drawControl, polygons, controlLocation]);
+        const bounds = new mapboxgl.LngLatBounds();
+        allFeatures.forEach((feature) => {
+          if (feature.geometry.type === 'Polygon') {
+            feature.geometry.coordinates[0].forEach((coord) => {
+              bounds.extend(coord as [number, number]);
+            });
+          } else if (feature.geometry.type === 'Point') {
+            bounds.extend(feature.geometry.coordinates as [number, number]);
+          }
+        });
+
+        map!.fitBounds(bounds, {
+          padding: 25,
+          maxZoom: 16,
+          duration: 0,
+        });
+      } else {
+        // Try again once source becomes available
+        map!.once('sourcedata', addFeaturesToMap);
+      }
+    }
+
+    if (map.isStyleLoaded()) {
+      addFeaturesToMap();
+    } else {
+      map.once('style.load', addFeaturesToMap);
+    }
+  }, [map, polygons, controlLocation]);
 
   return (
     <div className="position-relative h-100" style={{ width: '600px', height: '400px' }}>
