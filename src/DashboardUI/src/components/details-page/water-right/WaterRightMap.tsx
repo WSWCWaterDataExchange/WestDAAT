@@ -1,5 +1,5 @@
 import React from 'react';
-import useSiteDigestMapPopup from '../../../hooks/map-popups/useSiteDigestMapPopup';
+import useUnifiedDigestPopup from "../../../hooks/map-popups/useUnifiedDigestPopup";
 import DetailsMap from '../DetailsMap';
 import { useWaterRightDetailsContext } from './Provider';
 import MapProvider from '../../../contexts/MapProvider';
@@ -18,7 +18,7 @@ function Layout() {
     hostData: { siteLocationsQuery },
   } = useWaterRightDetailsContext();
 
-  useSiteDigestMapPopup();
+  useUnifiedDigestPopup()
   useMapLegend();
 
   if (siteLocationsQuery.isLoading || !siteLocationsQuery.data) return null;

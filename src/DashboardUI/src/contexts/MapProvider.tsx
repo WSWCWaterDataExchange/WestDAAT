@@ -28,6 +28,11 @@ export const defaultMapLocationData: MapSettings = {
   zoomLevel: 4,
 };
 
+export interface MapExportOptions {
+  width: number;
+  height: number;
+}
+
 export const defaultMapStyle = MapStyle.Light;
 
 export type MapLayerFilterType = any[] | boolean | null | undefined;
@@ -133,6 +138,8 @@ interface MapContextState {
   drawPolygon: GeoJSON.Feature<GeoJSON.Polygon> | null;
   setDrawPolygon: React.Dispatch<React.SetStateAction<GeoJSON.Feature<GeoJSON.Polygon> | null>>;
   addGeometriesToMap: React.RefObject<((geometries: GeoJSON.Feature<GeoJSON.Geometry>[]) => void) | null>;
+  exportToPngFn: ((options: MapExportOptions) => Promise<Blob | null>) | null;
+  setExportToPngFn: React.Dispatch<React.SetStateAction<((options: MapExportOptions) => Promise<Blob | null>) | null>>;
 }
 
 const defaultState: MapContextState = {
@@ -184,6 +191,12 @@ const defaultState: MapContextState = {
   drawPolygon: null,
   setDrawPolygon: () => {},
   addGeometriesToMap: { current: null },
+  exportToPngFn: null,
+  setExportToPngFn: () => (options: MapExportOptions) => {
+    return new Promise<Blob | null>((resolve) => {
+      resolve(null);
+    });
+  },
 };
 
 const MapContext = createContext<MapContextState>(defaultState);
@@ -411,6 +424,10 @@ const MapProvider = ({ children }: MapProviderProps) => {
 
   const addGeometriesToMap = useRef<(geometries: GeoJSON.Feature<GeoJSON.Geometry>[]) => void>(null);
 
+  const [exportToPngFn, setExportToPngFn] = useState<((options: MapExportOptions) => Promise<Blob | null>) | null>(
+    null,
+  );
+
   const mapContextProviderValue: MapContextState = {
     isMapLoaded,
     setIsMapLoaded,
@@ -460,6 +477,8 @@ const MapProvider = ({ children }: MapProviderProps) => {
     drawPolygon,
     setDrawPolygon,
     addGeometriesToMap,
+    exportToPngFn,
+    setExportToPngFn,
   };
 
   return <MapContext.Provider value={mapContextProviderValue}>{children}</MapContext.Provider>;
