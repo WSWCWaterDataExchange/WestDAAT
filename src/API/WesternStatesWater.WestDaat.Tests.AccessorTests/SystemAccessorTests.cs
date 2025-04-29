@@ -1,4 +1,5 @@
-﻿using WesternStatesWater.WaDE.Database.EntityFramework;
+﻿using Microsoft.EntityFrameworkCore;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 
@@ -11,7 +12,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task LoadFilters_WaterRightsControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
         {
             // Arrange
-            await using var db = CreateDatabaseContextFactory().Create();
+            await using var db = CreateAdjustedDatabaseContextFactory().Create();
 
             var waterAllocationTypes = new WaterAllocationTypeCVFaker()
                 .RuleFor(a => a.WaDEName, f => f.Random.Word())
@@ -70,7 +71,38 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         private ISystemAccessor CreateSystemAccessor()
         {
-            return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateDatabaseContextFactory());
+            return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateAdjustedDatabaseContextFactory());
+        }
+
+        private IDatabaseContextFactory CreateAdjustedDatabaseContextFactory()
+        {
+            var originalFactory = base.CreateDatabaseContextFactory();
+            return new DatabaseContextFactoryWithEnlistFalse(originalFactory);
+        }
+
+        private class DatabaseContextFactoryWithEnlistFalse : IDatabaseContextFactory
+        {
+            private readonly IDatabaseContextFactory _innerFactory;
+
+            public DatabaseContextFactoryWithEnlistFalse(IDatabaseContextFactory innerFactory)
+            {
+                _innerFactory = innerFactory;
+            }
+
+            public DatabaseContext Create()
+            {
+                var context = _innerFactory.Create();
+                var connectionString = context.Database.GetConnectionString();
+                var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+
+                if (builder.Enlist)
+                {
+                    builder.Enlist = false;
+                    context.Database.SetConnectionString(builder.ToString());
+                }
+
+                return context;
+            }
         }
     }
 }
