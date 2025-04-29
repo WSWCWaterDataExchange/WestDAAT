@@ -1,4 +1,4 @@
-import { createRef, useRef, useState } from 'react';
+import { createRef, useMemo, useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
@@ -15,22 +15,37 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import ApplicationStaticMap from './ApplicationStaticMap';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormProps {
+  perspective: ApplicationReviewPerspective;
   ref: React.Ref<HTMLFormElement>;
   formValidated: boolean;
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const { ref, formValidated } = props;
+  const { perspective, ref, formValidated } = props;
 
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
-  const polygonData = state.conservationApplication.estimateLocations;
+
+  const validPolygonData = useMemo(
+    () =>
+      state.conservationApplication.estimateLocations.filter(
+        (location) => !!location.waterConservationApplicationEstimateLocationId,
+      ),
+    [state.conservationApplication.estimateLocations],
+  );
+
+  const navigate = useNavigate();
+  const navigateToReviewPageMap = () => {
+    navigate('map');
+  };
 
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
@@ -43,7 +58,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef(polygonData.map(() => createRef()));
+  const propertyAdditionalDetailsRef = useRef(validPolygonData.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -85,7 +100,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      fieldDetails: polygonData.map((field, index) => ({
+      fieldDetails: validPolygonData.map((field, index) => ({
         waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
@@ -216,6 +231,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control type="email" maxLength={255} ref={agentEmailRef} defaultValue={stateForm.agentEmail} />
+          <Form.Control.Feedback type="invalid">Valid email is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentPhoneNumber">
@@ -236,7 +252,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
       <div className="row">
         <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-          {polygonData.map((field, index) => (
+          {validPolygonData.map((field, index) => (
             <div className="row mb-4" key={field.fieldName}>
               <div className="col-3">
                 <span>{field.fieldName}</span>
@@ -267,8 +283,12 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         </ApplicationFormSection>
 
         <div className="col-lg-6 col-12">
-          Static map here
-          <NotImplementedPlaceholder />
+          <ApplicationStaticMap mapImageUrl={state.conservationApplication.mapImageUrl} />
+          {perspective === 'reviewer' && (
+            <Button className="mt-3" variant="outline-primary" onClick={navigateToReviewPageMap}>
+              Edit in Estimator
+            </Button>
+          )}
         </div>
       </div>
 
@@ -295,6 +315,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             ref={canalOrIrrigationEntityEmailRef}
             defaultValue={stateForm.canalOrIrrigationEntityEmail}
           />
+          <Form.Control.Feedback type="invalid">Valid email is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="canalOrIrrigationEntityPhoneNumber">
@@ -422,7 +443,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
               <span className="fw-bold">Consumptive Use</span>
             </div>
             <div>
-              <span>{formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet</span>
+              <span>{formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2)} Acre-Feet</span>
             </div>
           </div>
 

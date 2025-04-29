@@ -11,9 +11,7 @@ function FormElementDisplay(props: FormElementDisplay) {
       <div>
         <span className="text-muted">{label}</span>
       </div>
-      <div>
-        <span>{displayValue || '-'}</span>
-      </div>
+      <div className="text-break">{displayValue || '-'}</div>
     </>
   );
 }

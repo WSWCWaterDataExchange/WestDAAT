@@ -2,6 +2,7 @@ using Azure.Messaging.ServiceBus;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
@@ -29,7 +30,7 @@ public class MessageBusUtilityTests : UtilityTestBase
         }
     }
 
-    class SmokeTestRequest : RequestBase
+    class SmokeTestRequest : EventBase
     {
         public string Message { get; set; } = null!;
     }

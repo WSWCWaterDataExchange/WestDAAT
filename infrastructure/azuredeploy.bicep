@@ -169,6 +169,7 @@ resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@20
 // List of containers to create
 var containers = [
   'application-documents'
+  'application-map-images'
 ]
 
 resource storage_account_containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [
@@ -324,14 +325,17 @@ var fnAppSettings = {
   'Database:WadeConnectionString': 'Server=tcp:${wadeDatabaseServer[Environment]},1433;Initial Catalog=${wadeDatabaseName[Environment]};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
   'Environment:IsDevelopment': false
+  'Environment:SiteUrl': siteOrigins[Environment]
   'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
   'Nldi:MaxDownstreamDiversionDistance': '500'
   'Nldi:MaxDownstreamMainDistance': '500'
   'Nldi:MaxUpstreamMainDistance': '500'
   'Nldi:MaxUpstreamTributaryDistance': '500'
-  'Smtp:FeedbackFrom': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackFrom': 'no-reply@westernstateswater.org'
   'Smtp:FeedbackTo:0': 'WaDE_WSWC@hotmail.com'
   'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
+  'Smtp:NotificationFrom': 'no-reply@westernstateswater.org'
+  'Smtp:NotificationFromName': 'WestDAAT'
   APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
   AzureWebJobsSecretStorageType: 'files'
   AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
@@ -539,7 +543,7 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
 //   AzureNames.Queues list
 //   sb-emulator.config.json
 var queueNames = [
-  'conservation-application-submitted'
+  'conservation-application-status-changed'
 ]
 
 resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = [

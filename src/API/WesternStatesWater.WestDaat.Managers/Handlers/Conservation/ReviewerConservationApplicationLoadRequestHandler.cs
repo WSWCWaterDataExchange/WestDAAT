@@ -17,8 +17,8 @@ public class ReviewerConservationApplicationLoadRequestHandler : IRequestHandler
 
     public async Task<ReviewerConservationApplicationLoadResponse> Handle(ReviewerConservationApplicationLoadRequest request)
     {
-        var dtoRequest = request.Map<Common.DataContracts.ApplicationLoadSingleRequest>();
-        var dtoResponse = (Common.DataContracts.ApplicationLoadSingleResponse)await ApplicationAccessor.Load(dtoRequest);
+        var dtoRequest = request.Map<DTO.ApplicationLoadSingleRequest>();
+        var dtoResponse = (DTO.ApplicationLoadSingleResponse)await ApplicationAccessor.Load(dtoRequest);
 
         var response = dtoResponse.Map<ReviewerConservationApplicationLoadResponse>();
         return response;

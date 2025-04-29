@@ -1,9 +1,11 @@
-import { PolygonEtDatapoint } from './PolygonEtDatapoint';
+import { GeometryEtDatapoint } from './GeometryEtDatapoint';
 
 export interface PolygonEtDataCollection {
-  waterConservationApplicationEstimateLocationId: string;
+  waterConservationApplicationEstimateLocationId: string | null;
   polygonWkt: string;
-  averageYearlyEtInInches: number;
-  averageYearlyEtInAcreFeet: number;
-  datapoints: PolygonEtDatapoint[];
+  averageYearlyTotalEtInInches: number;
+  averageYearlyTotalEtInAcreFeet: number;
+  averageYearlyNetEtInInches: number | null;
+  averageYearlyNetEtInAcreFeet: number | null;
+  datapoints: GeometryEtDatapoint[];
 }

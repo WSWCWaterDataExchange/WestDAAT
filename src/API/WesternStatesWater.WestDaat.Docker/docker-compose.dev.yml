@@ -42,6 +42,7 @@ services:
       - -c
       - |
         az storage container create --name application-documents
+        az storage container create --name application-map-images
         az storage cors add --origins '*' --services 'b' --methods GET POST PUT OPTIONS HEAD --allowed-headers '*'
     depends_on:
       azurite:

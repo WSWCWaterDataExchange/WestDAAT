@@ -14,8 +14,10 @@ import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
 import Button from 'react-bootstrap/esm/Button';
 import { useNavigate } from 'react-router-dom';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 interface EstimationToolSidebarProps {
+  perspective: ApplicationReviewPerspective;
   isLoading: boolean;
   loadFailed: boolean;
 }
@@ -27,7 +29,11 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
   const desiredUnitsRef = useRef<HTMLSelectElement>(null);
 
   const onEstimationFormChanged = () => {
-    const desiredDollars = Number(desiredDollarsRef.current?.value);
+    let desiredDollars: number | undefined = Number(desiredDollarsRef.current!.value);
+    if (desiredDollars === 0 || isNaN(desiredDollars)) {
+      desiredDollars = undefined;
+    }
+
     const desiredUnitsAsEnum: CompensationRateUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
     const desiredUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined =
       desiredUnitsAsEnum === CompensationRateUnits.None ? undefined : desiredUnitsAsEnum;
@@ -103,7 +109,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
-          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water nott returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
+          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
           isLoading={props.isLoading}
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
@@ -113,13 +119,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {(state.conservationApplication.totalAverageYearlyEtAcreFeet ?? 0) > 0 ? (
+            {(state.conservationApplication.cumulativeTotalEtInAcreFeet ?? 0) > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
                 <span className="fs-5 fw-bold et-blue-text">
-                  {formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet
+                  {formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2)} Acre-Feet
                 </span>
               </>
             ) : (
@@ -158,12 +164,13 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
                   type="number"
-                  placeholder="100"
+                  placeholder=""
                   min={1}
                   aria-describedby="dollar-sign-addon"
                   aria-label="Desired compensation in dollars"
                   defaultValue={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
+                  disabled={props.perspective !== 'applicant'}
                 ></Form.Control>
               </InputGroup>
 
@@ -171,6 +178,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 aria-label="Desired compensation units"
                 defaultValue={state.conservationApplication.desiredCompensationUnits}
                 ref={desiredUnitsRef}
+                disabled={props.perspective !== 'applicant'}
               >
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
@@ -190,7 +198,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
         >
-          {state.conservationApplication.conservationPayment ? (
+          {state.conservationApplication.conservationPayment !== undefined ? (
             <>
               <div>
                 <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
@@ -224,25 +232,27 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           )}
         </SidebarElement>
 
-        <SidebarElement>
-          <div className="mb-3">
-            <Button
-              variant="primary"
-              className="w-100"
-              disabled={!state.canContinueToApplication}
-              onClick={navigateToCreateApplicationPage}
-            >
-              Continue to Application
-            </Button>
-          </div>
-          <div>
-            <span className="text-muted">
-              If you own this water right or have legal authority over the use of its water, you may apply to a water
-              conservation program for compensated, temporary, and voluntary measure. Pending verification and approval
-              by appropriate parties.
-            </span>
-          </div>
-        </SidebarElement>
+        {props.perspective === 'applicant' && (
+          <SidebarElement>
+            <div className="mb-3">
+              <Button
+                variant="primary"
+                className="w-100"
+                disabled={!state.canContinueToApplication}
+                onClick={navigateToCreateApplicationPage}
+              >
+                Continue to Application
+              </Button>
+            </div>
+            <div>
+              <span className="text-muted">
+                If you own this water right or have legal authority over the use of its water, you may apply to a water
+                conservation program for compensated, temporary, and voluntary measure. Pending verification and
+                approval by appropriate parties.
+              </span>
+            </div>
+          </SidebarElement>
+        )}
       </div>
     </div>
   );

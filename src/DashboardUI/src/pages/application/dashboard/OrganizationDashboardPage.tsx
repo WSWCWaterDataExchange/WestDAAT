@@ -25,14 +25,16 @@ import { CompensationRateUnitsLabelsPlural } from '../../../data-contracts/Compe
 import {
   ConservationApplicationStatus,
   ConservationApplicationStatusDisplayNames,
+  getApplicationStatusIconClass,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useOrganizationQuery } from '../../../hooks/queries';
 import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
-import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
+import { getUserOrganization, hasPermission, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
+import { Permission } from '../../../roleConfig';
 
 import './organization-dashboard-page.scss';
 
@@ -51,20 +53,23 @@ export function OrganizationDashboardPage() {
   const [dataGridFilters, setDataGridFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
+  const isUserLoaded = !!user;
   const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
-  const organizationIdFilter = !isGlobalAdmin ? getUserOrganization(user) : null;
+  const organizationIdFilter = isUserLoaded && !isGlobalAdmin ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isLoading: applicationListLoading, isError: applicationListErrored } =
-    useLoadDashboardApplications(organizationIdFilter);
+  const { isLoading: applicationListLoading, isError: applicationListErrored } = useLoadDashboardApplications(
+    organizationIdFilter,
+    isUserLoaded,
+  );
 
   const apiRef = useGridApiRef();
 
   const getKeysFromLookup = (obj: GridFilterState['filteredRowsLookup']) => {
     const keys = [];
     for (const key in obj) {
-      if (obj.hasOwnProperty(key) && obj[key]) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key]) {
         keys.push(key);
       }
     }
@@ -89,19 +94,6 @@ export function OrganizationDashboardPage() {
     return formatDateString(date, 'MM/DD/YYYY');
   };
 
-  const getApplicationStatusIconClass = (status: ConservationApplicationStatus): string => {
-    switch (status) {
-      case ConservationApplicationStatus.Approved:
-        return 'application-status-icon-approved';
-      case ConservationApplicationStatus.Rejected:
-        return 'application-status-icon-rejected';
-      case ConservationApplicationStatus.InReview:
-        return 'application-status-icon-inReview';
-      case ConservationApplicationStatus.Unknown:
-        return 'application-status-icon-unknown';
-    }
-  };
-
   const renderHeader = (params: GridColumnHeaderParams) => (
     <div className="header-column-text">{params.colDef.headerName}</div>
   );
@@ -121,12 +113,31 @@ export function OrganizationDashboardPage() {
   };
 
   const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
-    return <NavLink to={`/details/right/${params.row.waterRightState}wr_WR${params.value}`}>{params.value}</NavLink>;
+    return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
   };
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
     const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
-    return <NavLink to={`/application/${application.applicationId}/review`}>{params.value}</NavLink>;
+
+    const canUpdate = hasPermission(user, Permission.ApplicationUpdate);
+    const canApprove = hasPermission(user, Permission.ApplicationApprove);
+
+    let navLinkPageSlug = 'approve';
+
+    switch (application.status) {
+      case ConservationApplicationStatus.Approved:
+      case ConservationApplicationStatus.Denied:
+        navLinkPageSlug = 'approve';
+        break;
+      case ConservationApplicationStatus.InTechnicalReview:
+        navLinkPageSlug = canUpdate ? 'review' : 'approve';
+        break;
+      case ConservationApplicationStatus.InFinalReview:
+        navLinkPageSlug = canApprove ? 'approve' : 'review';
+        break;
+    }
+
+    return <NavLink to={`/application/${application.applicationId}/${navLinkPageSlug}`}>{params.value}</NavLink>;
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
@@ -148,7 +159,12 @@ export function OrganizationDashboardPage() {
             )}
           </Card.Title>
           <Card.Text className="mb-3 mx-3 fs-6">
-            {!applicationListLoading && subtitle && <p className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</p>}
+            {!applicationListLoading && subtitle && (
+              <>
+                <span className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</span>
+                <br />
+              </>
+            )}
             {applicationListLoading ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
@@ -251,8 +267,8 @@ export function OrganizationDashboardPage() {
         {dashboardTitle()}
         <div className="row my-4">
           {renderStatisticsCard('Submitted Applications', state.dashboardApplicationsStatistics.submittedApplications)}
-          {renderStatisticsCard('Accepted Applications', state.dashboardApplicationsStatistics.acceptedApplications)}
-          {renderStatisticsCard('Rejected Applications', state.dashboardApplicationsStatistics.rejectedApplications)}
+          {renderStatisticsCard('Approved Applications', state.dashboardApplicationsStatistics.approvedApplications)}
+          {renderStatisticsCard('Denied Applications', state.dashboardApplicationsStatistics.deniedApplications)}
           {renderStatisticsCard('Applications In Review', state.dashboardApplicationsStatistics.inReviewApplications)}
           {renderStatisticsCard(
             'Cumulative Est. Savings',
@@ -283,12 +299,8 @@ export function OrganizationDashboardPage() {
               },
             }}
             onStateChange={handleDataGridStateChange}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  fundingOrganization: isGlobalAdmin ? true : false,
-                },
-              },
+            columnVisibilityModel={{
+              fundingOrganization: isGlobalAdmin ? true : false,
             }}
           ></DataGrid>
         </TableLoading>

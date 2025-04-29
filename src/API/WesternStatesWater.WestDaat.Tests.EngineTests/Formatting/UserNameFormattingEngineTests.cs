@@ -1,4 +1,6 @@
-﻿using WesternStatesWater.WestDaat.Accessors;
+﻿using Microsoft.Extensions.DependencyInjection;
+using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
@@ -25,6 +27,8 @@ public class UserNameFormattingEngineTests : EngineTestBase
 
         _formattingEngine = new FormattingEngine(
             CreateLogger<FormattingEngine>(),
+            Services.GetRequiredService<EnvironmentConfiguration>(),
+            Services.GetRequiredService<EmailServiceConfiguration>(),
             _applicationAccessorMock.Object,
             _organizationAccessorMock.Object,
             _userAccessorMock.Object

@@ -42,9 +42,6 @@ function SiteNavbar() {
   const showOrganizationDashboard =
     isFeatureEnabled('conservationEstimationTool') && (userOrganizationId != null || isGlobalAdmin);
 
-  const showWaterUserDashboard =
-    isFeatureEnabled('conservationEstimationTool') && userOrganizationId == null && !isGlobalAdmin;
-
   const showProfileEdit = isFeatureEnabled('conservationEstimationTool');
 
   return (
@@ -91,11 +88,6 @@ function SiteNavbar() {
                 {showOrganizationDashboard && (
                   <NavDropdown.Item as={Link} to="/application/organization/dashboard">
                     Application Dashboard
-                  </NavDropdown.Item>
-                )}
-                {showWaterUserDashboard && (
-                  <NavDropdown.Item as={Link} to="/application/dashboard">
-                    My Applications
                   </NavDropdown.Item>
                 )}
                 <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>

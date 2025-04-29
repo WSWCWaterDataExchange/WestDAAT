@@ -2,5 +2,5 @@
 
 public class RasterTimeSeriesPolygonResponse
 {
-    public RasterTimeSeriesPolygonResponseDatapoint[] Data { get; set; }
+    public RasterTimeSeriesDatapoint[] Data { get; set; }
 }

@@ -9,7 +9,7 @@ namespace WesternStatesWater.WestDaat.Common.Constants;
 public static class Queues
 {
     public const string SmokeTest = "smoke-test"; // Local only
-    public const string ConservationApplicationSubmitted = "conservation-application-submitted";
+    public const string ConservationApplicationStatusChanged = "conservation-application-status-changed";
 }
 
 /// <summary>
@@ -21,4 +21,5 @@ public static class Queues
 public static class Containers
 {
     public const string ApplicationDocuments = "application-documents";
+    public const string ApplicationMapImages = "application-map-images";
 }

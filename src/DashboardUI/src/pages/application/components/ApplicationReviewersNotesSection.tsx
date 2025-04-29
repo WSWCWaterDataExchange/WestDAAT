@@ -1,7 +1,9 @@
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
-import { formatDateString } from '../../../utilities/valueFormatters';
+import { formatDateString, momentJsLocalizedDateFormatString } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import { ApplicationReviewersNotesCreate } from './ApplicationReviewersNotesCreate';
 
 import './ApplicationReviewersNotesSection.scss';
 
@@ -11,12 +13,9 @@ function ApplicationReviewersNotesSection() {
 
   const { user } = useAuthenticationContext();
 
-  // docs: https://momentjs.com/docs/#/displaying/
-  const momentJsLocalizedDateFormatString = 'llll';
-
   return (
     <>
-      <hr className="text-primary" />
+      <ApplicationFormSectionRule width={1} />
       <ApplicationFormSection title="Notes from Reviewers (Hidden from Applicant)" className="col mb-4">
         {notes && notes.length > 0 ? (
           notes.map((note) => (
@@ -26,7 +25,7 @@ function ApplicationReviewersNotesSection() {
             >
               <div className="d-flex gap-3">
                 <div>
-                  <span className="text-primary">{note.submittedByFullName}</span>
+                  <span className="text-primary fw-bold">{note.submittedByFullName}</span>
                 </div>
                 <div>
                   <span className="text-muted fst-italic">
@@ -43,6 +42,7 @@ function ApplicationReviewersNotesSection() {
         ) : (
           <p>No notes from reviewers.</p>
         )}
+        <ApplicationReviewersNotesCreate />
       </ApplicationFormSection>
     </>
   );

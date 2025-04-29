@@ -3,4 +3,6 @@
 public class MultiPolygonYearlyEtResponse : CalculateResponseBase
 {
     public PolygonEtDataCollection[] DataCollections { get; set; }
+
+    public PointEtDataCollection ControlLocationDataCollection { get; set; } = null!;
 }

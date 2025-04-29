@@ -3,6 +3,7 @@ import { ApplicationStoreRequestBase } from './ApplicationStoreRequestBase';
 import { CompensationRateUnits } from './CompensationRateUnits';
 
 export interface WaterConservationApplicationSubmissionRequest extends ApplicationStoreRequestBase {
+  $type: 'WaterConservationApplicationSubmissionRequest',
   waterConservationApplicationId: string;
   waterRightNativeId: string;
 

@@ -3,6 +3,8 @@
 public class ReviewerConservationApplicationLoadResponse : ApplicationLoadResponseBase
 {
     public Common.DataContracts.ApplicationDetails Application { get; set; } = null!;
+    
+    public Common.DataContracts.ReviewPipeline ReviewPipeline { get; set; } = null!;
 
     public Common.DataContracts.ApplicationReviewNote[] Notes { get; set; } = null!;
 }

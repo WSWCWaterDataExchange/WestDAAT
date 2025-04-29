@@ -100,3 +100,12 @@ input[type='date'][value=''] {
     }
   }
 }
+
+.resize-none {
+  resize: none;
+}
+
+.modal-75w {
+  max-width: none !important;
+  width: 75%;
+}

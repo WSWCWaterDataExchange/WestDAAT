@@ -1,3 +1,4 @@
+import { ConservationApplicationStatus } from './ConservationApplicationStatus';
 import { EstimateDetails } from './EstimateDetails';
 import { SubmissionDetails } from './SubmissionDetails';
 import { SupportingDocumentDetails } from './SupportingDocumentDetails';
@@ -11,4 +12,6 @@ export interface ApplicationDetails {
   estimate: EstimateDetails;
   submission: SubmissionDetails;
   supportingDocuments: SupportingDocumentDetails[];
+  status: ConservationApplicationStatus;
+  mapImageUrl: string;
 }

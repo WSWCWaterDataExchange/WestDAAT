@@ -2,13 +2,19 @@
 
 public class PolygonEtDataCollection
 {
-    public Guid WaterConservationApplicationEstimateLocationId { get; set; }
+    public Guid? WaterConservationApplicationEstimateLocationId { get; set; }
 
     public string PolygonWkt { get; set; }
 
-    public double AverageYearlyEtInInches { get; set; }
+    public Common.DataContracts.DrawToolType DrawToolType { get; set; }
 
-    public double AverageYearlyEtInAcreFeet { get; set; }
+    public double AverageYearlyTotalEtInInches { get; set; }
 
-    public PolygonEtDatapoint[] Datapoints { get; set; }
+    public double AverageYearlyTotalEtInAcreFeet { get; set; }
+
+    public double? AverageYearlyNetEtInInches { get; set; }
+
+    public double? AverageYearlyNetEtInAcreFeet { get; set; }
+
+    public GeometryEtDatapoint[] Datapoints { get; set; }
 }

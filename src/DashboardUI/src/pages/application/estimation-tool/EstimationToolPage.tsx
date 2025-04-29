@@ -10,13 +10,14 @@ import {
 } from '../../../hooks/queries/useApplicationQuery';
 import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
-import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
+import { applicantEstimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
-import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
+import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 import './estimation-tool-page.scss';
+import { MapPolygon } from '../../../data-contracts/MapPolygon';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -50,22 +51,22 @@ export function EstimationToolPage() {
     mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
       validateFields(fields);
 
-      const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
+      const apiCallFields: Parameters<typeof applicantEstimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
-        polygonWkts: fields.polygonWkts!,
+        polygons: fields.polygons!,
         compensationRateDollars: fields.compensationRateDollars,
         units: fields.units,
       };
 
-      return await estimateConsumptiveUse(context, apiCallFields);
+      return await applicantEstimateConsumptiveUse(context, apiCallFields);
     },
-    onSuccess: (result: EstimateConsumptiveUseResponse) => {
+    onSuccess: (result: ApplicantEstimateConsumptiveUseResponse) => {
       if (result) {
         dispatch({
-          type: 'CONSUMPTIVE_USE_ESTIMATED',
+          type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
           payload: {
-            totalAverageYearlyEtAcreFeet: result.totalAverageYearlyEtAcreFeet,
+            cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
             conservationPayment: result.conservationPayment,
             dataCollections: result.dataCollections,
           },
@@ -78,10 +79,17 @@ export function EstimationToolPage() {
   });
 
   const handleEstimateConsumptiveUseClicked = async () => {
-    await estimateConsumptiveUseMutation.mutateAsync({
+    await estimateConsumptiveUseMutation.mutate({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      polygonWkts: state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
+      polygons: state.conservationApplication.estimateLocations.map(
+        (polygon): MapPolygon => ({
+          // backend overwrites locations for applicant EstimateConsumptiveUse use case
+          waterConservationApplicationEstimateLocationId: null,
+          polygonWkt: polygon.polygonWkt!,
+          drawToolType: polygon.drawToolType!,
+        }),
+      ),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
       units: state.conservationApplication.desiredCompensationUnits,
     });
@@ -97,12 +105,15 @@ export function EstimationToolPage() {
         navigateBack={navigateToWaterRightLandingPage}
         backButtonText="Back to Water Right Landing Page"
         centerText="Water Conservation Estimation Tool"
+        centerTextIsLoading={false}
+        displayWaterIcon={true}
       />
 
       <div className="flex-grow-1 overflow-y-auto">
         <div className="h-100 d-flex overflow-y-auto align-items-stretch">
           <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
             <EstimationToolSidebar
+              perspective="applicant"
               isLoading={isLoadingFundingOrganization || isLoadingApplication}
               loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
             />
@@ -125,7 +136,7 @@ export function EstimationToolPage() {
 interface EstimateConsumptiveUseApiCallFields {
   waterConservationApplicationId: string | undefined;
   waterRightNativeId: string | undefined;
-  polygonWkts: string[] | undefined;
+  polygons: MapPolygon[] | undefined;
   compensationRateDollars: number | undefined;
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }
@@ -134,8 +145,8 @@ const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
   const isValid: boolean =
     !!fields.waterConservationApplicationId &&
     !!fields.waterRightNativeId &&
-    !!fields.polygonWkts &&
-    fields.polygonWkts.length > 0; // compensation rate is optional
+    !!fields.polygons &&
+    fields.polygons.length > 0; // compensation rate is optional
   if (!isValid) {
     throw new Error('Invalid fields');
   }

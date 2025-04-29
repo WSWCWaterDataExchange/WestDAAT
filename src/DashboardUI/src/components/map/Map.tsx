@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -17,33 +17,35 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorPolygon, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
-import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
-import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
+import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
+import truncate from '@turf/truncate';
 
 import './map.scss';
-import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeature?: Feature<Point, GeoJsonProperties> | undefined;
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
+  isControlLocationSelectionToolDisplayed?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -53,9 +55,11 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  polygonLabelFeatures,
+  conservationApplicationPolygonLabelFeatures,
+  conservationApplicationPointLabelFeature,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
+  isControlLocationSelectionToolDisplayed,
 }: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -66,6 +70,7 @@ function Map({
     visibleLayers,
     geoJsonData,
     userDrawnPolygonData,
+    isControlLocationSelectionToolEnabled,
     filters,
     circleColors,
     circleRadii,
@@ -95,6 +100,7 @@ function Map({
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const drawControlStateRef = useRef<MapboxDraw | null>(null);
+  const isControlLocationSelectionToolEnabledRef = useRef<boolean>(isControlLocationSelectionToolEnabled);
 
   const geocoderControl = useRef(
     new MapboxGeocoder({
@@ -134,17 +140,34 @@ function Map({
     }
   };
 
+  useEffect(() => {
+    isControlLocationSelectionToolEnabledRef.current = isControlLocationSelectionToolEnabled;
+  }, [isControlLocationSelectionToolEnabled]);
+
   const mapboxDrawControl = (mapInstance: mapboxgl.Map): void => {
     if (!handleMapDrawnPolygonChange) {
       return;
     }
+
+    const controlLocationSelectionToolDrawBarButton: DrawBarButton = {
+      on: 'click',
+      title: 'Control Location tool',
+      buttonIconPath: mdiMapMarker,
+      action: () => {
+        // cannot reference the state variable directly inside of an inline function
+        const isEnabled: boolean = isControlLocationSelectionToolEnabledRef.current;
+        if (isEnabled) {
+          drawControlStateRef.current?.changeMode('draw_point');
+        } else {
+          toast.error('Only one Control Location is allowed.');
+        }
+      },
+    };
+
     const dc = new ExtendedMapboxDraw({
       props: {
         displayControlsDefault: false,
         controls: {
-          // These controls must be enabled to allow the custom draw modes to work.
-          // Enabling this functionality also has the side effect of adding the corresponding buttons to the draw bar
-          polygon: true,
           trash: true,
         },
         modes: {
@@ -156,6 +179,15 @@ function Map({
       },
       // these buttons are rendered in reverse order
       buttons: [
+        {
+          on: 'click',
+          title: 'Polygon tool',
+          buttonIconPath: mdiVectorPolygon,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_polygon');
+          },
+        },
+        ...(isControlLocationSelectionToolDisplayed ? [controlLocationSelectionToolDrawBarButton] : []),
         {
           on: 'click',
           title: 'Rectangle tool',
@@ -179,7 +211,14 @@ function Map({
 
     const callback = () => {
       if (handleMapDrawnPolygonChange) {
-        handleMapDrawnPolygonChange(dc.getAll().features);
+        const allFeatures = dc.getAll().features;
+
+        for (const feature of allFeatures) {
+          // limit decimal precision
+          feature.geometry = truncate(feature.geometry, { precision: 6 });
+        }
+
+        handleMapDrawnPolygonChange(allFeatures);
       }
     };
 
@@ -550,24 +589,39 @@ function Map({
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
       maxZoom: mapBoundSettings.maxZoom,
+      duration: mapBoundSettings.duration ?? 5000,
     });
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) {
+    if (!map || !conservationApplicationPolygonLabelFeatures) {
       return;
     }
 
-    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
-
-    source?.setData({
+    const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    polygonSource?.setData({
       type: 'FeatureCollection',
-      features: polygonLabelFeatures,
+      features: conservationApplicationPolygonLabelFeatures,
     });
 
     // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
     map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-  }, [map, polygonLabelFeatures]);
+  }, [map, conservationApplicationPolygonLabelFeatures]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    pointSource?.setData({
+      type: 'FeatureCollection',
+      features: conservationApplicationPointLabelFeature ? [conservationApplicationPointLabelFeature] : [],
+    });
+
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
@@ -623,7 +677,6 @@ function Map({
           dropRef(el);
         }}
       ></div>
-      <ToastContainer />
     </div>
   );
 }

@@ -36,19 +36,24 @@ export function ApplicationCreatePage() {
     }
   };
 
+  const pageHeaderInstructions =
+    'Complete the below fields in order to submit your application to your state agency for verification. Be sure everything is filled out accurately and truthfully.';
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
         navigateBack={navigateToEstimationToolPage}
         backButtonText="Back to Estimator"
-        centerText="Water Conservation Estimation Tool"
+        centerText="New Application"
+        centerTextIsLoading={false}
+        displayWaterIcon={false}
       />
 
       <div className="overflow-y-auto">
         <div className="container">
-          <ApplicationReviewHeader perspective={perspective} />
-          <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
-          <ApplicationDocumentSection readOnly={false} />
+          <ApplicationReviewHeader additionalText={pageHeaderInstructions} />
+          <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
+          <ApplicationDocumentSection perspective={perspective} readOnly={false} />
           <ApplicantButtonRow handleSubmitClicked={handleSubmitClicked} />
         </div>
       </div>

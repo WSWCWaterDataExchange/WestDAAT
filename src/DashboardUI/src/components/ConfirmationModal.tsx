@@ -9,6 +9,7 @@ interface ConfirmationModalProps {
   cancelText: string;
   confirmText: string;
   children: React.ReactNode;
+  disableActionButtons?: boolean;
 }
 
 function ConfirmationModal(props: ConfirmationModalProps) {
@@ -19,10 +20,10 @@ function ConfirmationModal(props: ConfirmationModalProps) {
       </Modal.Header>
       <Modal.Body>{props.children}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onCancel}>
+        <Button variant="secondary" onClick={props.onCancel} disabled={props.disableActionButtons}>
           {props.cancelText}
         </Button>
-        <Button variant="primary" onClick={props.onConfirm}>
+        <Button variant="primary" onClick={props.onConfirm} disabled={props.disableActionButtons}>
           {props.confirmText}
         </Button>
       </Modal.Footer>

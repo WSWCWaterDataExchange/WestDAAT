@@ -17,8 +17,8 @@ public class ApplicantConservationApplicationLoadRequestHandler : IRequestHandle
 
     public async Task<ApplicantConservationApplicationLoadResponse> Handle(ApplicantConservationApplicationLoadRequest request)
     {
-        var dtoRequest = request.Map<Common.DataContracts.ApplicationLoadSingleRequest>();
-        var dtoResponse = (Common.DataContracts.ApplicationLoadSingleResponse)await ApplicationAccessor.Load(dtoRequest);
+        var dtoRequest = request.Map<DTO.ApplicationLoadSingleRequest>();
+        var dtoResponse = (DTO.ApplicationLoadSingleResponse)await ApplicationAccessor.Load(dtoRequest);
 
         // applicants cannot view notes
         dtoResponse.Application.Notes = null;

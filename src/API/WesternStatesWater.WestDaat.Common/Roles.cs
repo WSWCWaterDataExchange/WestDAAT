@@ -2,7 +2,7 @@ namespace WesternStatesWater.WestDaat.Common;
 
 public static class Roles
 {
-    public const string Member = "Member";
+    public const string OrganizationMember = "OrganizationMember";
 
     public const string TechnicalReviewer = "TechnicalReviewer";
     

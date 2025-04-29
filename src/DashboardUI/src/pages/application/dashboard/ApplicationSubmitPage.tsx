@@ -1,16 +1,19 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import Button from 'react-bootstrap/esm/Button';
-import Modal from 'react-bootstrap/esm/Modal';
-import { useState } from 'react';
-import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
-import { submitApplication } from '../../../accessors/applicationAccessor';
+import { useState } from 'react';
+import Button from 'react-bootstrap/esm/Button';
+import { useMutation } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
-import ApplicationReviewForm from '../components/ApplicationReviewForm';
+import { submitApplication } from '../../../accessors/applicationAccessor';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
+import GenericLoadingForm from '../../../components/GenericLoadingForm';
 
 export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
@@ -32,7 +35,7 @@ export function ApplicationSubmitPage() {
     if (state.isCreatingApplication) {
       navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
     } else {
-      history.back();
+      navigateToWaterRightLandingPage();
     }
   };
 
@@ -71,7 +74,7 @@ export function ApplicationSubmitPage() {
   };
 
   const handleModalConfirm = async () => {
-    await submitApplicationMutation.mutateAsync();
+    await submitApplicationMutation.mutate();
   };
 
   return (
@@ -79,14 +82,36 @@ export function ApplicationSubmitPage() {
       <ApplicationNavbar
         navigateBack={navigateBack}
         backButtonText={state.isCreatingApplication ? 'Back to Application' : 'Back'}
-        centerText="Water Conservation Estimation Tool"
+        centerText={`Application for Water Right Native ID: ${state.conservationApplication.waterRightNativeId}`}
+        centerTextIsLoading={isApplicationLoading || isFundingOrganizationLoading}
+        displayWaterIcon={false}
       />
 
       <div className="overflow-y-auto">
-        <ApplicationReviewForm
-          submitApplication={presentConfirmationModal}
-          isLoading={isApplicationLoading || isFundingOrganizationLoading}
-        />
+        <div className="container">
+          <ApplicationReviewHeader />
+
+          {isApplicationLoading || isFundingOrganizationLoading ? (
+            <GenericLoadingForm />
+          ) : (
+            <>
+              <ApplicationSubmissionFormDisplay />
+              <ApplicationDocumentSection readOnly={true} perspective={'applicant'} />
+
+              {state.isCreatingApplication && (
+                <>
+                  <ApplicationFormSectionRule width={2} />
+
+                  <div className="d-flex justify-content-end p-3">
+                    <Button variant="success" type="button" onClick={presentConfirmationModal}>
+                      Submit
+                    </Button>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <ConfirmationModal
@@ -96,6 +121,7 @@ export function ApplicationSubmitPage() {
         titleText="Submit for Review?"
         cancelText="Cancel"
         confirmText="Submit"
+        disableActionButtons={submitApplicationMutation.isLoading}
       >
         <div className="mb-2">
           Are you sure you want to submit this application? Once submitted, the application cannot be edited or resent.

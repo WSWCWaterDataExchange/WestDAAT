@@ -1,10 +1,11 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import {
   applicationSearch,
   createWaterConservationApplication,
   getApplication,
+  reviewerEstimateConsumptiveUse,
 } from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
@@ -12,13 +13,16 @@ import { getOrganizationFundingDetails } from '../../accessors/organizationAcces
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
 import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
+import { MapPolygon } from '../../data-contracts/MapPolygon';
+import { ReviewerEstimateConsumptiveUseResponse } from '../../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 
-export function useLoadDashboardApplications(organizationIdFilter: string | null) {
+export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
 
   return useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(context, organizationIdFilter),
+    enabled: isEnabled,
     onSuccess(data) {
       dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
     },
@@ -64,7 +68,10 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
   return useQuery(
     ['fundingOrganizationDetails', waterRightNativeId],
-    () => getOrganizationFundingDetails(context, waterRightNativeId!),
+    async () => {
+      dispatch({ type: 'FUNDING_ORGANIZATION_LOADING' });
+      return await getOrganizationFundingDetails(context, waterRightNativeId!);
+    },
     {
       enabled: !!waterRightNativeId,
       onSuccess: (result: OrganizationFundingDetailsResponse) => {
@@ -99,11 +106,14 @@ export function useGetApplicationQuery(
 
   return useQuery(
     ['getApplication', applicationId, perspective],
-    () =>
-      getApplication(context, {
+    async () => {
+      dispatch({ type: 'APPLICATION_LOADING' });
+
+      return await getApplication(context, {
         applicationId: applicationId!,
         perspective,
-      }),
+      });
+    },
     {
       enabled: !!applicationId && isQueryEnabled,
       // do not cache data. results should always be fresh in case another user updates the application
@@ -114,12 +124,78 @@ export function useGetApplicationQuery(
           payload: {
             application: result.application,
             notes: result.notes ?? [],
+            reviewPipeline: result.reviewPipeline ?? { reviewSteps: [] },
           },
         });
       },
       onError: (error: Error) => {
+        console.error('Error loading application data:', error);
         toast.error('Failed to load Application data. Please try again later.');
+        dispatch({ type: 'APPLICATION_LOAD_ERRORED' });
       },
     },
   );
+}
+
+export function useReviewerEstimateConsumptiveUseMutation() {
+  const msalContext = useMsal();
+  const { state, dispatch } = useConservationApplicationContext();
+
+  const mutation = useMutation({
+    mutationFn: async (options: { updateEstimate: boolean }) => {
+      dispatch({
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_STARTED',
+      });
+
+      const apiCallFields: Parameters<typeof reviewerEstimateConsumptiveUse>[1] = {
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
+        polygons: state.conservationApplication.estimateLocations.map(
+          (polygon): MapPolygon => ({
+            waterConservationApplicationEstimateLocationId:
+              polygon.waterConservationApplicationEstimateLocationId ?? null,
+            polygonWkt: polygon.polygonWkt!,
+            drawToolType: polygon.drawToolType!,
+          }),
+        ),
+        controlLocation: {
+          pointWkt: state.conservationApplication.controlLocation!.pointWkt!,
+        },
+        updateEstimate: options.updateEstimate,
+      };
+
+      const result = await reviewerEstimateConsumptiveUse(msalContext, apiCallFields);
+      return { result, estimateWasSaved: options.updateEstimate };
+    },
+    onSuccess: (data: { result: ReviewerEstimateConsumptiveUseResponse, estimateWasSaved: boolean }) => {
+      const { result, estimateWasSaved } = data;
+      if (result) {
+        dispatch({
+          type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
+          payload: {
+            cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
+            cumulativeNetEtInAcreFeet: result.cumulativeNetEtInAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+            controlDataCollection: result.controlDataCollection,
+            estimateWasSaved
+          },
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to estimate consumptive use. Please try again later.');
+
+      dispatch({
+        type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATE_ERRORED',
+      });
+    },
+    mutationKey: ['reviewer-estimate-consumptive-use'],
+  });
+
+  // only exposing these methods forces the caller to reference state to get the mutation status
+  // this is necessary because even if we return the state value here, it will be stale
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+  };
 }
