@@ -13,4 +13,5 @@ export interface ApplicationDetails {
   submission: SubmissionDetails;
   supportingDocuments: SupportingDocumentDetails[];
   status: ConservationApplicationStatus;
+  mapImageUrl: string;
 }

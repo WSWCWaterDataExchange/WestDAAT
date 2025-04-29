@@ -21,6 +21,8 @@ public class ApplicationDetails
     public SupportingDocumentDetails[] SupportingDocuments { get; set; } = null!;
 
     public ConservationApplicationStatus Status { get; set; }
+    
+    public Uri MapImageUrl { get; set; } = null!;
 
     // JsonIgnore so the json is never sent to the client.
     // This is mapped to two separate client contracts.

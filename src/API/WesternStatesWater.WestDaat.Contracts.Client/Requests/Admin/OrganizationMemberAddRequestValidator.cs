@@ -14,7 +14,7 @@ public class OrganizationMemberAddRequestValidator : AbstractValidator<Organizat
         RuleFor(x => x.Role)
             .Must(role =>
             {
-                string[] allowedRoles = [Roles.Member, Roles.OrganizationAdmin, Roles.TechnicalReviewer];
+                string[] allowedRoles = [Roles.OrganizationMember, Roles.OrganizationAdmin, Roles.TechnicalReviewer];
                 return allowedRoles.Contains(role);
             })
             .WithMessage("Role not allowed.");

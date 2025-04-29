@@ -63,7 +63,7 @@ describe('AuthorizedTemplate', () => {
       user: {
         userId: '123',
         emailAddress: 'wesley@westdaat.com',
-        roles: [Role.Member],
+        roles: [Role.OrganizationMember],
         organizationRoles: [],
       },
     });
@@ -85,7 +85,7 @@ describe('AuthorizedTemplate', () => {
     });
 
     const { queryByText } = render(
-      <AuthorizedTemplate roles={[Role.Member]}>
+      <AuthorizedTemplate roles={[Role.OrganizationMember]}>
         <div>Authorized Content</div>
       </AuthorizedTemplate>,
     );
