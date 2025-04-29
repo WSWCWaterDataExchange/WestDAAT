@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -42,7 +42,8 @@ import './map.scss';
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeature?: Feature<Point, GeoJsonProperties> | undefined;
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
@@ -55,7 +56,8 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  polygonLabelFeatures,
+  conservationApplicationPolygonLabelFeatures,
+  conservationApplicationPointLabelFeature,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
@@ -88,6 +90,8 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setUserDrawnPolygonData,
+    addGeometriesToMap,
     setExportToPngFn,
   } = useMapContext();
 
@@ -253,6 +257,26 @@ function Map({
     }
   }, [map, uploadedGeoJSON]);
 
+  const addGeometriesToMapCallback = useCallback(
+    (geoJsonData: Feature<Geometry, GeoJsonProperties>[]) => {
+      if (drawControl && geoJsonData.length > 0) {
+        geoJsonData.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
+          drawControl.add(feature);
+        });
+
+        const allFeatures = drawControl.getAll().features;
+        if (allFeatures.length > 0) {
+          handleMapDrawnPolygonChange?.(allFeatures);
+        }
+      }
+    },
+    [drawControl, handleMapDrawnPolygonChange],
+  );
+
+  useEffect(() => {
+    addGeometriesToMap.current = addGeometriesToMapCallback;
+  }, [addGeometriesToMapCallback]);
+
   useEffect(() => {
     setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -353,8 +377,10 @@ function Map({
   useEffect(() => {
     if (!map) return;
     setMapRenderedFeatures(map);
-    mapConfig.layers.forEach((a) => {
-      map.on('click', a.id, (e) => {
+    map.on(
+      'click',
+      mapConfig.layers.map((m) => m.id),
+      (e) => {
         if (e.features && e.features.length > 0) {
           // prevent click event if one of the drawing tools are active
           if (drawControl?.getMode().startsWith('draw')) {
@@ -364,12 +390,14 @@ function Map({
           setMapClickedFeatures({
             latitude: e.lngLat.lat,
             longitude: e.lngLat.lng,
-            layer: a.id,
+            layer: '',
             features: e.features,
           });
         }
-      });
+      },
+    );
 
+    mapConfig.layers.forEach((a) => {
       map.on('mouseenter', a.id, (e) => {
         if (e.features && e.features.length > 0) {
           map.getCanvas().style.cursor = 'pointer';
@@ -504,8 +532,18 @@ function Map({
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
 
-    map.once('styledata', () => {
-      newPolygons.forEach((polygon) => drawControl.add(polygon));
+    if (newPolygons.length === 0) {
+      return;
+    }
+
+    map.once('idle', () => {
+      while (!map.isStyleLoaded()) {
+        continue;
+      }
+      newPolygons.forEach(drawControl.add);
+
+      // clear the polygons from the state
+      setUserDrawnPolygonData([]);
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
@@ -593,20 +631,34 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) {
+    if (!map || !conservationApplicationPolygonLabelFeatures) {
       return;
     }
 
-    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
-
-    source?.setData({
+    const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    polygonSource?.setData({
       type: 'FeatureCollection',
-      features: polygonLabelFeatures,
+      features: conservationApplicationPolygonLabelFeatures,
     });
 
     // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
     map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-  }, [map, polygonLabelFeatures]);
+  }, [map, conservationApplicationPolygonLabelFeatures]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    pointSource?.setData({
+      type: 'FeatureCollection',
+      features: conservationApplicationPointLabelFeature ? [conservationApplicationPointLabelFeature] : [],
+    });
+
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

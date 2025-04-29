@@ -1,5 +1,3 @@
-import './geometryHelpers.mock';
-
 import { Feature, GeoJsonProperties, Point, Polygon } from 'geojson';
 import { doesPointExistWithinPolygon, doPolygonsIntersect } from './geometryHelpers';
 

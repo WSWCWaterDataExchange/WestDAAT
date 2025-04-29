@@ -1,66 +1,35 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import useNldiClickedOnMap, { NldiSiteData } from './useNldiClickedOnMap';
-import NldiSiteCard from '../../components/map-popups/NldiSiteCard';
-import SiteDigestCard from '../../components/map-popups/SiteDigestCard';
-import { useSiteDigest } from '../queries';
-import LoadingCard from '../../components/map-popups/LoadingCard';
-import ErrorCard from '../../components/map-popups/ErrorCard';
+import React, { useEffect, useCallback } from 'react';
+import useSiteClickedOnMap, { ProcessedFeature } from './useSiteClickedOnMap';
+import NldiSiteCard, { NldiSiteCardProps } from '../../components/map-popups/NldiSiteCard';
 
 function useNldiMapPopup() {
-  const { updatePopup, nldiData } = useNldiClickedOnMap();
-  const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
+  const { updatePopup, features } = useSiteClickedOnMap();
 
-  const { data: siteData, isFetching } = useSiteDigest(
-    nldiData && (nldiData as NldiSiteData).isTimeSeries ? nldiData.identifier : '',
-  );
-
-  const result = useMemo(() => {
-    if (!nldiData) return undefined;
-
-    if ((nldiData as NldiSiteData).isTimeSeries) {
-      if (isFetching) {
-        return (
-          <LoadingCard
-            onClosePopup={handleClosePopup}
-            loadingText={`Retrieving site data for ${(nldiData as NldiSiteData).identifier}`}
-          />
-        );
-      }
-      if (!siteData) {
-        return (
-          <ErrorCard
-            onClosePopup={handleClosePopup}
-            errorText={`Unable to find site data for ${(nldiData as NldiSiteData).identifier}`}
-          />
-        );
-      }
-      return (
-        <SiteDigestCard
-          site={siteData}
-          currentIndex={0}
-          onSelectedIndexChanged={() => {}}
-          onClosePopup={handleClosePopup}
-        />
-      );
-    }
-
-    return (
-      <NldiSiteCard
-        sourceName={(nldiData as NldiSiteData).sourceName}
-        identifier={(nldiData as NldiSiteData).identifier}
-        uri={(nldiData as NldiSiteData).uri}
-        name={(nldiData as NldiSiteData).name}
-        onClosePopup={handleClosePopup}
-      />
-    );
-  }, [nldiData, siteData, isFetching, handleClosePopup]);
+  const handleClosePopup = useCallback(() => {
+    updatePopup(undefined);
+  }, [updatePopup]);
 
   useEffect(() => {
-    if (result) {
-      updatePopup(result);
+    const nldiFeature = features.find((f): f is ProcessedFeature & { type: 'nldi' } => f.type === 'nldi');
+    if (!nldiFeature) {
+      updatePopup(undefined);
+      return;
     }
-  }, [result, updatePopup]);
+
+    const { nldiData } = nldiFeature;
+    const props: NldiSiteCardProps = {
+      sourceName: nldiData.sourceName,
+      identifier: nldiData.identifier,
+      uri: nldiData.uri,
+      name: nldiData.name,
+      onClosePopup: handleClosePopup,
+      isTimeSeries: nldiData.isTimeSeries || false,
+    };
+
+    updatePopup(<NldiSiteCard {...props} />);
+  }, [features, updatePopup, handleClosePopup]);
 
   return null;
 }
+
 export default useNldiMapPopup;
