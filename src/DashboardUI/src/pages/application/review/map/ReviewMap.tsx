@@ -108,13 +108,13 @@ function ReviewMap(props: ReviewMapProps) {
     ];
     setUserDrawnPolygonData(allFeatures);
 
-    // zoom map in to focus on polygons
-    const userDrawnPolygonFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+    // zoom map in to focus on polygons + control location
+    const allFeaturesCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonFeatures,
+      features: allFeatures,
     };
     setMapBoundSettings({
-      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
       padding: 25,
       maxZoom: 16,
       duration: 2000,
