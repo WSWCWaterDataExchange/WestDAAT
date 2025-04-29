@@ -583,10 +583,12 @@ function Map({
     mapBoundSettings.LngLatBounds.forEach((x) => {
       bounds.extend(x);
     });
-    map.fitBounds(bounds, {
-      padding: mapBoundSettings.padding,
-      maxZoom: mapBoundSettings.maxZoom,
-      duration: mapBoundSettings.duration ?? 5000,
+    map.once('idle', () => {
+      map.fitBounds(bounds, {
+        padding: mapBoundSettings.padding,
+        maxZoom: mapBoundSettings.maxZoom,
+        duration: mapBoundSettings.duration ?? 5000,
+      });
     });
   }, [map, mapBoundSettings]);
 
