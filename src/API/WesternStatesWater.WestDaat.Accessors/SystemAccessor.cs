@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Concurrent;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+
+
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -17,69 +21,67 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
-            var overlayTypesTask = GetOverlayTypes();
-            var overlayWaterSourcesTask = GetOverlayWaterSources();
-            var overlayStatesTask = GetOverlayStates();
-            var beneficialUsesTask = GetBeneficialUses();
-            var ownerClassificationsTask = GetOwnerClassifications();
-            var allocationTypesTask = GetAllocationTypes();
-            var legalStatusesTask = GetLegalStatuses();
-            var siteTypesTask = GetSiteTypes();
-            var waterSourcesTask = GetWaterSources();
-            var wrStatesTask = GetWrStates();
-            var tsSiteTypesTask = GetTsSiteTypes();
-            var tsPrimaryUsesTask = GetTsPrimaryUses();
-            var tsVariableTypesTask = GetTsVariableTypes();
-            var tsWaterSourcesTask = GetTsWaterSources();
-            var tsStatesTask = GetTsStates();
+            var results = new ConcurrentDictionary<string,object>();
+            var factories = new List<(string Key,Func<Task<object>> Factory)>
+            {
+                ("OverlayTypes",        async () => await GetOverlayTypes()),
+                ("OverlayWaterSources", async () => await GetOverlayWaterSources()),
+                ("OverlayStates",       async () => await GetOverlayStates()),
+                ("BeneficialUses",      async () => await GetBeneficialUses()),
+                ("OwnerClassifications",async () => await GetOwnerClassifications()),
+                ("AllocationTypes",     async () => await GetAllocationTypes()),
+                ("LegalStatuses",       async () => await GetLegalStatuses()),
+                ("SiteTypes",           async () => await GetSiteTypes()),
+                ("WaterSources",        async () => await GetWaterSources()),
+                ("WrStates",            async () => await GetWrStates()),
+                ("TsSiteTypes",         async () => await GetTsSiteTypes()),
+                ("TsPrimaryUses",       async () => await GetTsPrimaryUses()),
+                ("TsVariableTypes",     async () => await GetTsVariableTypes()),
+                ("TsWaterSources",      async () => await GetTsWaterSources()),
+                ("TsStates",            async () => await GetTsStates())
+            };
 
-            await Task.WhenAll(
-                overlayTypesTask,
-                overlayWaterSourcesTask,
-                overlayStatesTask,
-                beneficialUsesTask,
-                ownerClassificationsTask,
-                allocationTypesTask,
-                legalStatusesTask,
-                siteTypesTask,
-                waterSourcesTask,
-                wrStatesTask,
-                tsSiteTypesTask,
-                tsPrimaryUsesTask,
-                tsVariableTypesTask,
-                tsWaterSourcesTask,
-                tsStatesTask
+            async ValueTask ProcessFactory((string Key,Func<Task<object>> Factory) item, CancellationToken ct)
+            {
+                results[item.Key] = await item.Factory();
+            }
+
+            await Parallel.ForEachAsync(
+                factories,
+                new ParallelOptions { CancellationToken = CancellationToken.None },
+                ProcessFactory
             );
 
             return new DashboardFilters
             {
                 Overlays = new OverlayFilterSet
                 {
-                    OverlayTypes = overlayTypesTask.Result,
-                    WaterSourceTypes = overlayWaterSourcesTask.Result,
-                    States = overlayStatesTask.Result
+                    OverlayTypes      = (string[])results["OverlayTypes"],
+                    WaterSourceTypes  = (string[])results["OverlayWaterSources"],
+                    States            = (string[])results["OverlayStates"]
                 },
                 WaterRights = new WaterRightsFilterSet
                 {
-                    BeneficialUses = beneficialUsesTask.Result,
-                    OwnerClassifications = ownerClassificationsTask.Result,
-                    AllocationTypes = allocationTypesTask.Result,
-                    LegalStatuses = legalStatusesTask.Result,
-                    SiteTypes = siteTypesTask.Result,
-                    WaterSourceTypes = waterSourcesTask.Result,
-                    States = wrStatesTask.Result,
-                    RiverBasins = RiverBasinConstants.RiverBasinNames.ToArray()
+                    BeneficialUses       = (BeneficialUseItem[])results["BeneficialUses"],
+                    OwnerClassifications = (string[])results["OwnerClassifications"],
+                    AllocationTypes      = (string[])results["AllocationTypes"],
+                    LegalStatuses        = (string[])results["LegalStatuses"],
+                    SiteTypes            = (string[])results["SiteTypes"],
+                    WaterSourceTypes     = (string[])results["WaterSources"],
+                    States               = (string[])results["WrStates"],
+                    RiverBasins          = RiverBasinConstants.RiverBasinNames.ToArray()
                 },
                 TimeSeries = new TimeSeriesFilterSet
                 {
-                    SiteTypes = tsSiteTypesTask.Result,
-                    PrimaryUseCategories = tsPrimaryUsesTask.Result,
-                    VariableTypes = tsVariableTypesTask.Result,
-                    WaterSourceTypes = tsWaterSourcesTask.Result,
-                    States = tsStatesTask.Result
+                    SiteTypes            = (string[])results["TsSiteTypes"],
+                    PrimaryUseCategories = (string[])results["TsPrimaryUses"],
+                    VariableTypes        = (string[])results["TsVariableTypes"],
+                    WaterSourceTypes     = (string[])results["TsWaterSources"],
+                    States               = (string[])results["TsStates"]
                 }
             };
         }
+
         
         private static string[] SplitAndDistinct(string[] rawValues)
         {

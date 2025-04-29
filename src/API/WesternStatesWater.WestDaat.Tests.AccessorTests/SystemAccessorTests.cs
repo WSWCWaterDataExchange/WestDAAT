@@ -1,6 +1,6 @@
-﻿using WesternStatesWater.WestDaat.Accessors;
+﻿using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
-using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -55,8 +55,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
 
             // Act
-            DashboardFilters result;
-            result = await accessor.LoadFilters();
+            var result = await accessor.LoadFilters();
             var waterRights = result.WaterRights;
 
             // Assert
