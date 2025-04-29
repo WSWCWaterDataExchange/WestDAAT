@@ -43,6 +43,8 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle,
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
+    addGeometriesToMap,
+    exportToPngFn,
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
@@ -118,6 +120,13 @@ function ReviewMap(props: ReviewMapProps) {
       duration: 2000,
     });
 
+    if (exportToPngFn) {
+      exportToPngFn!({
+        height: 600,
+        width: 800,
+      });
+    }
+
     setHasInitializedMap(true);
   }, [
     userDrawnPolygonFeatures,
@@ -137,6 +146,38 @@ function ReviewMap(props: ReviewMapProps) {
       setIsControlLocationSelectionToolEnabled(false);
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addGeometriesToMap.current!(newFeatures);
+
+    // zoom to fit all data
+    const allFeatures = [
+      ...userDrawnPolygonFeatures,
+      ...newFeatures,
+      ...(controlLocationFeature ? [controlLocationFeature] : []),
+    ];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
     // irrigated field locations
@@ -201,10 +242,6 @@ function ReviewMap(props: ReviewMapProps) {
 
   const estimateButtonEnabled = state.canReviewerEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
-  const allLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
-    return userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
-  }, [userDrawnPolygonFeatures, controlLocationLabelFeature]);
-
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
@@ -237,7 +274,8 @@ function ReviewMap(props: ReviewMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={allLabelFeatures}
+        conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
+        conservationApplicationPointLabelFeature={controlLocationLabelFeature}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}

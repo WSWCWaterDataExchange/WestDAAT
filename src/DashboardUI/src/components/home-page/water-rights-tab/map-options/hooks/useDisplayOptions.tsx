@@ -6,8 +6,7 @@ import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useMapLegend } from './useMapLegend';
 import { useMapPointScaling } from './useMapPointScaling';
 import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
-import useSiteDigestMapPopup from '../../../../../hooks/map-popups/useSiteDigestMapPopup';
-import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
+import useUnifiedDigestPopup from "../../../../../hooks/map-popups/useUnifiedDigestPopup";
 import { useAlerts } from '../../useAlerts';
 import { useTimeSeriesFilter } from '../../sidebar-filtering/time-series/hooks/useTimeSeriesFilter';
 
@@ -26,6 +25,11 @@ const timeSeriesLayers = [
   mapLayerNames.timeSeriesPolygonsLayer
 ];
 
+const highlightLayers = [
+  'selected-feature-outline',
+  'selected-feature-point-outline',
+];
+
 export function useDisplayOptions() {
   const {
     filters: { riverBasinNames, isNldiFilterActive, isWaterRightsFilterActive },
@@ -37,6 +41,8 @@ export function useDisplayOptions() {
 
   useEffect(() => {
     const visible: string[] = [];
+
+    visible.push(...highlightLayers);
 
     if (isWaterRightsFilterActive) {
       visible.push(...baseLayers);
@@ -71,7 +77,6 @@ export function useDisplayOptions() {
   useMapLegend();
   useMapPointScaling();
   useNldiMapPopup();
-  useOverlayDigestMapPopup();
-  useSiteDigestMapPopup();
+  useUnifiedDigestPopup()
   useAlerts();
 }

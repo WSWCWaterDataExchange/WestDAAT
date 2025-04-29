@@ -23,7 +23,8 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs"
+      "axios": "axios/dist/node/axios.cjs",
+      "but-unzip": "<rootDir>/node_modules/shpjs/lib/unzip.js"
     },
     "transformIgnorePatterns": [
       "'node_modules/(?!d3)/'"

@@ -19,8 +19,9 @@ public class ApplicationMapImageUploadSasTokenRequestHandler : IRequestHandler<A
     {
         var blobName = request.WaterConservationApplicationId.ToString();
 
+        // Allow overwriting the blob if it already exists
         var sasUri = await _blobStorageSdk.GetSasUris(Containers.ApplicationMapImages, [blobName],
-            TimeSpan.FromMinutes(10), Azure.Storage.Sas.BlobContainerSasPermissions.Create);
+            TimeSpan.FromMinutes(10), Azure.Storage.Sas.BlobContainerSasPermissions.Write);
 
         var hostname = _blobStorageSdk.BlobServiceHostname();
 
