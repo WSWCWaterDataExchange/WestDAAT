@@ -659,11 +659,7 @@ function Map({
             // resize component for standard size screenshot
             mapContainer.style.width = options.width + 'px';
             mapContainer.style.height = options.height + 'px';
-            const mapContainerContainsHeightClass = mapContainer.classList.contains('h-100');
-            if (mapContainerContainsHeightClass) {
-              mapContainer.classList.remove('h-100');
-            }
-
+            mapContainer.classList.remove('h-100');
             map.resize();
 
             // fit map to bounding box set by the displayed features
@@ -697,9 +693,7 @@ function Map({
                 // reset style changes
                 mapContainer.style.width = '';
                 mapContainer.style.height = '';
-                if (mapContainerContainsHeightClass) {
-                  mapContainer.classList.add('h-100');
-                }
+                mapContainer.classList.add('h-100');
                 map.resize();
 
                 // return result
