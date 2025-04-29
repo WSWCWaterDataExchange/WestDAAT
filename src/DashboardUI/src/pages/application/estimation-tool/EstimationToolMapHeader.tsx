@@ -6,6 +6,10 @@ import { EstimationToolHelpVideo } from './EstimationToolHelpVideo';
 export function EstimationToolMapHeader() {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
+  const handleUploadClicked = () => {
+    alert('This feature will be implemented in a future release.');
+  };
+
   return (
     <div className="p-3 d-flex flex-column gap-2 d-print-none">
       <div>
@@ -25,10 +29,7 @@ export function EstimationToolMapHeader() {
       <div>
         <span className="me-2">Or, you can upload a file from your device.</span>
 
-        <Button
-          variant="outline-primary"
-          onClick={() => alert('This feature will be implemented in a future release.')}
-        >
+        <Button variant="outline-primary" onClick={handleUploadClicked}>
           Upload File
         </Button>
       </div>

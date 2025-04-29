@@ -11,6 +11,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
 import {
   defaultMapLocationData,
+  MapExportOptions,
   MapSettings,
   MapStyle,
   RenderedFeatureType,
@@ -38,10 +39,11 @@ import truncate from '@turf/truncate';
 
 import './map.scss';
 
-interface mapProps {
+interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
+  conservationApplicationPointLabelFeature?: Feature<Point, GeoJsonProperties> | undefined;
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
@@ -54,11 +56,12 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  polygonLabelFeatures,
+  conservationApplicationPolygonLabelFeatures,
+  conservationApplicationPointLabelFeature,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
-}: mapProps) {
+}: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -87,6 +90,7 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
+    setExportToPngFn,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -351,23 +355,23 @@ function Map({
   useEffect(() => {
     if (!map) return;
     setMapRenderedFeatures(map);
-    mapConfig.layers.forEach((a) => {
-      map.on('click', a.id, (e) => {
-        if (e.features && e.features.length > 0) {
-          // prevent click event if one of the drawing tools are active
-          if (drawControl?.getMode().startsWith('draw')) {
-            return;
-          }
-
-          setMapClickedFeatures({
-            latitude: e.lngLat.lat,
-            longitude: e.lngLat.lng,
-            layer: a.id,
-            features: e.features,
-          });
+    map.on('click', mapConfig.layers.map(m => m.id), (e) => {
+      if (e.features && e.features.length > 0) {
+        // prevent click event if one of the drawing tools are active
+        if (drawControl?.getMode().startsWith('draw')) {
+          return;
         }
-      });
 
+        setMapClickedFeatures({
+          latitude: e.lngLat.lat,
+          longitude: e.lngLat.lng,
+          layer: "",
+          features: e.features,
+        });
+      }
+    });
+
+    mapConfig.layers.forEach((a) => {
       map.on('mouseenter', a.id, (e) => {
         if (e.features && e.features.length > 0) {
           map.getCanvas().style.cursor = 'pointer';
@@ -379,6 +383,7 @@ function Map({
       });
     });
   }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
+
 
   useEffect(() => {
     if (!map) return;
@@ -593,20 +598,34 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) {
+    if (!map || !conservationApplicationPolygonLabelFeatures) {
       return;
     }
 
-    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
-
-    source?.setData({
+    const polygonSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+    polygonSource?.setData({
       type: 'FeatureCollection',
-      features: polygonLabelFeatures,
+      features: conservationApplicationPolygonLabelFeatures,
     });
 
     // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
     map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-  }, [map, polygonLabelFeatures]);
+  }, [map, conservationApplicationPolygonLabelFeatures]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const pointSource = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPointLabelsGeoJson);
+    pointSource?.setData({
+      type: 'FeatureCollection',
+      features: conservationApplicationPointLabelFeature ? [conservationApplicationPointLabelFeature] : [],
+    });
+
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPointLabelsLayer, 'visibility', 'visible');
+  }, [map, conservationApplicationPointLabelFeature]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
@@ -643,6 +662,37 @@ function Map({
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (!isMapRendering && map) {
+      map.once('idle', () => {
+        setExportToPngFn(() => (options: MapExportOptions) => {
+          const promise = new Promise<Blob | null>((resolve, reject) => {
+            const mapContainer = document.getElementById('map');
+
+            if (!mapContainer) {
+              throw new Error('Map container not found');
+              reject();
+            }
+
+            mapContainer!.style.width = options.width + 'px';
+            mapContainer!.style.height = options.height + 'px';
+            mapContainer?.classList.remove('h-100');
+            map.resize();
+
+            map.once('idle', async () => {
+              const canvas = map.getCanvas();
+              canvas.toBlob((blob: Blob | null) => {
+                resolve(blob);
+              });
+            });
+          });
+          
+          return promise;
+        });
+      });
+    }
+  }, [isMapRendering]);
 
   return (
     <div className="position-relative h-100">
