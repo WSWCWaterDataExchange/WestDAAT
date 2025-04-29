@@ -20,6 +20,16 @@ import './estimation-tool-page.scss';
 import { MapPolygon } from '../../../data-contracts/MapPolygon';
 import { useMapContext } from '../../../contexts/MapProvider';
 
+const blobToBase64 = (blob: Blob) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise((resolve) => {
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+  });
+};
+
 export function EstimationToolPage() {
   const context = useMsal();
   const navigate = useNavigate();
@@ -84,6 +94,15 @@ export function EstimationToolPage() {
             if (blob && applicationId) {
               const file = new File([blob], `${applicationId}.png`, { type: blob.type });
               uploadApplicationStaticMap(context, file, applicationId);
+
+              blobToBase64(blob).then((base64) => {
+                dispatch({
+                  type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
+                  payload: {
+                    mapImageUrl: base64 as string,
+                  },
+                });
+              });
             }
           });
         }

@@ -157,6 +157,7 @@ export type ApplicationAction =
   | ApplicationLoadedAction
   | ApplicationLoadErroredAction
   | ApplicationReviewerNoteAddedAction
+  | ApplicationMapStaticImageAddedAction
   | DataTableToggledAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -337,6 +338,13 @@ export interface ApplicationReviewerNoteAddedAction {
   };
 }
 
+export interface ApplicationMapStaticImageAddedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED';
+  payload: {
+    mapImageUrl: string;
+  };
+}
+
 export interface DataTableToggledAction {
   type: 'DATA_TABLE_TOGGLED';
 }
@@ -407,6 +415,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationLoadErrored(draftState);
     case 'APPLICATION_NOTE_ADDED':
       return onApplicationReviewerNoteAdded(draftState, action);
+    case 'APPLICATION_MAP_STATIC_IMAGE_ADDED':
+      return onApplicationMapStaticImageAdded(draftState, action);
     case 'DATA_TABLE_TOGGLED':
       return onDataTableToggled(draftState);
   }
@@ -1167,6 +1177,14 @@ const onApplicationReviewerNoteAdded = (
   action: ApplicationReviewerNoteAddedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.reviewerNotes.push(action.payload.note);
+  return draftState;
+};
+
+const onApplicationMapStaticImageAdded = (
+  draftState: ConservationApplicationState,
+  action: ApplicationMapStaticImageAddedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.mapImageUrl = action.payload.mapImageUrl;
   return draftState;
 };
 
