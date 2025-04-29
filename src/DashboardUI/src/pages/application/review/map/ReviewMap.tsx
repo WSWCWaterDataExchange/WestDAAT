@@ -43,6 +43,7 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle,
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
+    addGeometriesToMap,
     exportToPngFn,
   } = useMapContext();
 
@@ -148,6 +149,38 @@ function ReviewMap(props: ReviewMapProps) {
       setIsControlLocationSelectionToolEnabled(false);
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addGeometriesToMap.current!(newFeatures);
+
+    // zoom to fit all data
+    const allFeatures = [
+      ...userDrawnPolygonFeatures,
+      ...newFeatures,
+      ...(controlLocationFeature ? [controlLocationFeature] : []),
+    ];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 25,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
     // irrigated field locations

@@ -22,6 +22,7 @@ import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -46,6 +47,7 @@ export interface ConservationApplicationState {
     controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
     doesControlLocationOverlapWithPolygons: boolean;
+    polygonsAddedByFileUpload: PartialPolygonData[];
     // derived/computed state
     isDirty: boolean;
     isApplicationSubmissionFormValid: boolean;
@@ -101,6 +103,7 @@ export const defaultState = (): ConservationApplicationState => ({
     controlLocation: undefined,
     doPolygonsOverlap: false,
     doesControlLocationOverlapWithPolygons: false,
+    polygonsAddedByFileUpload: [],
     isDirty: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
@@ -134,6 +137,8 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
+  | GISFilePolygonsUploadedAction
+  | GISFilePolygonsProcessedAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
@@ -193,6 +198,17 @@ export interface FundingOrganizationLoadedAction {
 
 export interface FundingOrganizationLoadErrored {
   type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
+}
+
+export interface GISFilePolygonsUploadedAction {
+  type: 'GIS_FILE_POLYGONS_UPLOADED';
+  payload: {
+    polygons: MapSelectionPolygonData[];
+  };
+}
+
+export interface GISFilePolygonsProcessedAction {
+  type: 'GIS_FILE_POLYGONS_PROCESSED';
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -357,6 +373,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
+    case 'GIS_FILE_POLYGONS_UPLOADED':
+      return onGISFilePolygonsUploaded(draftState, action);
+    case 'GIS_FILE_POLYGONS_PROCESSED':
+      return onGISFilePolygonsProcessed(draftState);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
@@ -634,6 +654,38 @@ const onReviewerMapPolygonsUpdated = (
   updatePolygonAcreageSum(draftState);
   checkCanEstimateConsumptiveUse(draftState);
 
+  return draftState;
+};
+
+const onGISFilePolygonsUploaded = (
+  draftState: ConservationApplicationState,
+  { payload }: GISFilePolygonsUploadedAction,
+): ConservationApplicationState => {
+  // push new polygons to a separate queue to be processed
+  const newPolygons = payload.polygons.map(
+    (polygon): PartialPolygonData => ({
+      waterConservationApplicationEstimateLocationId: undefined,
+      polygonWkt: polygon.polygonWkt,
+      acreage: polygon.acreage,
+      drawToolType: DrawToolType.Freeform,
+      fieldName: undefined,
+      additionalDetails: undefined,
+      centerPoint: truncate(center(convertWktToGeometry(polygon.polygonWkt)), { precision: 6 }).geometry,
+      datapoints: [],
+      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyNetEtInAcreFeet: undefined,
+      averageYearlyNetEtInInches: undefined,
+    }),
+  );
+
+  draftState.conservationApplication.polygonsAddedByFileUpload.push(...newPolygons);
+
+  return draftState;
+};
+
+const onGISFilePolygonsProcessed = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.polygonsAddedByFileUpload = [];
   return draftState;
 };
 
