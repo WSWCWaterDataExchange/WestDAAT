@@ -35,11 +35,11 @@ import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
-
-import './map.scss';
 import Alert from 'react-bootstrap/esm/Alert';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Spinner from 'react-bootstrap/esm/Spinner';
+
+import './map.scss';
 
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
