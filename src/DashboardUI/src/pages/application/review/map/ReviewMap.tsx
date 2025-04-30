@@ -49,12 +49,14 @@ function ReviewMap(props: ReviewMapProps) {
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
 
+  const isPageLoading = state.isLoadingApplication || state.isLoadingFundingOrganization;
+
   useEffect(() => {
-    if (!isMapLoaded) {
+    if (isPageLoading || !isMapLoaded) {
       return;
     }
     setMapStyle(MapStyle.Satellite);
-  }, [isMapLoaded, setMapStyle]);
+  }, [isPageLoading, isMapLoaded, setMapStyle]);
 
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
     return state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
@@ -95,7 +97,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [controlLocationFeature, controlLocationFeature?.geometry]);
 
   useEffect(() => {
-    if (!userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
+    if (isPageLoading || !userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
       return;
     }
 
@@ -108,14 +110,14 @@ function ReviewMap(props: ReviewMapProps) {
     ];
     setUserDrawnPolygonData(allFeatures);
 
-    // zoom map in to focus on polygons
-    const userDrawnPolygonFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+    // zoom map in to focus on polygons + control location
+    const allFeaturesCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonFeatures,
+      features: allFeatures,
     };
     setMapBoundSettings({
-      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 25,
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
+      padding: 200,
       maxZoom: 16,
       duration: 2000,
     });
@@ -129,6 +131,7 @@ function ReviewMap(props: ReviewMapProps) {
 
     setHasInitializedMap(true);
   }, [
+    isPageLoading,
     userDrawnPolygonFeatures,
     controlLocationFeature,
     isMapLoaded,
@@ -169,7 +172,7 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 25,
+      padding: 200,
       maxZoom: 16,
       duration: 5000,
     });
