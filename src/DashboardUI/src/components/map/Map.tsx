@@ -31,7 +31,7 @@ import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
-import { Alert } from 'react-bootstrap';
+import { Alert, Placeholder, Spinner } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
@@ -47,6 +47,7 @@ interface MapProps {
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
+  showLoading?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -61,6 +62,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
+  showLoading,
 }: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -703,6 +705,18 @@ function Map({
     </div>
   );
 
+  const mapLoading = (
+    <div
+      style={{ zIndex: 1000 }}
+      className={`w-100 h-100 position-absolute bg-white d-flex flex-column justify-content-center align-items-center`}
+    >
+      <Placeholder as="div" animation="glow" className="w-100 h-100 position-absolute">
+        <Placeholder xs={12} className="w-100 h-100" />
+      </Placeholder>
+      <Spinner animation="border" className="text-primary" />
+    </div>
+  );
+
   useEffect(() => {
     if (!isMapRendering && map) {
       map.once('idle', () => {
@@ -781,6 +795,9 @@ function Map({
       {legend && map && <div className={`legend ${legendClass}`}>{legend}</div>}
 
       {map && mapAlert}
+
+      {showLoading && mapLoading}
+
       <div
         id="map"
         className="map h-100"

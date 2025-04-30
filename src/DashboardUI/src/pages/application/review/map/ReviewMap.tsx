@@ -270,18 +270,6 @@ function ReviewMap(props: ReviewMapProps) {
           </Dropdown>
         </div>
 
-        {state.isGeneratingMapImage && (
-          <div
-            style={{ zIndex: 10000 }}
-            className={`w-100 h-100 position-absolute bg-white d-flex flex-column justify-content-center align-items-center`}
-          >
-            <Placeholder as="div" animation="glow" className="w-100 h-100 position-absolute">
-              <Placeholder xs={12} className="w-100 h-100" />
-            </Placeholder>
-            <Spinner animation="border" className="text-primary" />
-          </div>
-        )}
-
         <Map
           handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
           conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
@@ -289,6 +277,7 @@ function ReviewMap(props: ReviewMapProps) {
           isConsumptiveUseAlertEnabled={false}
           isGeocoderInputFeatureEnabled={false}
           isControlLocationSelectionToolDisplayed={true}
+          showLoading={state.isGeneratingMapImage}
         />
         <EstimationToolTableView perspective="reviewer" />
       </div>
