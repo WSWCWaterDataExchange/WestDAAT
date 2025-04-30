@@ -85,6 +85,7 @@ export const CustomCircleDrawMode: DrawCustomMode = {
 
   onStop: function (state: CircleDrawModeState) {
     // no cleanup needed. we do want to leave this method in place to prevent the default behavior though
+    // we do not need to clean up because we did not call `this.addFeature` in `onSetup`,
   },
 
   toDisplayFeatures: function (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) {
