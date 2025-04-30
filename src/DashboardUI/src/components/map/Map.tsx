@@ -31,13 +31,15 @@ import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
-import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
 
 import './map.scss';
+import Alert from 'react-bootstrap/esm/Alert';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -47,6 +49,7 @@ interface MapProps {
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
+  showLoading?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -61,6 +64,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
+  showLoading,
 }: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -703,12 +707,27 @@ function Map({
     </div>
   );
 
+  const mapLoading = (
+    <div
+      style={{ zIndex: 1000 }}
+      className={`w-100 h-100 position-absolute bg-white d-flex flex-column justify-content-center align-items-center`}
+    >
+      <Placeholder as="div" animation="glow" className="w-100 h-100 position-absolute">
+        <Placeholder xs={12} className="w-100 h-100" />
+      </Placeholder>
+      <Spinner animation="border" className="text-primary" />
+    </div>
+  );
+
   useEffect(() => {
     if (!isMapRendering && map) {
       map.once('idle', () => {
         setExportToPngFn(() => (options: MapExportOptions) => {
           const promise = new Promise<Blob | null>((resolve, reject) => {
             const mapContainer = document.getElementById('map');
+
+            const originalWidth = mapContainer?.style.width;
+            const originalHeight = mapContainer?.style.height;
 
             if (!mapContainer) {
               reject(new Error('Map container not found'));
@@ -750,8 +769,8 @@ function Map({
               const canvas = map.getCanvas();
               canvas.toBlob((blob: Blob | null) => {
                 // reset style changes
-                mapContainer.style.width = '';
-                mapContainer.style.height = '';
+                mapContainer.style.width = originalWidth!;
+                mapContainer.style.height = originalHeight!;
                 mapContainer.classList.add('h-100');
                 map.resize();
 
@@ -778,6 +797,9 @@ function Map({
       {legend && map && <div className={`legend ${legendClass}`}>{legend}</div>}
 
       {map && mapAlert}
+
+      {showLoading && mapLoading}
+
       <div
         id="map"
         className="map h-100"

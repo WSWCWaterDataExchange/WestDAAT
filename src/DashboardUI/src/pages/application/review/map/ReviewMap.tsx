@@ -267,6 +267,7 @@ function ReviewMap(props: ReviewMapProps) {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
         conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
@@ -274,6 +275,7 @@ function ReviewMap(props: ReviewMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
+        showLoading={state.isGeneratingMapImage}
       />
       <EstimationToolTableView perspective="reviewer" />
     </div>

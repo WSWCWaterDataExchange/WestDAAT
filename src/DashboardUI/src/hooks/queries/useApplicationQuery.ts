@@ -185,6 +185,14 @@ export function useReviewerEstimateConsumptiveUseMutation() {
         });
 
         if (estimateWasSaved && mapContext.exportToPngFn) {
+          // TODO also apply to the applicant map generate area
+          // TODO also apply to the applicant map generate area
+          // TODO also apply to the applicant map generate area
+          // TODO also apply to the applicant map generate area
+          dispatch({
+            type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED',
+          });
+
           mapContext
             .exportToPngFn({
               height: 400,
@@ -196,6 +204,11 @@ export function useReviewerEstimateConsumptiveUseMutation() {
                 const file = new File([blob], `${applicationId}.png`, { type: blob.type });
                 uploadApplicationStaticMap(msalContext, file, applicationId);
               }
+            })
+            .finally(() => {
+              dispatch({
+                type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED',
+              });
             });
         }
       }
