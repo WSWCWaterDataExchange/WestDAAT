@@ -86,25 +86,35 @@ export function EstimationToolPage() {
 
         const wasDataSavedToDatabase = data.compensationRateDollars && data.units;
         if (wasDataSavedToDatabase) {
+          dispatch({
+            type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED',
+          });
+
           mapContext.exportToPngFn!({
             height: 400,
             width: 600,
-          }).then((blob) => {
-            const applicationId = state.conservationApplication.waterConservationApplicationId;
-            if (blob && applicationId) {
-              const file = new File([blob], `${applicationId}.png`, { type: blob.type });
-              uploadApplicationStaticMap(context, file, applicationId);
+          })
+            .then((blob) => {
+              const applicationId = state.conservationApplication.waterConservationApplicationId;
+              if (blob && applicationId) {
+                const file = new File([blob], `${applicationId}.png`, { type: blob.type });
+                uploadApplicationStaticMap(context, file, applicationId);
 
-              blobToBase64(blob).then((base64) => {
-                dispatch({
-                  type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
-                  payload: {
-                    mapImageUrl: base64 as string,
-                  },
+                blobToBase64(blob).then((base64) => {
+                  dispatch({
+                    type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
+                    payload: {
+                      mapImageUrl: base64 as string,
+                    },
+                  });
                 });
+              }
+            })
+            .finally(() => {
+              dispatch({
+                type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED',
               });
-            }
-          });
+            });
         }
       }
     },
