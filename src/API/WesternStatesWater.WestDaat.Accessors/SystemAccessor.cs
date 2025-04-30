@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Transactions;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common.Constants;
@@ -43,16 +39,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                 ("TsStates", async () => await GetTsStates())
             };
 
-            async ValueTask ProcessFactory((string Key, Func<Task<object>> Factory) item, CancellationToken ct)
+            foreach (var item in factories)
             {
-                results[item.Key] = await item.Factory();
+                    results[item.Key] = await item.Factory();
             }
-
-            await Parallel.ForEachAsync(
-                factories,
-                new ParallelOptions { CancellationToken = CancellationToken.None },
-                ProcessFactory
-            );
 
             return new DashboardFilters
             {
@@ -84,259 +74,254 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private static string[] SplitAndDistinct(string[] rawValues)
-        {
-            return rawValues?
-                       .Where(x => !string.IsNullOrEmpty(x))
-                       .SelectMany(x => x.Split("||", StringSplitOptions.RemoveEmptyEntries))
-                       .Distinct()
-                       .OrderBy(x => x)
-                       .ToArray()
-                   ?? Array.Empty<string>();
-        }
-
         private async Task<string[]> GetOverlayTypes()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.OverlaysViews
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.OverlayTypeWaDEName))
-                    .Select(x => x.OverlayTypeWaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.ReportingUnitsDim
+                .AsNoTracking()
+                .Join(db.OverlayReportingUnitsFact,
+                    rud => rud.ReportingUnitId,
+                    rruf => rruf.ReportingUnitId,
+                    (rud, rruf) => rruf)
+                .Join(db.OverlayDim,
+                    rruf => rruf.OverlayId,
+                    rod => rod.OverlayId,
+                    (rruf, rod) => rod)
+                .Join(db.OverlayTypeCv,
+                    rod => rod.OverlayTypeCV,
+                    rotcv => rotcv.Name,
+                    (rod, rotcv) => rotcv.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetOverlayWaterSources()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.OverlaysViews
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.WaterSourceTypeWaDEName))
-                    .Select(x => x.WaterSourceTypeWaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.OverlaysViews
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrEmpty(x.WaterSourceTypeWaDEName))
+                .Select(x => x.WaterSourceTypeWaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetOverlayStates()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.OverlaysViews
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.State))
-                    .Select(x => x.State)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.ReportingUnitsDim
+                .AsNoTracking()
+                .Where(rud => !string.IsNullOrEmpty(rud.StateCv))
+                .Select(rud => rud.StateCv.Trim())
+                .Distinct()
+                .OrderBy(state => state)
+                .ToArrayAsync();
         }
 
         private async Task<BeneficialUseItem[]> GetBeneficialUses()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var rawUses = await db.BeneficialUsesCV
-                    .AsNoTracking()
-                    .Where(cv =>
-                        db.AllocationBridgeBeneficialUsesFact.Any(b => b.BeneficialUseCV == cv.Name) ||
-                        db.SitesBridgeBeneficialUsesFact.Any(s => s.BeneficialUseCV == cv.Name))
-                    .Select(cv => new
-                    {
-                        Name = cv.WaDEName.Length > 0 ? cv.WaDEName : cv.Name,
-                        Category = cv.ConsumptionCategoryType != null
-                            ? cv.ConsumptionCategoryType.ToString()
-                            : Common.ConsumptionCategory.Unspecified.ToString()
-                    })
-                    .ToListAsync();
+            await using var db = _databaseContextFactory.Create();
+            var rawUses = await db.BeneficialUsesCV
+                .AsNoTracking()
+                .Where(cv =>
+                    db.AllocationBridgeBeneficialUsesFact.Any(b => b.BeneficialUseCV == cv.Name) ||
+                    db.SitesBridgeBeneficialUsesFact.Any(s => s.BeneficialUseCV == cv.Name))
+                .Select(cv => new
+                {
+                    Name = cv.WaDEName.Length > 0 ? cv.WaDEName : cv.Name,
+                    Category = cv.ConsumptionCategoryType != null
+                        ? cv.ConsumptionCategoryType.ToString()
+                        : Common.ConsumptionCategory.Unspecified.ToString()
+                })
+                .ToListAsync();
 
-                return rawUses
-                    .GroupBy(x => x.Name)
-                    .Select(g => new BeneficialUseItem
-                    {
-                        BeneficialUseName = g.Key,
-                        ConsumptionCategory = g.Max(x =>
-                            Enum.TryParse<Common.ConsumptionCategory>(x.Category, out var category)
-                                ? category
-                                : Common.ConsumptionCategory.Unspecified)
-                    })
-                    .OrderBy(x => x.BeneficialUseName)
-                    .ToArray();
-            }
+            return rawUses
+                .GroupBy(x => x.Name)
+                .Select(g => new BeneficialUseItem
+                {
+                    BeneficialUseName = g.Key,
+                    ConsumptionCategory = g.Max(x =>
+                        Enum.TryParse<Common.ConsumptionCategory>(x.Category, out var category)
+                            ? category
+                            : Common.ConsumptionCategory.Unspecified)
+                })
+                .OrderBy(x => x.BeneficialUseName)
+                .ToArray();
         }
 
         private async Task<string[]> GetOwnerClassifications()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.OwnerClassifications))
-                    .Select(x => x.OwnerClassifications)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .AsNoTracking()
+                .Join(db.OwnerClassificationCv,
+                    aaf => aaf.OwnerClassificationCV,
+                    occv => occv.Name,
+                    (aaf, occv) => occv.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetAllocationTypes()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.AllocationType))
-                    .Select(x => x.AllocationType)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .AsNoTracking()
+                .Join(db.WaterAllocationType,
+                    aaf => aaf.AllocationTypeCv,
+                    cvwat => cvwat.Name,
+                    (aaf, cvwat) => cvwat.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetLegalStatuses()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.LegalStatus))
-                    .Select(x => x.LegalStatus)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .AsNoTracking()
+                .Join(db.LegalStatus,
+                    aaf => aaf.AllocationLegalStatusCv,
+                    cvls => cvls.Name,
+                    (aaf, cvls) => cvls.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetSiteTypes()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.SiteType))
-                    .Select(x => x.SiteType)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SitesDim
+                .AsNoTracking()
+                .Join(db.AllocationBridgeSitesFact,
+                    sd => sd.SiteId,
+                    absf => absf.SiteId,
+                    (sd, absf) => sd)
+                .Join(db.SiteType,
+                    sd => sd.SiteTypeCv,
+                    cvst => cvst.Name,
+                    (sd, cvst) => cvst.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetWaterSources()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.WaterSources))
-                    .Select(x => x.WaterSources)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SitesDim
+                .AsNoTracking()
+                .Join(db.WaterSourceBridgeSitesFact,
+                    s => s.SiteId,
+                    wsbsf => wsbsf.SiteId,
+                    (s, wsbsf) => wsbsf)
+                .Join(db.WaterSourcesDim,
+                    wsbsf => wsbsf.WaterSourceId,
+                    wsd => wsd.WaterSourceId,
+                    (wsbsf, wsd) => wsd)
+                .Join(db.WaterSourceType,
+                    wsd => wsd.WaterSourceTypeCv,
+                    cv => cv.Name,
+                    (wsd, cv) => cv.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Select(name => name.Trim())
+                .Distinct()
+                .OrderBy(name => name)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetWrStates()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.AllocationAmountsView
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.States))
-                    .Select(x => x.States)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .AsNoTracking()
+                .Join(db.OrganizationsDim,
+                    aaf => aaf.OrganizationId,
+                    od => od.OrganizationId,
+                    (aaf, od) => od.State)
+                .Where(state => !string.IsNullOrEmpty(state))
+                .Select(state => state.Trim())
+                .Distinct()
+                .OrderBy(state => state)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetTsSiteTypes()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Where(x => x.Site.SiteTypeCvNavigation != null)
-                    .Select(x => x.Site.SiteTypeCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.Site.SiteTypeCvNavigation != null)
+                .Select(x => x.Site.SiteTypeCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetTsPrimaryUses()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Where(x => x.PrimaryBeneficialUse != null)
-                    .Select(x => x.PrimaryBeneficialUse.WaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.PrimaryBeneficialUse != null)
+                .Select(x => x.PrimaryBeneficialUse.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetTsVariableTypes()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Where(x => x.VariableSpecific != null)
-                    .Select(x => x.VariableSpecific.VariableCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.VariableSpecific != null)
+                .Select(x => x.VariableSpecific.VariableCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetTsWaterSources()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                return await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Where(x => x.WaterSource != null && x.WaterSource.WaterSourceTypeCvNavigation != null)
-                    .Select(x => x.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
-                    .Distinct()
-                    .OrderBy(x => x)
-                    .ToArrayAsync();
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Where(x => x.WaterSource != null && x.WaterSource.WaterSourceTypeCvNavigation != null)
+                .Select(x => x.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArrayAsync();
         }
 
         private async Task<string[]> GetTsStates()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await using var db = _databaseContextFactory.Create();
-                var raw = await db.SiteVariableAmountsFact
-                    .AsNoTracking()
-                    .Where(x => !string.IsNullOrEmpty(x.Site.StateCv))
-                    .Select(x => x.Site.StateCv)
-                    .Distinct()
-                    .ToArrayAsync();
-                return SplitAndDistinct(raw);
-            }
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .AsNoTracking()
+                .Join(db.SitesDim,
+                    svaf => svaf.SiteId,
+                    s => s.SiteId,
+                    (svaf, s) => s.StateCv)
+                .Where(state => !string.IsNullOrEmpty(state))
+                .Distinct()
+                .OrderBy(state => state)
+                .ToArrayAsync();
         }
     }
 }
