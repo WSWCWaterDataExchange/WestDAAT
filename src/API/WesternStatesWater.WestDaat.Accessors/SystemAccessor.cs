@@ -101,14 +101,23 @@ namespace WesternStatesWater.WestDaat.Accessors
         private async Task<string[]> GetOverlayWaterSources()
         {
             await using var db = _databaseContextFactory.Create();
-            return await db.OverlaysViews
+            return await db.OverlayReportingUnitsFact
                 .AsNoTracking()
-                .Where(x => !string.IsNullOrEmpty(x.WaterSourceTypeWaDEName))
-                .Select(x => x.WaterSourceTypeWaDEName)
+                .Join(db.OverlayDim,
+                    rruf => rruf.OverlayId, 
+                    rod => rod.OverlayId,
+                    (rruf, rod) => rod.WaterSourceTypeCV)
+                .Where(cv => cv != null)
+                .Join(db.WaterSourceType,
+                    cv => cv,
+                    wstcv => wstcv.Name,
+                    (cv, wstcv) => wstcv.WaDEName)
+                .Where(name => !string.IsNullOrEmpty(name))
                 .Distinct()
-                .OrderBy(x => x)
+                .OrderBy(name => name)
                 .ToArrayAsync();
         }
+
 
         private async Task<string[]> GetOverlayStates()
         {
