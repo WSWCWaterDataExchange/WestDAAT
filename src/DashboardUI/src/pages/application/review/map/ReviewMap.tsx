@@ -28,7 +28,6 @@ import {
 } from '../../../../config/constants';
 import { formatNumber } from '../../../../utilities/valueFormatters';
 import { OverlayTooltip } from '../../../../components/OverlayTooltip';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
