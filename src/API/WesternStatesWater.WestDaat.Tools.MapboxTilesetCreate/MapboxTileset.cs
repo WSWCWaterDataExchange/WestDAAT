@@ -114,7 +114,7 @@ public static class MapboxTileset
                 var pointsTask = WriteFeatures(pointFeatures,
                     Path.Combine(geoJsonDirectoryPath, "Allocations", "Points", Path.GetRandomFileName()));
                 var polygonsTask = WriteFeatures(polygonFeatures,
-                    Path.Combine(geoJsonDirectoryPath, "Allocations", "Polygons", Path.GetRandomFileName()));
+                    Path.Combine(geoJsonDirectoryPath, "Allocations","Polygons", Path.GetRandomFileName()));
                 var unknownTask = WriteFeatures(unknownFeatures,
                     Path.Combine(geoJsonDirectoryPath, "Allocations", "Unknown", Path.GetRandomFileName()));
 
@@ -449,19 +449,18 @@ public static class MapboxTileset
 
     private static Feature CreateSiteTimeSeriesFeature(List<TimeSeries> siteTimeSeries)
     {
-        var first = siteTimeSeries.First()!;
-
         var properties = new Dictionary<string, object>
         {
-            { "uuid", first.SiteUuid },
-            { "state", first.State },
-            { "siteType", first.SiteType },
-            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))!.Value },
-            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))!.Value },
+            { "uuid", siteTimeSeries.First().SiteUuid },
+            { "state", siteTimeSeries.First().State },
+            { "siteType", siteTimeSeries.First().SiteType },
+            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))! },
+            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))! },
             { "primaryUseCategory", siteTimeSeries.Select(x => x.PrimaryUseCagtegory).Distinct().ToArray() },
             { "variableType", siteTimeSeries.Select(x => x.VariableType).Distinct().ToArray() },
             { "waterSourceType", siteTimeSeries.Select(x => x.WaterSourceType).Distinct().ToArray() }
         };
+
         var geometry = siteTimeSeries.First().Location.AsGeoJsonGeometry();
         return new Feature(geometry, properties);
     }
