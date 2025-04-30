@@ -238,7 +238,7 @@ function ReviewMap(props: ReviewMapProps) {
   const estimateButtonEnabled = state.canReviewerEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
   return (
-    <div className={`flex-grow-1 bg-dark position-relative`}>
+    <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
         <Dropdown style={{ zIndex: 1000 }}>
