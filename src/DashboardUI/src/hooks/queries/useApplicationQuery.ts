@@ -205,7 +205,7 @@ export function useReviewerEstimateConsumptiveUseMutation() {
                   dispatch({
                     type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
                     payload: {
-                      mapImageUrl: base64 as string,
+                      mapImageUrl: base64,
                     },
                   });
                 });
