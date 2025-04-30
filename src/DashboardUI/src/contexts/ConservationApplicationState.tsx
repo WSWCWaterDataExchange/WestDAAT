@@ -64,6 +64,7 @@ export interface ConservationApplicationState {
   isLoadingApplication: boolean;
   loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
+  isGeneratingMapImage: boolean;
   loadFundingOrganizationErrored: boolean;
   isLoadingReviewerConsumptiveUseEstimate: boolean;
   reviewerConsumptiveUseEstimateHasErrored: boolean;
@@ -121,6 +122,7 @@ export const defaultState = (): ConservationApplicationState => ({
   isLoadingApplication: false,
   loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
+  isGeneratingMapImage: false,
   loadFundingOrganizationErrored: false,
   isLoadingReviewerConsumptiveUseEstimate: false,
   reviewerConsumptiveUseEstimateHasErrored: false,
@@ -158,6 +160,8 @@ export type ApplicationAction =
   | ApplicationLoadErroredAction
   | ApplicationReviewerNoteAddedAction
   | ApplicationMapStaticImageAddedAction
+  | ApplicationMapStaticImageGenerateStartedAction
+  | ApplicationMapStaticImageGenerateCompletedAction
   | DataTableToggledAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -345,6 +349,14 @@ export interface ApplicationMapStaticImageAddedAction {
   };
 }
 
+export interface ApplicationMapStaticImageGenerateStartedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED';
+}
+
+export interface ApplicationMapStaticImageGenerateCompletedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED';
+}
+
 export interface DataTableToggledAction {
   type: 'DATA_TABLE_TOGGLED';
 }
@@ -417,6 +429,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationReviewerNoteAdded(draftState, action);
     case 'APPLICATION_MAP_STATIC_IMAGE_ADDED':
       return onApplicationMapStaticImageAdded(draftState, action);
+    case 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED':
+      return onApplicationMapStaticImageGenerateStarted(draftState);
+    case 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED':
+      return onApplicationMapStaticImageGenerateCompleted(draftState);
     case 'DATA_TABLE_TOGGLED':
       return onDataTableToggled(draftState);
   }
@@ -1191,8 +1207,22 @@ const onApplicationMapStaticImageAdded = (
   return draftState;
 };
 
+const onApplicationMapStaticImageGenerateStarted = (
+  draftState: ConservationApplicationState,
+): ConservationApplicationState => {
+  draftState.isGeneratingMapImage = true;
+  return draftState;
+};
+
+const onApplicationMapStaticImageGenerateCompleted = (
+  draftState: ConservationApplicationState,
+): ConservationApplicationState => {
+  draftState.isGeneratingMapImage = false;
+  return draftState;
+};
+
 const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
-  draftState.displayDataTable = !draftState.displayDataTable;
+  draftState.isGeneratingMapImage = false;
   return draftState;
 };
 

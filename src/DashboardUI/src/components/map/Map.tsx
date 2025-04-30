@@ -710,6 +710,9 @@ function Map({
           const promise = new Promise<Blob | null>((resolve, reject) => {
             const mapContainer = document.getElementById('map');
 
+            const originalWidth = mapContainer?.style.width;
+            const originalHeight = mapContainer?.style.height;
+
             if (!mapContainer) {
               reject(new Error('Map container not found'));
               return;
@@ -750,8 +753,8 @@ function Map({
               const canvas = map.getCanvas();
               canvas.toBlob((blob: Blob | null) => {
                 // reset style changes
-                mapContainer.style.width = '';
-                mapContainer.style.height = '';
+                mapContainer.style.width = originalWidth!;
+                mapContainer.style.height = originalHeight!;
                 mapContainer.classList.add('h-100');
                 map.resize();
 

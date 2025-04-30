@@ -87,7 +87,12 @@ function App({ msalInstance }: AppProps) {
   }, []);
 
   const reviewerRoles = [Role.TechnicalReviewer, Role.OrganizationAdmin, Role.GlobalAdmin];
-  const approvePageViewerRoles = [Role.OrganizationMember, Role.TechnicalReviewer, Role.OrganizationAdmin, Role.GlobalAdmin];
+  const approvePageViewerRoles = [
+    Role.OrganizationMember,
+    Role.TechnicalReviewer,
+    Role.OrganizationAdmin,
+    Role.GlobalAdmin,
+  ];
   const adminRoles = [Role.OrganizationAdmin, Role.GlobalAdmin];
 
   return (

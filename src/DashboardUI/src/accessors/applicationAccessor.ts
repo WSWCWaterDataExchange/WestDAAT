@@ -124,10 +124,31 @@ export const reviewerEstimateConsumptiveUse = async (
   };
 
   const api = await westDaatApi(context);
-  const { data } = await api.post<ReviewerEstimateConsumptiveUseResponse>(
-    'Applications/EstimateConsumptiveUse',
-    request,
-  );
+  // const { data } = await api.post<ReviewerEstimateConsumptiveUseResponse>(
+  //   'Applications/EstimateConsumptiveUse',
+  //   request,
+  // );
+
+  // Mocking the API response
+  const data: ReviewerEstimateConsumptiveUseResponse = {
+    conservationPayment: 100,
+    controlDataCollection: {
+      averageYearlyTotalEtInInches: 10,
+      pointWkt: 'POINT(0 0)',
+      waterConservationApplicationEstimateControlLocationId: '123',
+      datapoints: [
+        {
+          effectivePrecipitationInInches: 1,
+          netEtInInches: 2,
+          year: 0,
+          totalEtInInches: 0,
+        },
+      ],
+    },
+    cumulativeNetEtInAcreFeet: 0,
+    cumulativeTotalEtInAcreFeet: 0,
+    dataCollections: [],
+  };
 
   return data;
 };
