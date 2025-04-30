@@ -3,7 +3,7 @@ import Select, { MultiValue } from 'react-select';
 import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function OverlayWaterSourceSelect() {
-  const { waterSourceTypes, selectedWaterSourceTypes, setWaterSourceTypes } = useOverlaysContext();
+  const { overlayWaterSources, selectedWaterSourceTypes, setWaterSourceTypes } = useOverlaysContext();
 
   const handleWaterSourceChange = useCallback(
     (values: MultiValue<{ value: string }>) => {
@@ -14,8 +14,8 @@ export function OverlayWaterSourceSelect() {
   );
 
   const options = useMemo(() => {
-    return waterSourceTypes?.map((type) => ({ value: type, label: type })) ?? [];
-  }, [waterSourceTypes]);
+    return overlayWaterSources?.map((type) => ({ value: type, label: type })) ?? [];
+  }, [overlayWaterSources]);
 
   const selectedValues = useMemo(() => {
     return selectedWaterSourceTypes?.map((type) => ({ value: type, label: type })) ?? [];
