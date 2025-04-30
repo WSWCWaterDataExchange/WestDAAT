@@ -31,13 +31,15 @@ import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
-import { Alert, Placeholder, Spinner } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
 
 import './map.scss';
+import Alert from 'react-bootstrap/esm/Alert';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 interface MapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
