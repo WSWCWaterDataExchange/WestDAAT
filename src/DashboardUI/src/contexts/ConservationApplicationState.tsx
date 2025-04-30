@@ -970,7 +970,7 @@ const onApplicationLoaded = (
     draftApplication.controlLocation = {
       waterConservationApplicationEstimateControlLocationId: controlLocation.id,
       pointWkt: controlLocation.pointWkt,
-      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+      datapoints: controlLocation.waterMeasurements.map(
         (measurement): GeometryEtDatapoint => ({
           year: measurement.year,
           totalEtInInches: measurement.totalEtInInches,
@@ -980,6 +980,9 @@ const onApplicationLoaded = (
       ),
     };
     draftState.controlPointLocationHasBeenSaved = true;
+  } else {
+    draftApplication.controlLocation = undefined;
+    draftState.controlPointLocationHasBeenSaved = false;
   }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 

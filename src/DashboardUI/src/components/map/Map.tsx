@@ -628,10 +628,12 @@ function Map({
     });
 
     // dev note - `fitBounds` throws an error if the padding is too high!
-    map.fitBounds(bounds, {
-      padding: mapBoundSettings.padding,
-      maxZoom: mapBoundSettings.maxZoom,
-      duration: mapBoundSettings.duration ?? 5000,
+    map.once('idle', () => {
+      map.fitBounds(bounds, {
+        padding: mapBoundSettings.padding,
+        maxZoom: mapBoundSettings.maxZoom,
+        duration: mapBoundSettings.duration ?? 5000,
+      });
     });
   }, [map, mapBoundSettings]);
 
