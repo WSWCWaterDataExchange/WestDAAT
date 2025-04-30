@@ -10,5 +10,5 @@ export interface EstimateDetails {
   cumulativeTotalEtInAcreFeet: number;
   cumulativeNetEtInAcreFeet: number | null;
   locations: LocationDetails[];
-  controlLocation: ControlLocationDetails;
+  controlLocation: ControlLocationDetails | null;
 }

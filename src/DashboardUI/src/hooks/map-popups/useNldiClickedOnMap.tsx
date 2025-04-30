@@ -12,12 +12,17 @@ export type NldiSiteData = {
 
 function useNldiClickedOnMap() {
   const { updatePopup, clickedFeatures } = useMapPopupOnClick();
+
   const nldiData = useMemo(() => {
-    if (!clickedFeatures || clickedFeatures.length === 0) return undefined;
+    if (!clickedFeatures || clickedFeatures.length === 0) {
+      return undefined;
+    }
     const nldiFeature = clickedFeatures.find(
       (a) => a.properties && a.properties[nldiSiteProperties.sourceName as string],
     );
-    if (!nldiFeature || !nldiFeature.properties) return undefined;
+    if (!nldiFeature || !nldiFeature.properties) {
+      return undefined;
+    }
 
     const data = getNldiSite(nldiFeature.properties);
     if (nldiFeature.properties.source === 'wade_timeseries') {
@@ -25,9 +30,9 @@ function useNldiClickedOnMap() {
     }
     return data;
   }, [clickedFeatures]);
+
   return { updatePopup, nldiData };
 }
-export default useNldiClickedOnMap;
 
 function getNldiSite(nldiProperties: { [name: string]: any }): NldiSiteData {
   return {
@@ -37,3 +42,5 @@ function getNldiSite(nldiProperties: { [name: string]: any }): NldiSiteData {
     uri: nldiProperties[nldiSiteProperties.uri as string],
   };
 }
+
+export default useNldiClickedOnMap;

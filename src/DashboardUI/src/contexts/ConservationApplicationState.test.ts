@@ -756,14 +756,14 @@ describe('ConservationApplicationState reducer', () => {
       // application estimate control location
       const controlLocation = application.controlLocation!;
       const expectedControlLocation = applicationDetails.estimate.controlLocation;
-      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
-      expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
-      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation!.id);
+      expect(controlLocation.pointWkt).toEqual(expectedControlLocation!.pointWkt);
+      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation!.waterMeasurements.length);
       expect(newState.controlPointLocationHasBeenSaved).toBe(true);
 
       // application estimate control location water measurements
       const controlLocationWaterMeasurement = controlLocation.datapoints![0];
-      const expectedControlLocationWaterMeasurement = expectedControlLocation.waterMeasurements[0];
+      const expectedControlLocationWaterMeasurement = expectedControlLocation!.waterMeasurements[0];
       expect(controlLocationWaterMeasurement.year).toEqual(expectedControlLocationWaterMeasurement.year);
       expect(controlLocationWaterMeasurement.totalEtInInches).toEqual(
         expectedControlLocationWaterMeasurement.totalEtInInches,
@@ -833,6 +833,67 @@ describe('ConservationApplicationState reducer', () => {
 
       // application dirty status
       expect(newState.conservationApplication.isDirty).toBe(false);
+    });
+
+    it('loading multiple applications should modify control location state', () => {
+      // Arrange
+      // first application - has control location
+      const applicationLoadedAction1: ApplicationLoadedAction = {
+        type: 'APPLICATION_LOADED',
+        payload: {
+          application: applicationDetails,
+          notes: [applicationReviewNote],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
+        },
+      };
+
+      // second application - has no control location
+      const applicationLoadedAction2: ApplicationLoadedAction = {
+        type: 'APPLICATION_LOADED',
+        payload: {
+          application: {
+            ...applicationDetails,
+            estimate: {
+              ...applicationDetails.estimate,
+              controlLocation: null,
+            },
+          },
+          notes: [applicationReviewNote],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
+        },
+      };
+
+      // Act 1
+      let newState = reducer(state, applicationLoadedAction1);
+
+      // Assert 1
+      expect(newState.conservationApplication.controlLocation).toBeDefined();
+      expect(newState.controlPointLocationHasBeenSaved).toBe(true);
+
+      // Act 2
+      newState = reducer(newState, applicationLoadedAction2);
+
+      // Assert 2
+      expect(newState.conservationApplication.controlLocation).toBeUndefined();
+      expect(newState.controlPointLocationHasBeenSaved).toBe(false);
     });
 
     it('reviewer updating map data should update state', () => {

@@ -18,10 +18,10 @@ export function useOverlayDetails(
   return useQuery(['overlay.Details', overlayUuid], async () => await getOverlayDetails(overlayUuid!), setOptions);
 }
 
-export function useOverlayDigests(overlayUuid: string | undefined) {
-  return useQuery(['overlay.Digests', overlayUuid], async () => await getOverlayDigests(overlayUuid!), {
-    enabled: !!overlayUuid,
-  });
+export function useOverlayDigests(overlayUuid: string | undefined, options = {}) {
+  return useQuery(['overlay.Digests', overlayUuid], async () => {
+    return await getOverlayDigests(overlayUuid!);
+  }, options);
 }
 
 export function useOverlayWaterRightInfoList(

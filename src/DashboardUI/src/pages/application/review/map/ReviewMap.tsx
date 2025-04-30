@@ -43,16 +43,20 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle,
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
+    addGeometriesToMap,
+    exportToPngFn,
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
 
+  const isPageLoading = state.isLoadingApplication || state.isLoadingFundingOrganization;
+
   useEffect(() => {
-    if (!isMapLoaded) {
+    if (isPageLoading || !isMapLoaded) {
       return;
     }
     setMapStyle(MapStyle.Satellite);
-  }, [isMapLoaded, setMapStyle]);
+  }, [isPageLoading, isMapLoaded, setMapStyle]);
 
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
     return state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
@@ -93,7 +97,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [controlLocationFeature, controlLocationFeature?.geometry]);
 
   useEffect(() => {
-    if (!userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
+    if (isPageLoading || !userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
       return;
     }
 
@@ -106,20 +110,28 @@ function ReviewMap(props: ReviewMapProps) {
     ];
     setUserDrawnPolygonData(allFeatures);
 
-    // zoom map in to focus on polygons
-    const userDrawnPolygonFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+    // zoom map in to focus on polygons + control location
+    const allFeaturesCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonFeatures,
+      features: allFeatures,
     };
     setMapBoundSettings({
-      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 25,
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
+      padding: 200,
       maxZoom: 16,
       duration: 2000,
     });
 
+    if (exportToPngFn) {
+      exportToPngFn!({
+        height: 600,
+        width: 800,
+      });
+    }
+
     setHasInitializedMap(true);
   }, [
+    isPageLoading,
     userDrawnPolygonFeatures,
     controlLocationFeature,
     isMapLoaded,
@@ -137,6 +149,38 @@ function ReviewMap(props: ReviewMapProps) {
       setIsControlLocationSelectionToolEnabled(false);
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addGeometriesToMap.current!(newFeatures);
+
+    // zoom to fit all data
+    const allFeatures = [
+      ...userDrawnPolygonFeatures,
+      ...newFeatures,
+      ...(controlLocationFeature ? [controlLocationFeature] : []),
+    ];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 200,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
     // irrigated field locations
@@ -201,10 +245,6 @@ function ReviewMap(props: ReviewMapProps) {
 
   const estimateButtonEnabled = state.canReviewerEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
-  const allLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
-    return userDrawnPolygonLabelFeatures.concat(controlLocationLabelFeature ?? []);
-  }, [userDrawnPolygonFeatures, controlLocationLabelFeature]);
-
   return (
     <div className="flex-grow-1 position-relative">
       <div className="w-100 position-absolute d-flex justify-content-around p-1 d-print-none">
@@ -237,7 +277,8 @@ function ReviewMap(props: ReviewMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={allLabelFeatures}
+        conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
+        conservationApplicationPointLabelFeature={controlLocationLabelFeature}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
