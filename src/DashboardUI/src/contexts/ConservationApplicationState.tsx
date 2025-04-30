@@ -353,9 +353,7 @@ export const reducer = (
   // Wrap reducer in immer's produce function so we can
   // mutate the draft state without mutating the original state.
   return produce(state, (draftState) => {
-    const newState = reduce(draftState, action);
-    console.log('performed action', action, 'new state:', JSON.parse(JSON.stringify(newState)));
-    return newState;
+    return reduce(draftState, action);
   });
 };
 
