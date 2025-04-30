@@ -15,20 +15,11 @@ import { useMsal } from '@azure/msal-react';
 import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import { useMapContext } from '../../../contexts/MapProvider';
+import { MapPolygon } from '../../../data-contracts/MapPolygon';
 
 import './estimation-tool-page.scss';
-import { MapPolygon } from '../../../data-contracts/MapPolygon';
-import { useMapContext } from '../../../contexts/MapProvider';
-
-const blobToBase64 = (blob: Blob) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(blob);
-  return new Promise((resolve) => {
-    reader.onloadend = () => {
-      resolve(reader.result);
-    };
-  });
-};
+import { blobToBase64 } from '../../../utilities/blobUtility';
 
 export function EstimationToolPage() {
   const context = useMsal();
