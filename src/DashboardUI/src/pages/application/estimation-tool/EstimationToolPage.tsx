@@ -17,9 +17,9 @@ import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useMapContext } from '../../../contexts/MapProvider';
 import { MapPolygon } from '../../../data-contracts/MapPolygon';
+import { blobToBase64 } from '../../../utilities/blobUtility';
 
 import './estimation-tool-page.scss';
-import { blobToBase64 } from '../../../utilities/blobUtility';
 
 export function EstimationToolPage() {
   const context = useMsal();
