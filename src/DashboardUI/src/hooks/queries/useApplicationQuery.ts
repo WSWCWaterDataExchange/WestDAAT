@@ -185,10 +185,6 @@ export function useReviewerEstimateConsumptiveUseMutation() {
         });
 
         if (estimateWasSaved && mapContext.exportToPngFn) {
-          // TODO also apply to the applicant map generate area
-          // TODO also apply to the applicant map generate area
-          // TODO also apply to the applicant map generate area
-          // TODO also apply to the applicant map generate area
           dispatch({
             type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED',
           });
