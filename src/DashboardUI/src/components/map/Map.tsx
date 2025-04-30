@@ -756,6 +756,12 @@ function Map({
                 feature.geometry.coordinates[0].forEach((coord) => {
                   bounds.extend(coord as [number, number]);
                 });
+              } else {
+                console.error(
+                  'Unsupported geometry type:',
+                  feature.geometry.type,
+                  'static map generation is not guaranteed to include this shape',
+                );
               }
             });
 
