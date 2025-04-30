@@ -28,10 +28,11 @@ export function ApplicationApprovePage() {
   const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
   const { user } = useAuthenticationContext();
 
   const navigateBack = () => {
+    dispatch({ type: 'NAVIGATED_BACK_TO_DASHBOARD' });
     navigate(`/application/organization/dashboard`);
   };
 

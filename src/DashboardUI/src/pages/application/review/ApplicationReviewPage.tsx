@@ -16,7 +16,7 @@ function ApplicationReviewPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const location = useLocation();
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
   const { user } = useAuthenticationContext();
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [cancelModalNavigateTo, setCancelModalNavigateTo] = useState<string | undefined>();
@@ -47,6 +47,7 @@ function ApplicationReviewPage() {
     } else {
       if (!state.conservationApplication.isDirty) {
         navigate(applicationOrganizationDashboardPath);
+        dispatch({ type: 'NAVIGATED_BACK_TO_DASHBOARD' });
       } else {
         setShowCancelConfirmationModal(true);
         setCancelModalNavigateTo(applicationOrganizationDashboardPath);
@@ -68,6 +69,9 @@ function ApplicationReviewPage() {
 
     if (cancelModalNavigateTo) {
       navigate(cancelModalNavigateTo);
+      if (cancelModalNavigateTo === applicationOrganizationDashboardPath) {
+        dispatch({ type: 'NAVIGATED_BACK_TO_DASHBOARD' });
+      }
     }
   };
 
