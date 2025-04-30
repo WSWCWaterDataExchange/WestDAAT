@@ -1222,7 +1222,7 @@ const onApplicationMapStaticImageGenerateCompleted = (
 };
 
 const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
-  draftState.isGeneratingMapImage = false;
+  draftState.displayDataTable = !draftState.displayDataTable;
   return draftState;
 };
 
