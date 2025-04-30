@@ -3,7 +3,7 @@ import Select, { MultiValue } from 'react-select';
 import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function OverlayStateSelect() {
-  const { states, selectedStates, setStates } = useOverlaysContext();
+  const { overlayStates, selectedStates, setStates } = useOverlaysContext();
 
   const handleStateChange = useCallback(
     (values: MultiValue<{ value: string }>) => {
@@ -14,8 +14,8 @@ export function OverlayStateSelect() {
   );
 
   const options = useMemo(() => {
-    return states?.map((state) => ({ value: state, label: state })) ?? [];
-  }, [states]);
+    return overlayStates?.map((state) => ({ value: state, label: state })) ?? [];
+  }, [overlayStates]);
 
   const selectedValues = useMemo(() => {
     return selectedStates?.map((state) => ({ value: state, label: state })) ?? [];

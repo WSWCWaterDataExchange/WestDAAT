@@ -1169,33 +1169,38 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var state1 = faker.Address.StateAbbr();
             var state2 = faker.Address.StateAbbr();
 
-            _systemAccessorMock.Setup(a => a.LoadFilters())
+            _systemAccessorMock
+                .Setup(a => a.LoadFilters())
                 .ReturnsAsync(new CommonContracts.DashboardFilters
                 {
-                    AllocationTypes = null,
-                    BeneficialUses = [beneficialUse1, beneficialUse2],
-                    LegalStatuses = null,
-                    OwnerClassifications = [ownerClassification1, ownerClassification2],
-                    RiverBasins = null,
-                    SiteTypes = null,
-                    States = [state1, state2],
-                    WaterSources = [waterSourceType1, waterSourceType2]
+                    WaterRights = new CommonContracts.WaterRightsFilterSet
+                    {
+                        AllocationTypes       = null,
+                        BeneficialUses        = new[] { beneficialUse1, beneficialUse2 },
+                        LegalStatuses         = null,
+                        OwnerClassifications  = new[] { ownerClassification1, ownerClassification2 },
+                        RiverBasins           = null,
+                        SiteTypes             = null,
+                        States                = new[] { state1, state2 },
+                        WaterSourceTypes      = new[] { waterSourceType1, waterSourceType2 },
+                    }
                 })
                 .Verifiable();
 
             var waterResourceManager = CreateWaterResourceManager();
-            var result = await waterResourceManager.LoadFilters();
-
+            var result = (await waterResourceManager.LoadFilters()).WaterRights;
+            
             result.BeneficialUses.Should().NotBeNull().And
-                .BeEquivalentTo([beneficialUse2, beneficialUse1]);
+                .BeEquivalentTo(new[] { beneficialUse2, beneficialUse1 });
             result.OwnerClassifications.Should().NotBeNull().And
                 .BeEquivalentTo(ownerClassification2, ownerClassification1);
             result.States.Should().NotBeNull().And
                 .BeEquivalentTo(state2, state1);
-            result.WaterSources.Should().NotBeNull().And
+            result.WaterSourceTypes.Should().NotBeNull().And
                 .BeEquivalentTo(waterSourceType2, waterSourceType1);
 
             _systemAccessorMock.VerifyAll();
+
         }
         
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)

@@ -5,9 +5,9 @@ interface OverlaysContextValue {
   overlayTypes: string[];
   visibleOverlayTypes: string[];
   selectedOverlayTypes?: string[];
-  states: string[];
+  overlayStates: string[];
   selectedStates?: string[];
-  waterSourceTypes: string[];
+  overlayWaterSources: string[];
   selectedWaterSourceTypes?: string[];
   isOverlayFilterActive: boolean;
   setOverlayFilterActive: (active: boolean) => void;
@@ -21,9 +21,9 @@ const OverlaysContext = createContext<OverlaysContextValue>({
   overlayTypes: [],
   visibleOverlayTypes: [],
   selectedOverlayTypes: undefined,
-  states: [],
+  overlayStates: [],
   selectedStates: undefined,
-  waterSourceTypes: [],
+  overlayWaterSources: [],
   selectedWaterSourceTypes: undefined,
   isOverlayFilterActive: false,
   setOverlayFilterActive: () => {},
@@ -36,9 +36,9 @@ const OverlaysContext = createContext<OverlaysContextValue>({
 export function OverlaysProvider({ children }: { children: React.ReactNode }) {
   const dashboardFiltersQuery = useDashboardFilters();
 
-  const overlayTypes = dashboardFiltersQuery.data?.overlays ?? [];
-  const states = dashboardFiltersQuery.data?.states ?? [];
-  const waterSourceTypes = dashboardFiltersQuery.data?.waterSources ?? [];
+  const overlayTypes = dashboardFiltersQuery.data?.overlays.overlayTypes ?? [];
+  const overlayStates = dashboardFiltersQuery.data?.overlays.states ?? [];
+  const overlayWaterSources = dashboardFiltersQuery.data?.overlays.waterSourceTypes ?? [];
 
   const [selectedOverlayTypes, setSelectedOverlayTypes] = useState<string[] | undefined>(undefined);
   const [visibleOverlayTypes, setVisibleOverlayTypes] = useState<string[]>(overlayTypes);
@@ -66,9 +66,9 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
     overlayTypes,
     visibleOverlayTypes,
     selectedOverlayTypes,
-    states,
+    overlayStates,
     selectedStates,
-    waterSourceTypes,
+    overlayWaterSources,
     selectedWaterSourceTypes,
     isOverlayFilterActive,
     setOverlayFilterActive,
