@@ -67,16 +67,16 @@ public class Maptiler<T>
 
 public class AllocationFeatureProperties
 {
-    public string uuid { get; set; } = null!;
-    public string o { get; set; } = null!;
-    public string[] oClass { get; set; } = null!;
-    public string[] bu { get; set; }
-    public string podPou { get; set; }
-    public string[] wsType { get; set; }
-    public string[] st { get; set; }
-    public string[] ls { get; set; }
-    public string[] sType { get; set; }
-    public string[] allocType { get; set; }
+    public string uuid { get; set; } = "";
+    public string o { get; set; } = "";
+    public string[] oClass { get; set; } = [];
+    public string[] bu { get; set; } = [];
+    public string podPou { get; set; } = "";
+    public string[] wsType { get; set; } = [];
+    public string[] st { get; set; } = [];
+    public string[] ls { get; set; } = [];
+    public string[] sType { get; set; } = [];
+    public string[] allocType { get; set; } = [];
     public bool xmpt { get; set; }
     public double? minFlow { get; set; }
     public double? maxFlow { get; set; }
