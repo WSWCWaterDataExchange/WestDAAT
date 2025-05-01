@@ -998,6 +998,7 @@ const onApplicationLoaded = (
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
   draftState.conservationApplication.isDirty = false;
+  draftState.displayDataTable = false;
 
   return draftState;
 };

@@ -833,6 +833,9 @@ describe('ConservationApplicationState reducer', () => {
 
       // application dirty status
       expect(newState.conservationApplication.isDirty).toBe(false);
+
+      // data table should be hidden
+      expect(newState.displayDataTable).toBe(false);
     });
 
     it('loading multiple applications should modify control location state', () => {
