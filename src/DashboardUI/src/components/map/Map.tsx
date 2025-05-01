@@ -458,6 +458,7 @@ function Map({
       setMapClickedFeatures(null);
     }
   }, [map, mapPopup, setMapClickedFeatures]);
+
   useEffect(() => {
     if (!map) return;
     updateMapControls(map, isAuthenticated);
