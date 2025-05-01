@@ -17,7 +17,7 @@ import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationRe
 import { MapPolygon } from '../../data-contracts/MapPolygon';
 import { ReviewerEstimateConsumptiveUseResponse } from '../../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { useMapContext } from '../../contexts/MapProvider';
-import { blobToBase64 } from '../../utilities/blobUtility';
+import { blobToBase64 } from '../../utilities/fileUploadHelpers';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
