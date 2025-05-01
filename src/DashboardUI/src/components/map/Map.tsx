@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   LayerSpecification,
   GeoJSONSourceSpecification,
@@ -11,7 +11,6 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
 import {
   defaultMapLocationData,
-  MapExportOptions,
   MapSettings,
   MapStyle,
   RenderedFeatureType,
@@ -39,7 +38,7 @@ import truncate from '@turf/truncate';
 
 import './map.scss';
 
-interface MapProps {
+interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   conservationApplicationPolygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
@@ -61,7 +60,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
-}: MapProps) {
+}: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -90,9 +89,6 @@ function Map({
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
-    setUserDrawnPolygonData,
-    addGeometriesToMap,
-    setExportToPngFn,
   } = useMapContext();
 
   const { uploadedGeoJSON } = useHomePageContext();
@@ -257,26 +253,6 @@ function Map({
     }
   }, [map, uploadedGeoJSON]);
 
-  const addGeometriesToMapCallback = useCallback(
-    (geoJsonData: Feature<Geometry, GeoJsonProperties>[]) => {
-      if (drawControl && geoJsonData.length > 0) {
-        geoJsonData.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
-          drawControl.add(feature);
-        });
-
-        const allFeatures = drawControl.getAll().features;
-        if (allFeatures.length > 0) {
-          handleMapDrawnPolygonChange?.(allFeatures);
-        }
-      }
-    },
-    [drawControl, handleMapDrawnPolygonChange],
-  );
-
-  useEffect(() => {
-    addGeometriesToMap.current = addGeometriesToMapCallback;
-  }, [addGeometriesToMapCallback]);
-
   useEffect(() => {
     setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -376,39 +352,52 @@ function Map({
 
   useEffect(() => {
     if (!map) return;
-    setMapRenderedFeatures(map);
-    map.on(
-      'click',
-      mapConfig.layers.map((m) => m.id),
-      (e) => {
-        if (e.features && e.features.length > 0) {
-          // prevent click event if one of the drawing tools are active
-          if (drawControl?.getMode().startsWith('draw')) {
-            return;
-          }
+    if (currentMapPopup.current) {
+      currentMapPopup.current.remove();
+    }
+    if (mapPopup) {
+      const { latitude, longitude } = mapPopup;
+      const clickPoint = map.project([longitude, latitude]);
 
-          setMapClickedFeatures({
-            latitude: e.lngLat.lat,
-            longitude: e.lngLat.lng,
-            layer: '',
-            features: e.features,
-          });
-        }
-      },
-    );
+      const mapWidth = map.getContainer().clientWidth;
+      const mapHeight = map.getContainer().clientHeight;
 
-    mapConfig.layers.forEach((a) => {
-      map.on('mouseenter', a.id, (e) => {
-        if (e.features && e.features.length > 0) {
-          map.getCanvas().style.cursor = 'pointer';
-        }
-      });
+      const edgeThreshold = 150;
 
-      map.on('mouseleave', a.id, () => {
-        map.getCanvas().style.cursor = '';
-      });
-    });
-  }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
+      let anchor: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom';
+
+      if (clickPoint.y < edgeThreshold) {
+        anchor = 'top';
+      } else if (clickPoint.y > mapHeight - edgeThreshold) {
+        anchor = 'bottom';
+      }
+
+      if (clickPoint.x < edgeThreshold) {
+        anchor = anchor === 'top' ? 'top-left' : 'bottom-left';
+      } else if (clickPoint.x > mapWidth - edgeThreshold) {
+        anchor = anchor === 'top' ? 'top-right' : 'bottom-right';
+      }
+
+      currentMapPopup.current = new mapboxgl.Popup({
+        closeOnClick: false,
+        anchor: anchor,
+      })
+        .setLngLat({
+          lat: latitude,
+          lng: longitude,
+        })
+        .setHTML("<div id='mapboxPopupId'></div>")
+        .once('open', () => {
+          const popupContainer = document.getElementById('mapboxPopupId');
+          const root = createRoot(popupContainer!);
+          root.render(mapPopup.element);
+        })
+        .addTo(map);
+    } else {
+      setMapClickedFeatures(null);
+    }
+  }, [map, mapPopup, setMapClickedFeatures]);
+
 
   useEffect(() => {
     if (!map) return;
@@ -532,18 +521,8 @@ function Map({
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
 
-    if (newPolygons.length === 0) {
-      return;
-    }
-
-    map.once('idle', () => {
-      while (!map.isStyleLoaded()) {
-        continue;
-      }
-      newPolygons.forEach(drawControl.add);
-
-      // clear the polygons from the state
-      setUserDrawnPolygonData([]);
+    map.once('styledata', () => {
+      newPolygons.forEach((polygon) => drawControl.add(polygon));
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
@@ -623,12 +602,10 @@ function Map({
     mapBoundSettings.LngLatBounds.forEach((x) => {
       bounds.extend(x);
     });
-    map.once('idle', () => {
-      map.fitBounds(bounds, {
-        padding: mapBoundSettings.padding,
-        maxZoom: mapBoundSettings.maxZoom,
-        duration: mapBoundSettings.duration ?? 5000,
-      });
+    map.fitBounds(bounds, {
+      padding: mapBoundSettings.padding,
+      maxZoom: mapBoundSettings.maxZoom,
+      duration: mapBoundSettings.duration ?? 5000,
     });
   }, [map, mapBoundSettings]);
 
@@ -697,36 +674,6 @@ function Map({
       </div>
     </div>
   );
-
-  useEffect(() => {
-    if (!isMapRendering && map) {
-      map.once('idle', () => {
-        setExportToPngFn(() => (options: MapExportOptions) => {
-          const promise = new Promise<Blob | null>((resolve, reject) => {
-            const mapContainer = document.getElementById('map');
-
-            if (!mapContainer) {
-              throw new Error('Map container not found');
-            }
-
-            mapContainer!.style.width = options.width + 'px';
-            mapContainer!.style.height = options.height + 'px';
-            mapContainer?.classList.remove('h-100');
-            map.resize();
-
-            map.once('idle', async () => {
-              const canvas = map.getCanvas();
-              canvas.toBlob((blob: Blob | null) => {
-                resolve(blob);
-              });
-            });
-          });
-
-          return promise;
-        });
-      });
-    }
-  }, [isMapRendering]);
 
   return (
     <div className="position-relative h-100">
