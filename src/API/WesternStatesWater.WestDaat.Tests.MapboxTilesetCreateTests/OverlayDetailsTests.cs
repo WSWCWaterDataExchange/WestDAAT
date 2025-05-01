@@ -95,9 +95,11 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(2);
         
-        var resultAdminOverlay = features.First(f => f.properties.uuid == reportingUnitDim1.ReportingUnitUuid);
-        resultAdminOverlay.properties.oType.Should().BeEquivalentTo("Administrator");
-        var resultFederalOverlay = features.First(f => f.properties.uuid == reportingUnitDim2.ReportingUnitUuid);
-        resultFederalOverlay.properties.oType.Should().BeEquivalentTo("Federal", "Administrator");
+        var resultAdminOverlay = features?.FirstOrDefault(f => f.properties.uuid == reportingUnitDim1.ReportingUnitUuid);
+        resultAdminOverlay.Should().NotBeNull();
+        resultAdminOverlay!.properties.oType.Should().BeEquivalentTo("Administrator");
+        var resultFederalOverlay = features?.FirstOrDefault(f => f.properties.uuid == reportingUnitDim2.ReportingUnitUuid);
+        resultFederalOverlay.Should().NotBeNull();
+        resultFederalOverlay!.properties.oType.Should().BeEquivalentTo("Federal", "Administrator");
     }
 }
