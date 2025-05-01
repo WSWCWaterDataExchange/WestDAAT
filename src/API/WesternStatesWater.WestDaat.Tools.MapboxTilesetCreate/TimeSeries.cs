@@ -7,8 +7,8 @@ public class TimeSeries
     public long SiteId { get; set; }
     public long SiteVariableAmountId { get; set; }
     public required string SiteUuid { get; set; }
-    public string? State { get; set; }
-    public string? SiteType { get; set; }
+    public required string State { get; set; }
+    public required string SiteType { get; set; }
     public required Geometry Location { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }

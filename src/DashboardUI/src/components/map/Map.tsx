@@ -31,11 +31,13 @@ import { toast } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
-import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 import { DrawBarButton, ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 import truncate from '@turf/truncate';
+import Alert from 'react-bootstrap/esm/Alert';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 import './map.scss';
 
@@ -47,6 +49,7 @@ interface MapProps {
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
   isControlLocationSelectionToolDisplayed?: boolean;
+  showLoading?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -61,6 +64,7 @@ function Map({
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
   isControlLocationSelectionToolDisplayed,
+  showLoading,
 }: MapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -619,16 +623,29 @@ function Map({
 
   useEffect(() => {
     if (!map || !mapBoundSettings || mapBoundSettings.LngLatBounds.length === 0) return;
-    const bounds = new mapboxgl.LngLatBounds(mapBoundSettings.LngLatBounds[0], mapBoundSettings.LngLatBounds[0]);
+
+    // initialize the bounding box with the first point, then extend it with every point
+    const boundsStartingPoint = mapBoundSettings.LngLatBounds[0];
+    const bounds = new mapboxgl.LngLatBounds(boundsStartingPoint, boundsStartingPoint);
     mapBoundSettings.LngLatBounds.forEach((x) => {
       bounds.extend(x);
     });
+
     map.once('idle', () => {
-      map.fitBounds(bounds, {
-        padding: mapBoundSettings.padding,
-        maxZoom: mapBoundSettings.maxZoom,
-        duration: mapBoundSettings.duration ?? 5000,
-      });
+      try {
+        // `fitBounds` throws an error if the padding is too high
+        map.fitBounds(bounds, {
+          padding: mapBoundSettings.padding,
+          maxZoom: mapBoundSettings.maxZoom,
+          duration: mapBoundSettings.duration ?? 5000,
+        });
+      } catch {
+        map.fitBounds(bounds, {
+          padding: 0,
+          maxZoom: mapBoundSettings.maxZoom,
+          duration: mapBoundSettings.duration ?? 5000,
+        });
+      }
     });
   }, [map, mapBoundSettings]);
 
@@ -698,6 +715,18 @@ function Map({
     </div>
   );
 
+  const mapLoading = (
+    <div
+      style={{ zIndex: 1000 }}
+      className={`w-100 h-100 position-absolute bg-white d-flex flex-column justify-content-center align-items-center`}
+    >
+      <Placeholder as="div" animation="glow" className="w-100 h-100 position-absolute">
+        <Placeholder xs={12} className="w-100 h-100" />
+      </Placeholder>
+      <Spinner animation="border" className="text-primary" />
+    </div>
+  );
+
   useEffect(() => {
     if (!isMapRendering && map) {
       map.once('idle', () => {
@@ -705,18 +734,61 @@ function Map({
           const promise = new Promise<Blob | null>((resolve, reject) => {
             const mapContainer = document.getElementById('map');
 
+            const originalWidth = mapContainer?.style.width;
+            const originalHeight = mapContainer?.style.height;
+
             if (!mapContainer) {
-              throw new Error('Map container not found');
+              reject(new Error('Map container not found'));
+              return;
             }
 
-            mapContainer!.style.width = options.width + 'px';
-            mapContainer!.style.height = options.height + 'px';
-            mapContainer?.classList.remove('h-100');
+            // resize component for standard size screenshot
+            mapContainer.style.width = options.width + 'px';
+            mapContainer.style.height = options.height + 'px';
+            mapContainer.classList.remove('h-100');
             map.resize();
+
+            // fit map to bounding box set by the displayed features
+            const displayedFeatures = drawControl!.getAll().features;
+            if (displayedFeatures.length === 0) {
+              reject(new Error('No features to display'));
+              return;
+            }
+
+            const bounds = new mapboxgl.LngLatBounds();
+            displayedFeatures.forEach((feature) => {
+              // only supports these geometries
+              if (feature.geometry.type === 'Point') {
+                bounds.extend(feature.geometry.coordinates as [number, number]);
+              } else if (feature.geometry.type === 'Polygon') {
+                feature.geometry.coordinates[0].forEach((coord) => {
+                  bounds.extend(coord as [number, number]);
+                });
+              } else {
+                console.error(
+                  'Unsupported geometry type:',
+                  feature.geometry.type,
+                  'static map generation is not guaranteed to include this shape',
+                );
+              }
+            });
+
+            map.fitBounds(bounds, {
+              padding: 25,
+              maxZoom: 16,
+              duration: 0,
+            });
 
             map.once('idle', async () => {
               const canvas = map.getCanvas();
               canvas.toBlob((blob: Blob | null) => {
+                // reset style changes
+                mapContainer.style.width = originalWidth!;
+                mapContainer.style.height = originalHeight!;
+                mapContainer.classList.add('h-100');
+                map.resize();
+
+                // return result
                 resolve(blob);
               });
             });
@@ -739,6 +811,9 @@ function Map({
       {legend && map && <div className={`legend ${legendClass}`}>{legend}</div>}
 
       {map && mapAlert}
+
+      {showLoading && mapLoading}
+
       <div
         id="map"
         className="map h-100"

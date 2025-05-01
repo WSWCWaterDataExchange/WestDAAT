@@ -17,6 +17,7 @@ import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationRe
 import { MapPolygon } from '../../data-contracts/MapPolygon';
 import { ReviewerEstimateConsumptiveUseResponse } from '../../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { useMapContext } from '../../contexts/MapProvider';
+import { blobToBase64 } from '../../utilities/fileUploadHelpers';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
@@ -185,6 +186,10 @@ export function useReviewerEstimateConsumptiveUseMutation() {
         });
 
         if (estimateWasSaved && mapContext.exportToPngFn) {
+          dispatch({
+            type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED',
+          });
+
           mapContext
             .exportToPngFn({
               height: 400,
@@ -195,7 +200,21 @@ export function useReviewerEstimateConsumptiveUseMutation() {
               if (blob && applicationId) {
                 const file = new File([blob], `${applicationId}.png`, { type: blob.type });
                 uploadApplicationStaticMap(msalContext, file, applicationId);
+
+                blobToBase64(blob).then((base64) => {
+                  dispatch({
+                    type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
+                    payload: {
+                      mapImageUrl: base64,
+                    },
+                  });
+                });
               }
+            })
+            .finally(() => {
+              dispatch({
+                type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED',
+              });
             });
         }
       }
