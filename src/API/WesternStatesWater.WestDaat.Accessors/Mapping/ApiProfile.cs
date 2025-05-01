@@ -162,7 +162,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt => opt.MapFrom(source => source.OverlayType.WaDEName.Length > 0 ? source.OverlayType.WaDEName : source.OverlayTypeCV))
                 .ForMember(dest => dest.WaterSourceType,
                     opt => opt.MapFrom(source => source.WaterSourceType.WaDEName.Length > 0 ? source.WaterSourceType.WaDEName : source.WaterSourceTypeCV))
-                .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.RegulatoryStatusCv))
+                .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.OverlayStatusCv))
                 .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.Statute))
                 .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.StatuteLink))
                 .ForMember(dest => dest.StatutoryEffectiveDate, opt => opt.MapFrom(source => source.StatutoryEffectiveDate))
