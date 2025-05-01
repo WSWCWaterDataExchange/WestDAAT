@@ -352,52 +352,35 @@ function Map({
 
   useEffect(() => {
     if (!map) return;
-    if (currentMapPopup.current) {
-      currentMapPopup.current.remove();
-    }
-    if (mapPopup) {
-      const { latitude, longitude } = mapPopup;
-      const clickPoint = map.project([longitude, latitude]);
+    setMapRenderedFeatures(map);
+    mapConfig.layers.forEach((a) => {
+      map.on('click', a.id, (e) => {
+        if (e.features && e.features.length > 0) {
+          // prevent click event if one of the drawing tools are active
+          if (drawControl?.getMode().startsWith('draw')) {
+            return;
+          }
 
-      const mapWidth = map.getContainer().clientWidth;
-      const mapHeight = map.getContainer().clientHeight;
+          setMapClickedFeatures({
+            latitude: e.lngLat.lat,
+            longitude: e.lngLat.lng,
+            layer: a.id,
+            features: e.features,
+          });
+        }
+      });
 
-      const edgeThreshold = 150;
+      map.on('mouseenter', a.id, (e) => {
+        if (e.features && e.features.length > 0) {
+          map.getCanvas().style.cursor = 'pointer';
+        }
+      });
 
-      let anchor: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom';
-
-      if (clickPoint.y < edgeThreshold) {
-        anchor = 'top';
-      } else if (clickPoint.y > mapHeight - edgeThreshold) {
-        anchor = 'bottom';
-      }
-
-      if (clickPoint.x < edgeThreshold) {
-        anchor = anchor === 'top' ? 'top-left' : 'bottom-left';
-      } else if (clickPoint.x > mapWidth - edgeThreshold) {
-        anchor = anchor === 'top' ? 'top-right' : 'bottom-right';
-      }
-
-      currentMapPopup.current = new mapboxgl.Popup({
-        closeOnClick: false,
-        anchor: anchor,
-      })
-        .setLngLat({
-          lat: latitude,
-          lng: longitude,
-        })
-        .setHTML("<div id='mapboxPopupId'></div>")
-        .once('open', () => {
-          const popupContainer = document.getElementById('mapboxPopupId');
-          const root = createRoot(popupContainer!);
-          root.render(mapPopup.element);
-        })
-        .addTo(map);
-    } else {
-      setMapClickedFeatures(null);
-    }
-  }, [map, mapPopup, setMapClickedFeatures]);
-
+      map.on('mouseleave', a.id, () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+  }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
 
   useEffect(() => {
     if (!map) return;
