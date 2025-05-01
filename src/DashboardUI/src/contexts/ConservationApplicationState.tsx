@@ -485,6 +485,7 @@ function calculateApplicationStatistics(applications: ApplicationDashboardListIt
     totalObligationDollars: totalObligation,
   };
 }
+
 const onEstimationToolPageLoaded = (
   draftState: ConservationApplicationState,
   { payload }: EstimationToolPageLoadedAction,
@@ -1023,6 +1024,7 @@ const onApplicationLoaded = (
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
   draftState.conservationApplication.isDirty = false;
+  draftState.displayDataTable = false;
 
   return draftState;
 };
