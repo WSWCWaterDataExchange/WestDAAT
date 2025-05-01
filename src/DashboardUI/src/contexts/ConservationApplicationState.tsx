@@ -133,7 +133,6 @@ export const defaultState = (): ConservationApplicationState => ({
 export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | DashboardApplicationsFilteredAction
-  | NavigatedBackToDashboardAction
   | EstimationToolPageLoadedAction
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
@@ -172,10 +171,6 @@ export interface DashboardApplicationsFilteredAction {
   payload: {
     applicationIds: string[];
   };
-}
-
-export interface NavigatedBackToDashboardAction {
-  type: 'NAVIGATED_BACK_TO_DASHBOARD';
 }
 
 export interface EstimationToolPageLoadedAction {
@@ -364,8 +359,6 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onDashboardApplicationsLoaded(draftState, action);
     case 'DASHBOARD_APPLICATION_FILTERS_CHANGED':
       return onDashboardApplicationsFiltered(draftState, action);
-    case 'NAVIGATED_BACK_TO_DASHBOARD':
-      return onNavigatedBackToDashboard(draftState);
     case 'ESTIMATION_TOOL_PAGE_LOADED':
       return onEstimationToolPageLoaded(draftState, action);
     case 'FUNDING_ORGANIZATION_LOADING':
@@ -466,15 +459,6 @@ function calculateApplicationStatistics(applications: ApplicationDashboardListIt
     totalObligationDollars: totalObligation,
   };
 }
-
-const onNavigatedBackToDashboard = (draftState: ConservationApplicationState): ConservationApplicationState => {
-  // reset state, except for dashboard applications
-  return {
-    ...defaultState(),
-    dashboardApplications: draftState.dashboardApplications,
-    dashboardApplicationsStatistics: draftState.dashboardApplicationsStatistics,
-  };
-};
 
 const onEstimationToolPageLoaded = (
   draftState: ConservationApplicationState,
