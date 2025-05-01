@@ -631,13 +631,21 @@ function Map({
       bounds.extend(x);
     });
 
-    // dev note - `fitBounds` throws an error if the padding is too high!
     map.once('idle', () => {
-      map.fitBounds(bounds, {
-        padding: mapBoundSettings.padding,
-        maxZoom: mapBoundSettings.maxZoom,
-        duration: mapBoundSettings.duration ?? 5000,
-      });
+      try {
+        // `fitBounds` throws an error if the padding is too high
+        map.fitBounds(bounds, {
+          padding: mapBoundSettings.padding,
+          maxZoom: mapBoundSettings.maxZoom,
+          duration: mapBoundSettings.duration ?? 5000,
+        });
+      } catch {
+        map.fitBounds(bounds, {
+          padding: 0,
+          maxZoom: mapBoundSettings.maxZoom,
+          duration: mapBoundSettings.duration ?? 5000,
+        });
+      }
     });
   }, [map, mapBoundSettings]);
 
