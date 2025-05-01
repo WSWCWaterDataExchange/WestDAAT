@@ -85,7 +85,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
     });
   }, [
@@ -136,7 +136,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
       duration: 5000,
     });
@@ -196,6 +196,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         conservationApplicationPolygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
+        showLoading={state.isGeneratingMapImage}
       />
       <EstimationToolTableView perspective="applicant" />
     </div>

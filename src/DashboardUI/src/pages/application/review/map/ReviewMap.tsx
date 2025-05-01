@@ -44,7 +44,6 @@ function ReviewMap(props: ReviewMapProps) {
     setUserDrawnPolygonData,
     setIsControlLocationSelectionToolEnabled,
     addGeometriesToMap,
-    exportToPngFn,
   } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
@@ -117,17 +116,10 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
       duration: 2000,
     });
-
-    if (exportToPngFn) {
-      exportToPngFn!({
-        height: 600,
-        width: 800,
-      });
-    }
 
     setHasInitializedMap(true);
   }, [
@@ -172,7 +164,7 @@ function ReviewMap(props: ReviewMapProps) {
     };
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
-      padding: 200,
+      padding: 50,
       maxZoom: 16,
       duration: 5000,
     });
@@ -275,6 +267,7 @@ function ReviewMap(props: ReviewMapProps) {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
         conservationApplicationPolygonLabelFeatures={userDrawnPolygonLabelFeatures}
@@ -282,6 +275,7 @@ function ReviewMap(props: ReviewMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
         isControlLocationSelectionToolDisplayed={true}
+        showLoading={state.isGeneratingMapImage}
       />
       <EstimationToolTableView perspective="reviewer" />
     </div>
