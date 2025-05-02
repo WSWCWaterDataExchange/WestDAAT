@@ -416,22 +416,79 @@ function Map({
 
   useEffect(() => {
     if (!map) return;
+
     if (currentMapPopup.current) {
       currentMapPopup.current.remove();
     }
+
     if (mapPopup) {
-      currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
-        .setLngLat({
-          lat: mapPopup.latitude,
-          lng: mapPopup.longitude,
-        })
+      let { latitude, longitude } = mapPopup;
+      const bounds = map.getBounds();
+      if (bounds && !bounds.contains([longitude, latitude])) {
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        longitude = Math.max(sw.lng, Math.min(ne.lng, longitude));
+        latitude = Math.max(sw.lat, Math.min(ne.lat, latitude));
+      }
+
+      currentMapPopup.current = new mapboxgl.Popup({
+        closeOnClick: false,
+      })
+        .setLngLat({ lat: latitude, lng: longitude })
         .setHTML("<div id='mapboxPopupId'></div>")
-        .once('open', () => {
-          const popupContainer = document.getElementById('mapboxPopupId');
-          const root = createRoot(popupContainer!);
-          root.render(mapPopup.element);
-        })
         .addTo(map);
+
+      // Dynamically updates the position and anchor of the map popup to ensure it remains visible within the map's current viewport.
+      // It calculates the popup's position based on the view's dimensions, the popup's size, and the user's click location.
+      // Also adjusts the anchor of the popup to improve UI when dragging around the map
+      const updatePopupPosition = () => {
+        if (!currentMapPopup.current || !map) return;
+
+        const lngLat = currentMapPopup.current.getLngLat();
+        const clickPoint = map.project([lngLat.lng, lngLat.lat]);
+        const mapWidth = map.getContainer().clientWidth;
+        const mapHeight = map.getContainer().clientHeight;
+        const popupElement = currentMapPopup.current.getElement();
+        const popupWidth = popupElement ? popupElement.offsetWidth : 250;
+        const popupHeight = popupElement ? popupElement.offsetHeight : 425;
+        const edgeMargin = 500;
+        let anchor: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom';
+
+        if (clickPoint.y + popupHeight + edgeMargin > mapHeight) {
+          anchor = 'top';
+        } else if (clickPoint.y - popupHeight - edgeMargin < 0) {
+          anchor = 'bottom';
+        }
+
+        if (clickPoint.x + popupWidth / 2 + edgeMargin > mapWidth) {
+          anchor = anchor === 'top' ? 'top-left' : 'bottom-left';
+        } else if (clickPoint.x - popupWidth / 2 - edgeMargin < 0) {
+          anchor = anchor === 'top' ? 'top-right' : 'bottom-right';
+        }
+
+        currentMapPopup.current.setOffset([0, 0]);
+        (currentMapPopup.current as any)._update(anchor);
+      };
+
+      const popupContainer = document.getElementById('mapboxPopupId');
+      if (popupContainer) {
+        const root = createRoot(popupContainer);
+        root.render(mapPopup.element);
+        setTimeout(() => {
+          updatePopupPosition();
+        }, 10);
+      }
+
+      map.on('move', updatePopupPosition);
+      map.on('zoom', updatePopupPosition);
+
+      return () => {
+        map.off('move', updatePopupPosition);
+        map.off('zoom', updatePopupPosition);
+        if (currentMapPopup.current) {
+          currentMapPopup.current.remove();
+        }
+      };
     } else {
       setMapClickedFeatures(null);
     }
