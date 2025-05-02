@@ -438,6 +438,9 @@ function Map({
         .setHTML("<div id='mapboxPopupId'></div>")
         .addTo(map);
 
+      // Dynamically updates the position and anchor of the map popup to ensure it remains visible within the map's current viewport.
+      // It calculates the popup's position based on the view's dimensions, the popup's size, and the user's click location.
+      // Also adjusts the anchor of the popup to improve UI when dragging around the map
       const updatePopupPosition = () => {
         if (!currentMapPopup.current || !map) return;
 
