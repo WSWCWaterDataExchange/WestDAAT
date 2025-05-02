@@ -153,22 +153,6 @@ function SideBar() {
       <div className="position-relative flex-grow-1 panel-content">
         <Accordion flush alwaysOpen activeKey={openAccordionKeys} onSelect={setOpenAccordionKeys}>
           <MapTheme />
-          <Accordion.Item eventKey="overlayFilters">
-            <Accordion.Header>
-              <Form.Check
-                type="switch"
-                id="overlayFilters"
-                label=""
-                aria-label="overlay filters"
-                checked={isOverlayFilterActive}
-                onChange={handleOverlaySwitchChange}
-              />
-              <label className="fw-bold ms-2">OVERLAY FILTER</label>
-            </Accordion.Header>
-            <Accordion.Body>
-              <OverlaysFilter />
-            </Accordion.Body>
-          </Accordion.Item>
           <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header>
               <Form.Check
@@ -198,6 +182,22 @@ function SideBar() {
             </Accordion.Header>
             <Accordion.Body>
               <TimeSeriesFilter />
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="overlayFilters">
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="overlayFilters"
+                label=""
+                aria-label="overlay filters"
+                checked={isOverlayFilterActive}
+                onChange={handleOverlaySwitchChange}
+              />
+              <label className="fw-bold ms-2">OVERLAY FILTER</label>
+            </Accordion.Header>
+            <Accordion.Body>
+              <OverlaysFilter />
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
