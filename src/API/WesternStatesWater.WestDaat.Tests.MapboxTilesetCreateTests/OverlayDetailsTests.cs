@@ -22,7 +22,7 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         Db.ReportingUnitType.Add(reportingUnitType);
         await Db.SaveChangesAsync();
 
-        var statusFinal = new RegulatoryStatusCVFaker().Generate();
+        var statusFinal = new OverlayStatusCVFaker().Generate();
 
         var overlayTypeAdmin = new OverlayTypeFaker()
             .RuleFor(r => r.Name, "AA")
@@ -39,18 +39,18 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         var overlayDimWest = new OverlayDimFaker()
             .RuleFor(r => r.OverlayName, "Western Utah Management")
             .RuleFor(r => r.OverlayTypeCV, overlayTypeAdmin.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
         var overlayDimNorthwest = new OverlayDimFaker()
             .RuleFor(r => r.OverlayName, "Northwestern Utah Management")
             .RuleFor(r => r.OverlayTypeCV, overlayTypeFederal.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
 
         var overlayDimEast = new OverlayDimFaker()
             .RuleFor(r => r.OverlayName, "Eastern Utah Management")
             .RuleFor(r => r.OverlayTypeCV, overlayTypeAdmin.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
         Db.OverlayDim.AddRange(overlayDimWest, overlayDimNorthwest, overlayDimEast);
         await Db.SaveChangesAsync();
