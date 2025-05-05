@@ -444,7 +444,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task Store_OrganizationMemberAddRequest_AddingMemberWithDifferentEmailDomain_ShouldNotAllow()
+    public async Task Store_OrganizationMemberAddRequest_AddingMemberWithDifferentEmailDomain_ShouldAllow()
     {
         // Arrange
         var organization = new OrganizationFaker()
@@ -472,8 +472,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         });
 
         // Assert
-        response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<ValidationError>();
+        response.Error.Should().BeNull();
     }
     
     [TestMethod]
