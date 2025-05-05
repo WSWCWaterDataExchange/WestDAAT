@@ -502,20 +502,14 @@ public static class MapboxTileset
         Console.WriteLine("Filters table updated.");
     }
     
-    private static void SafeTryAdd(ConcurrentDictionary<string, byte> dict, string? key, string context = "")
+    private static void SafeTryAdd(ConcurrentDictionary<string, byte> dict, string? key)
     {
-        var trimmedKey = key?.Trim();
-
-        if (string.IsNullOrWhiteSpace(trimmedKey))
+        if (!string.IsNullOrWhiteSpace(key))
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"[SafeTryAdd] Skipped null/whitespace key: '{key}' (Context: {context})");
-            Console.ResetColor();
-            return;
+            dict.TryAdd(key.Trim(), 0);
         }
-
-        dict.TryAdd(trimmedKey, 0);
     }
+
 
     private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
     {
