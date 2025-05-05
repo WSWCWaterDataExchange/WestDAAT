@@ -111,6 +111,7 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public virtual DbSet<WaterSourceBridgeSitesFact> WaterSourceBridgeSitesFact { get; set; }
         public virtual DbSet<WaterSourceType> WaterSourceType { get; set; }
         public virtual DbSet<WaterSourcesDim> WaterSourcesDim { get; set; }
+         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
