@@ -2,8 +2,10 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -11,13 +13,16 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 {
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
     private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
+    private readonly IBlobStorageSdk _blobStorageSdk;
 
     public ApplicationAccessor(ILogger<ApplicationAccessor> logger,
         EF.IDatabaseContextFactory databaseContextFactory,
-        EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
+        EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory,
+        IBlobStorageSdk blobStorageSdk) : base(logger)
     {
         _databaseContextFactory = databaseContextFactory;
         _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
+        _blobStorageSdk = blobStorageSdk;
     }
 
     public async Task<ApplicationLoadResponseBase> Load(ApplicationLoadRequestBase request)
@@ -68,8 +73,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .SingleAsync();
 
 
-        var reviewPipeline = await GetReviewPipeline(request.ApplicationId);
-        application.ReviewPipeline = reviewPipeline;
+        application.ReviewPipeline = await GetReviewPipeline(request.ApplicationId);
+        application.MapImageUrl = await GetApplicationMapImageUrl(request.ApplicationId);
 
         return new ApplicationLoadSingleResponse
         {
@@ -164,6 +169,14 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             ReviewSteps = reviewSteps.ToArray()
         };
+    }
+
+    private async Task<Uri> GetApplicationMapImageUrl(Guid applicationId)
+    {
+        var sasUris = await _blobStorageSdk.GetSasUris(Containers.ApplicationMapImages, [applicationId.ToString()], TimeSpan.FromMinutes(10),
+            Azure.Storage.Sas.BlobContainerSasPermissions.Read);
+
+        return sasUris.Values.Single();
     }
 
     private async Task<ApplicationExistsLoadResponse> CheckApplicationExists(ApplicationExistsLoadRequest request)
@@ -576,24 +589,24 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     private async Task<WaterConservationApplicationNoteCreateResponse> CreateApplicationNote(WaterConservationApplicationNoteCreateRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
-        
+
         var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
-        
+
         var applicationSubmission = await db.WaterConservationApplicationSubmissions
             .Include(sub => sub.SubmissionNotes)
             .Where(s => s.WaterConservationApplicationId == request.WaterConservationApplicationId)
             .SingleAsync();
-        
+
         applicationSubmission.SubmissionNotes.Add(note);
-        
+
         await db.SaveChangesAsync();
-        
+
         var savedNote = await db.WaterConservationApplicationSubmissionNotes
             .Include(n => n.User).ThenInclude(user => user.UserProfile)
             .Where(n => n.Id == note.Id)
             .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
             .SingleAsync();
-        
+
         return new WaterConservationApplicationNoteCreateResponse
         {
             Note = savedNote

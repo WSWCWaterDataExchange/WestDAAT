@@ -39,9 +39,8 @@ export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
     units: 'kilometers',
   });
   const circleFeature = circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
-  // `circle` generates coordinates with up to 14 decimal places of precision.
-  // 7 decimals is worth up to 1.1cm of precision, which is more than enough for our purposes.
-  return truncate(circleFeature, { precision: 7 });
+  // limit geometry precision to save space
+  return truncate(circleFeature, { precision: 6 });
 };
 
 export const doPolygonsIntersect = (polygons: Feature<Geometry, GeoJsonProperties>[]): boolean => {

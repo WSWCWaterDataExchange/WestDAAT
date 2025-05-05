@@ -23,13 +23,17 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
         drawToolType: DrawToolType.Rectangle,
         polygonAreaInAcres: 1,
         additionalDetails: 'I, the user, have some things to say about this field.',
+        averageYearlyTotalEtInInches: 120,
+        averageYearlyTotalEtInAcreFeet: 10,
+        averageYearlyNetEtInInches: 60,
+        averageYearlyNetEtInAcreFeet: 5,
         waterMeasurements: [
           {
             id: 'consumptive-use-guid',
             year: 2025,
-            totalEtInInches: 400,
-            effectivePrecipitationInInches: null,
-            netEtInInches: null,
+            totalEtInInches: 120,
+            effectivePrecipitationInInches: 60,
+            netEtInInches: 60,
           },
         ],
       },
@@ -93,4 +97,5 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     },
   ],
   status: ConservationApplicationStatus.InTechnicalReview,
+  mapImageUrl: 'https://example.com/map-image.png',
 });

@@ -80,7 +80,7 @@ public class SecurityUtilityTests : UtilityTestBase
                 new OrganizationRole
                 {
                     OrganizationId = organizationId,
-                    RoleNames = ["Member"]
+                    RoleNames = [nameof(Roles.OrganizationMember)]
                 }
             ]
         };
@@ -110,7 +110,7 @@ public class SecurityUtilityTests : UtilityTestBase
                 new OrganizationRole
                 {
                     OrganizationId = organizationId,
-                    RoleNames = ["Member"]
+                    RoleNames = [nameof(Roles.OrganizationMember)]
                 }
             ]
         };

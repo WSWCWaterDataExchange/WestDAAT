@@ -9,7 +9,15 @@ public class MapboxTilesetTestBase
 {
     private TransactionScope _transactionScopeFixture = null!;
     protected DatabaseContext Db = null!;
-    protected string GeoJsonDir = null!; 
+    protected string GeoJsonDir = null!;
+
+    private static Dictionary<string, string> DefaultTestConfiguration => new()
+    {
+        {
+            $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}",
+            "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+        }
+    };
     
     [TestInitialize]
     public void TestInitialize()
@@ -33,6 +41,7 @@ public class MapboxTilesetTestBase
 
         var config = new ConfigurationBuilder()
             .SetBasePath(Environment.CurrentDirectory)
+            .AddInMemoryCollection(DefaultTestConfiguration!)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
@@ -61,13 +70,13 @@ public class AllocationFeatureProperties
     public string uuid { get; set; } = null!;
     public string o { get; set; } = null!;
     public string[] oClass { get; set; } = null!;
-    public string[] bu { get; set; }
-    public string podPou { get; set; }
-    public string[] wsType { get; set; }
-    public string[] st { get; set; }
-    public string[] ls { get; set; }
-    public string[] sType { get; set; }
-    public string[] allocType { get; set; }
+    public string[] bu { get; set; } = null!;
+    public string podPou { get; set; } = null!;
+    public string[] wsType { get; set; } = null!;
+    public string[] st { get; set; } = null!;
+    public string[] ls { get; set; } = null!;
+    public string[] sType { get; set; } = null!;
+    public string[] allocType { get; set; } = null!;
     public bool xmpt { get; set; }
     public double? minFlow { get; set; }
     public double? maxFlow { get; set; }

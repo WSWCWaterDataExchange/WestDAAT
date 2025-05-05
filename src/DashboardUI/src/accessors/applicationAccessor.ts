@@ -22,7 +22,11 @@ import { WaterConservationApplicationCreateResponse } from '../data-contracts/Wa
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
 import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-contracts/WaterConservationApplicationSubmissionUpdateRequest';
 import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
-import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
+import {
+  generateDocumentDownloadSasToken,
+  generateDocumentUploadSasTokens,
+  generateMapImageUploadSasToken,
+} from './fileAccessor';
 import westDaatApi from './westDaatApi';
 import { MapPolygon } from '../data-contracts/MapPolygon';
 import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
@@ -132,7 +136,7 @@ export const uploadApplicationDocuments = async (
   context: IMsalContext,
   files: File[],
 ): Promise<ApplicationDocument[]> => {
-  const sasTokens = (await generateUploadSasTokens(context, files.length)).sasTokens;
+  const sasTokens = (await generateDocumentUploadSasTokens(context, files.length)).sasTokens;
   const applicationDocuments: ApplicationDocument[] = [];
   const blobUploads: BlobUpload[] = [];
   files.forEach((file, index) => {
@@ -152,8 +156,27 @@ export const uploadApplicationDocuments = async (
   return applicationDocuments;
 };
 
+export const uploadApplicationStaticMap = async (
+  context: IMsalContext,
+  file: File,
+  applicationId: string,
+): Promise<void> => {
+  const sasToken = (await generateMapImageUploadSasToken(context, applicationId)).sasToken;
+
+  const blobUploads: BlobUpload[] = [
+    {
+      data: file,
+      contentLength: file.size,
+      blobname: sasToken.blobname,
+      hostname: sasToken.hostname,
+      sasToken: sasToken.sasToken,
+    },
+  ];
+  await uploadFilesToBlobStorage(ContainerName.ApplicationMapImages, blobUploads);
+};
+
 export const downloadApplicationDocuments = async (context: IMsalContext, documentId: string): Promise<void> => {
-  const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
+  const { sasToken, fileName } = await generateDocumentDownloadSasToken(context, documentId);
   await downloadFilesFromBlobStorage(sasToken, fileName);
 };
 
@@ -284,7 +307,7 @@ export const submitApplicationApproval = async (
     waterConservationApplicationId: string;
     approvalDecision: ApprovalDecision;
     approvalNotes: string;
-  }
+  },
 ): Promise<void> => {
   const api = await westDaatApi(context);
 
@@ -292,11 +315,11 @@ export const submitApplicationApproval = async (
     $type: 'WaterConservationApplicationApprovalRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     approvalDecision: data.approvalDecision,
-    approvalNotes: data.approvalNotes
-  }
+    approvalNotes: data.approvalNotes,
+  };
 
   await api.post<void>('Applications/Submit', request);
-}
+};
 
 export const getApplication = async (
   context: IMsalContext,
@@ -367,4 +390,4 @@ export const createApplicationReviewerNote = async (
   );
 
   return response;
-}
+};

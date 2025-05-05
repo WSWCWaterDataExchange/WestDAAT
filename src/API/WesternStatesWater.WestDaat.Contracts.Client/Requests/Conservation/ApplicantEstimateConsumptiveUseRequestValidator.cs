@@ -14,7 +14,7 @@ public class ApplicantEstimateConsumptiveUseRequestValidator : AbstractValidator
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
         {
             polygonEntryValidator.RuleFor(polygon => polygon).NotNull();
-            polygonEntryValidator.RuleFor(polygon => polygon.PolygonWkt).NotEmpty();
+            polygonEntryValidator.RuleFor(polygon => polygon.PolygonWkt).NotEmpty().MaximumLength(4000);
             polygonEntryValidator.RuleFor(polygon => polygon.DrawToolType).NotEmpty();
         });
 

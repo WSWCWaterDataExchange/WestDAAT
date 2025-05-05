@@ -1,11 +1,19 @@
-import React from 'react';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { useDashboardFilters } from '../../../../hooks/queries';
 import { BeneficialUseListItem } from '@data-contracts';
 import { DataPoints, Directions } from '../../../../data-contracts/nldi';
 import { useDisplayOptionsUrlParameters } from '../map-options/hooks/useDisplayOptionsUrlParameters';
-import { defaultDisplayOptions, DisplayOptions } from '../map-options/components/DisplayOptions';
+import {
+  defaultDisplayOptions,
+  DisplayOptions,
+} from '../map-options/components/DisplayOptions';
 import { useFiltersUrlParameters } from '../map-options/hooks/useFiltersUrlParameters';
-import { useDashboardFilters } from '../../../../hooks/queries';
 import { UseQueryResult } from 'react-query';
 
 export interface WaterRightsFilters {
@@ -96,8 +104,13 @@ export const defaultWaterRightsFilters: WaterRightsFilters = {
 export const defaultNldiFilters = {
   latitude: null as number | null,
   longitude: null as number | null,
-  directions: Directions.Upstream | Directions.Downstream,
-  dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.WadeRights | DataPoints.WadeTimeseries,
+  directions:
+    Directions.Upstream | Directions.Downstream,
+  dataPoints:
+    DataPoints.Usgs |
+    DataPoints.Epa |
+    DataPoints.WadeRights |
+    DataPoints.WadeTimeseries,
 };
 
 export const defaultState: WaterRightsContextState = {
@@ -120,27 +133,38 @@ export const defaultState: WaterRightsContextState = {
   },
 };
 
-const WaterRightsContext = createContext<WaterRightsContextState>(defaultState);
-export const useWaterRightsContext = () => useContext(WaterRightsContext);
+const WaterRightsContext = createContext<WaterRightsContextState>(
+  defaultState
+);
+export const useWaterRightsContext = () =>
+  useContext(WaterRightsContext);
 
 interface WaterRightsProviderProps {
   children: React.ReactNode;
 }
 
-export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
-  const { getParameter: getDisplayOptionsParameter, setParameter: setDisplayOptionsParameter } =
-    useDisplayOptionsUrlParameters();
-  const { getParameter: getFiltersParameter, setParameter: setFiltersParameter } = useFiltersUrlParameters();
+export const WaterRightsProvider = ({
+                                      children,
+                                    }: WaterRightsProviderProps) => {
+  const {
+    getParameter: getDisplayOptionsParameter,
+    setParameter: setDisplayOptionsParameter,
+  } = useDisplayOptionsUrlParameters();
+  const {
+    getParameter: getFiltersParameter,
+    setParameter: setFiltersParameter,
+  } = useFiltersUrlParameters();
 
-  const [filters, setFilters] = useState<WaterRightsFilters>(getFiltersParameter() ?? defaultWaterRightsFilters);
-  const [displayOptions, setDisplayOptions] = useState<DisplayOptions>(
-    getDisplayOptionsParameter() ?? defaultDisplayOptions,
+  const [filters, setFilters] = useState<WaterRightsFilters>(
+    getFiltersParameter() ?? defaultWaterRightsFilters
   );
+  const [displayOptions, setDisplayOptions] = useState<
+    DisplayOptions
+  >(getDisplayOptionsParameter() ?? defaultDisplayOptions);
   const [nldiIds, setNldiIds] = useState<string[]>([]);
 
   const dashboardFiltersQuery = useDashboardFilters();
-  const isLoading = dashboardFiltersQuery.isLoading;
-  const isError = dashboardFiltersQuery.isError;
+  const { isLoading, isError, data } = dashboardFiltersQuery;
 
   useEffect(() => {
     setDisplayOptionsParameter(displayOptions);
@@ -156,7 +180,7 @@ export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
     setNldiIds([]);
   }, [setFilters, setDisplayOptions]);
 
-  const filterContextProviderValue = {
+  const filterContextProviderValue: WaterRightsContextState = {
     filters,
     setFilters,
     nldiIds,
@@ -166,47 +190,53 @@ export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
     resetWaterRightsOptions,
     hostData: {
       beneficialUsesQuery: {
-        data: dashboardFiltersQuery.data?.beneficialUses,
+        data: data?.waterRights.beneficialUses,
         isLoading,
         isError,
       },
       waterSourcesQuery: {
-        data: dashboardFiltersQuery.data?.waterSources,
+        data: data?.waterRights.waterSourceTypes,
         isLoading,
         isError,
       },
       ownerClassificationsQuery: {
-        data: dashboardFiltersQuery.data?.ownerClassifications,
+        data: data?.waterRights.ownerClassifications,
         isLoading,
         isError,
       },
       statesQuery: {
-        data: dashboardFiltersQuery.data?.states,
+        data: data?.waterRights.states,
         isLoading,
         isError,
       },
       riverBasinsQuery: {
-        data: dashboardFiltersQuery.data?.riverBasins,
+        data: data?.waterRights.riverBasins,
         isLoading,
         isError,
       },
       allocationTypesQuery: {
-        data: dashboardFiltersQuery.data?.allocationTypes,
+        data: data?.waterRights.allocationTypes,
         isLoading,
         isError,
       },
       legalStatusesQuery: {
-        data: dashboardFiltersQuery.data?.legalStatuses,
+        data: data?.waterRights.legalStatuses,
         isLoading,
         isError,
       },
       siteTypesQuery: {
-        data: dashboardFiltersQuery.data?.siteTypes,
+        data: data?.waterRights.siteTypes,
         isLoading,
         isError,
       },
     },
   };
 
-  return <WaterRightsContext.Provider value={filterContextProviderValue}>{children}</WaterRightsContext.Provider>;
+  return (
+    <WaterRightsContext.Provider
+      value={filterContextProviderValue}
+    >
+      {children}
+    </WaterRightsContext.Provider>
+  );
 };

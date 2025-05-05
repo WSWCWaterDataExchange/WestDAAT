@@ -7,5 +7,9 @@ export interface LocationDetails {
   drawToolType: DrawToolType;
   polygonAreaInAcres: number;
   additionalDetails: string | null;
+  averageYearlyTotalEtInInches: number;
+  averageYearlyTotalEtInAcreFeet: number;
+  averageYearlyNetEtInInches: number | null;
+  averageYearlyNetEtInAcreFeet: number | null;
   waterMeasurements: LocationWaterMeasurementDetails[];
 }

@@ -1,5 +1,5 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
-import { Feature, GeoJSON, GeoJsonProperties, Geometry } from 'geojson';
+import { GeoJSON } from 'geojson';
 import bboxPolygon from '@turf/bbox-polygon';
 import { buildDefaultNewRectangleFeature } from '../../utilities/customMapShapesUtility';
 
@@ -59,7 +59,24 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
   },
 
   onStop: function (state: RectangleDrawModeState) {
-    // no cleanup needed. we do want to leave this method in place to prevent the default behavior though
+    // clean up: we need may need to remove the rectangle feature from the map.
+    // This is because we called `this.addFeature` in `onSetup`, which adds the feature to the map.
+
+    // check if feature has been deleted
+    if (!state.rectangleDrawFeature || !this.getFeature((state.rectangleDrawFeature.id ?? '') as string)) {
+      return;
+    }
+
+    // if feature is valid, add to map
+    // else delete and switch back to default draw mode
+    if (state.rectangleDrawFeature.isValid()) {
+      this.map.fire('draw.create', {
+        features: [state.rectangleDrawFeature],
+      });
+    } else {
+      this.deleteFeature(state.rectangleDrawFeature.id as string, { silent: true });
+      this.changeMode('simple_select', {}, { silent: true });
+    }
   },
 
   toDisplayFeatures: function (state: any, geojson: GeoJSON, display: (geojson: GeoJSON) => void): void {

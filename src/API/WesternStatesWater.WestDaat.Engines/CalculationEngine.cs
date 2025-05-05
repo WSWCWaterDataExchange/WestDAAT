@@ -64,7 +64,7 @@ internal class CalculationEngine : ICalculationEngine
 
         return new EstimateConservationPaymentResponse
         {
-            EstimatedCompensationDollars = (int)estimatedCompensation
+            EstimatedCompensationDollars = Math.Max(0, (int)estimatedCompensation)
         };
     }
 
@@ -149,7 +149,7 @@ internal class CalculationEngine : ICalculationEngine
 
             var result = new PolygonEtDataCollection
             {
-                WaterConservationApplicationEstimateLocationId = null,
+                WaterConservationApplicationEstimateLocationId = polygon.WaterConservationApplicationEstimateLocationId,
                 PolygonWkt = polygon.PolygonWkt,
                 DrawToolType = polygon.DrawToolType,
                 AverageYearlyTotalEtInInches = averageTotalEtInInches,

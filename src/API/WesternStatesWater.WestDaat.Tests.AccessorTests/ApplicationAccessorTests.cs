@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests;
 
@@ -22,7 +24,8 @@ public class ApplicationAccessorTests : AccessorTestBase
         _accessor = new ApplicationAccessor(
             CreateLogger<ApplicationAccessor>(),
             dbContextFactory,
-            westDaatDbContextFactory
+            westDaatDbContextFactory,
+            Services.GetRequiredService<IBlobStorageSdk>()
         );
 
         _westDaatDb = westDaatDbContextFactory.Create();
@@ -269,9 +272,9 @@ public class ApplicationAccessorTests : AccessorTestBase
             .RuleFor(loc => loc.AdditionalDetails, () => "Custom additional details")
             .Generate(2);
         var locationWaterMeasurements = locations.Select(location =>
-            new LocationWaterMeasurementFaker(location).Generate(5)
-        ).SelectMany(waterMeasurements => waterMeasurements)
-        .ToArray();
+                new LocationWaterMeasurementFaker(location).Generate(5)
+            ).SelectMany(waterMeasurements => waterMeasurements)
+            .ToArray();
         await _westDaatDb.LocationWaterMeasurements.AddRangeAsync(locationWaterMeasurements);
 
         WaterConservationApplicationEstimateControlLocation controlLocation = null;
@@ -285,7 +288,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.SaveChangesAsync();
 
         string pointWkt = "POINT (5 5)",
-               polygonWkt = "POLYGON ((1 1), (3 3), (5 5))";
+            polygonWkt = "POLYGON ((1 1), (3 3), (5 5))";
 
         var request = new ApplicationEstimateUpdateRequest
         {
@@ -301,7 +304,8 @@ public class ApplicationAccessorTests : AccessorTestBase
                 PointWkt = pointWkt,
                 // if control location did not already exist, new water measurements will be created
                 // if control location did exist, existing water measurements will be deleted and new water measurements will be created
-                WaterMeasurements = [
+                WaterMeasurements =
+                [
                     new ApplicationEstimateStoreControlLocationWaterMeasurementsDetails
                     {
                         Year = 2025,

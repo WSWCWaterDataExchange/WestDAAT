@@ -22,7 +22,7 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         Db.ReportingUnitType.Add(reportingUnitType);
         await Db.SaveChangesAsync();
 
-        var statusFinal = new RegulatoryStatusCVFaker().Generate();
+        var statusFinal = new OverlayStatusCVFaker().Generate();
 
         var overlayTypeAdmin = new OverlayTypeFaker()
             .RuleFor(r => r.Name, "AA")
@@ -33,26 +33,26 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
             .RuleFor(r => r.Name, "FF")
             .RuleFor(r => r.WaDEName, "Federal")
             .Generate();
-        Db.RegulatoryOverlayType.AddRange(overlayTypeAdmin, overlayTypeFederal);
+        Db.OverlayTypeCv.AddRange(overlayTypeAdmin, overlayTypeFederal);
         await Db.SaveChangesAsync();
 
         var overlayDimWest = new OverlayDimFaker()
-            .RuleFor(r => r.RegulatoryName, "Western Utah Management")
-            .RuleFor(r => r.RegulatoryOverlayTypeCV, overlayTypeAdmin.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r => r.OverlayName, "Western Utah Management")
+            .RuleFor(r => r.OverlayTypeCV, overlayTypeAdmin.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
         var overlayDimNorthwest = new OverlayDimFaker()
-            .RuleFor(r => r.RegulatoryName, "Northwestern Utah Management")
-            .RuleFor(r => r.RegulatoryOverlayTypeCV, overlayTypeFederal.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r => r.OverlayName, "Northwestern Utah Management")
+            .RuleFor(r => r.OverlayTypeCV, overlayTypeFederal.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
 
         var overlayDimEast = new OverlayDimFaker()
-            .RuleFor(r => r.RegulatoryName, "Eastern Utah Management")
-            .RuleFor(r => r.RegulatoryOverlayTypeCV, overlayTypeAdmin.Name)
-            .RuleFor(r=>r.RegulatoryStatusCv, statusFinal.Name)
+            .RuleFor(r => r.OverlayName, "Eastern Utah Management")
+            .RuleFor(r => r.OverlayTypeCV, overlayTypeAdmin.Name)
+            .RuleFor(r=>r.OverlayStatusCv, statusFinal.Name)
             .Generate();
-        Db.RegulatoryOverlayDim.AddRange(overlayDimWest, overlayDimNorthwest, overlayDimEast);
+        Db.OverlayDim.AddRange(overlayDimWest, overlayDimNorthwest, overlayDimEast);
         await Db.SaveChangesAsync();
 
         var reportingUnitDim1 = new ReportingUnitDimFaker()
@@ -71,18 +71,18 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         await Db.SaveChangesAsync();
 
         var reportingUnitFact1 = new ReportingUnitsFactFaker()
-            .RuleFor(r => r.RegulatoryOverlayId, overlayDimWest.RegulatoryOverlayId)
+            .RuleFor(r => r.OverlayId, overlayDimWest.OverlayId)
             .RuleFor(r => r.ReportingUnitId, reportingUnitDim1.ReportingUnitId)
             .Generate();
         var reportingUnitFact2 = new ReportingUnitsFactFaker()
-            .RuleFor(r => r.RegulatoryOverlayId, overlayDimNorthwest.RegulatoryOverlayId)
+            .RuleFor(r => r.OverlayId, overlayDimNorthwest.OverlayId)
             .RuleFor(r => r.ReportingUnitId, reportingUnitDim2.ReportingUnitId)
             .Generate();
         var reportingUnitFact3 = new ReportingUnitsFactFaker()
-            .RuleFor(r => r.RegulatoryOverlayId, overlayDimEast.RegulatoryOverlayId)
+            .RuleFor(r => r.OverlayId, overlayDimEast.OverlayId)
             .RuleFor(r => r.ReportingUnitId, reportingUnitDim2.ReportingUnitId)
             .Generate();
-        Db.RegulatoryReportingUnitsFact.AddRange(reportingUnitFact1, reportingUnitFact2, reportingUnitFact3);
+        Db.OverlayReportingUnitsFact.AddRange(reportingUnitFact1, reportingUnitFact2, reportingUnitFact3);
         await Db.SaveChangesAsync();
 
         // Act
@@ -95,9 +95,11 @@ public class OverlayDetailsTests : MapboxTilesetTestBase
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(2);
         
-        var resultAdminOverlay = features.First(f => f.properties.uuid == reportingUnitDim1.ReportingUnitUuid);
-        resultAdminOverlay.properties.oType.Should().BeEquivalentTo("Administrator");
-        var resultFederalOverlay = features.First(f => f.properties.uuid == reportingUnitDim2.ReportingUnitUuid);
-        resultFederalOverlay.properties.oType.Should().BeEquivalentTo("Federal", "Administrator");
+        var resultAdminOverlay = features?.FirstOrDefault(f => f.properties.uuid == reportingUnitDim1.ReportingUnitUuid);
+        resultAdminOverlay.Should().NotBeNull();
+        resultAdminOverlay!.properties.oType.Should().BeEquivalentTo("Administrator");
+        var resultFederalOverlay = features?.FirstOrDefault(f => f.properties.uuid == reportingUnitDim2.ReportingUnitUuid);
+        resultFederalOverlay.Should().NotBeNull();
+        resultFederalOverlay!.properties.oType.Should().BeEquivalentTo("Federal", "Administrator");
     }
 }

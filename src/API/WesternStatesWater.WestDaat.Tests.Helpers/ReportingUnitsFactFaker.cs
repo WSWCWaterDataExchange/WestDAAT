@@ -2,7 +2,7 @@ using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class ReportingUnitsFactFaker : Faker<RegulatoryReportingUnitsFact>
+public class ReportingUnitsFactFaker : Faker<OverlayReportingUnitsFact>
 {
     public ReportingUnitsFactFaker()
     {

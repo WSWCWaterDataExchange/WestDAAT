@@ -18,6 +18,7 @@ import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { DrawToolType } from '../data-contracts/DrawToolType';
 import { ReviewStepStatus } from '../data-contracts/ReviewStepStatus';
 import { ReviewStepType } from '../data-contracts/ReviewStepType';
+import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
 
 const shouldApplicantBeAbleToPerformConsumptiveUseEstimate = (
   state: ConservationApplicationState,
@@ -755,14 +756,14 @@ describe('ConservationApplicationState reducer', () => {
       // application estimate control location
       const controlLocation = application.controlLocation!;
       const expectedControlLocation = applicationDetails.estimate.controlLocation;
-      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
-      expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
-      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation!.id);
+      expect(controlLocation.pointWkt).toEqual(expectedControlLocation!.pointWkt);
+      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation!.waterMeasurements.length);
       expect(newState.controlPointLocationHasBeenSaved).toBe(true);
 
       // application estimate control location water measurements
       const controlLocationWaterMeasurement = controlLocation.datapoints![0];
-      const expectedControlLocationWaterMeasurement = expectedControlLocation.waterMeasurements[0];
+      const expectedControlLocationWaterMeasurement = expectedControlLocation!.waterMeasurements[0];
       expect(controlLocationWaterMeasurement.year).toEqual(expectedControlLocationWaterMeasurement.year);
       expect(controlLocationWaterMeasurement.totalEtInInches).toEqual(
         expectedControlLocationWaterMeasurement.totalEtInInches,
@@ -832,6 +833,70 @@ describe('ConservationApplicationState reducer', () => {
 
       // application dirty status
       expect(newState.conservationApplication.isDirty).toBe(false);
+
+      // data table should be hidden
+      expect(newState.displayDataTable).toBe(false);
+    });
+
+    it('loading multiple applications should modify control location state', () => {
+      // Arrange
+      // first application - has control location
+      const applicationLoadedAction1: ApplicationLoadedAction = {
+        type: 'APPLICATION_LOADED',
+        payload: {
+          application: applicationDetails,
+          notes: [applicationReviewNote],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
+        },
+      };
+
+      // second application - has no control location
+      const applicationLoadedAction2: ApplicationLoadedAction = {
+        type: 'APPLICATION_LOADED',
+        payload: {
+          application: {
+            ...applicationDetails,
+            estimate: {
+              ...applicationDetails.estimate,
+              controlLocation: null,
+            },
+          },
+          notes: [applicationReviewNote],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
+        },
+      };
+
+      // Act 1
+      let newState = reducer(state, applicationLoadedAction1);
+
+      // Assert 1
+      expect(newState.conservationApplication.controlLocation).toBeDefined();
+      expect(newState.controlPointLocationHasBeenSaved).toBe(true);
+
+      // Act 2
+      newState = reducer(newState, applicationLoadedAction2);
+
+      // Assert 2
+      expect(newState.conservationApplication.controlLocation).toBeUndefined();
+      expect(newState.controlPointLocationHasBeenSaved).toBe(false);
     });
 
     it('reviewer updating map data should update state', () => {
@@ -1131,7 +1196,7 @@ describe('ConservationApplicationState reducer', () => {
             },
           ],
         },
-        estimateWasSaved: false
+        estimateWasSaved: false,
       },
     };
     newState = reducer(newState, estimateConsumptiveUseAction);
@@ -1176,8 +1241,186 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.controlPointLocationHasBeenSaved).toEqual(true);
   });
 
+  it('reviewer modified polygons and saved changes - polygons and Application Submission form should be updated', () => {
+    // Arrange
+    // reviewer loads application with existing polygons
+    const applicationMock = applicationDetailsMock();
+    const applicationLoadedAction: ApplicationLoadedAction = {
+      type: 'APPLICATION_LOADED',
+      payload: {
+        application: {
+          ...applicationMock,
+          estimate: {
+            ...applicationMock.estimate,
+            locations: [
+              {
+                id: 'polygon-1',
+                additionalDetails: 'field 1 details',
+                polygonWkt: 'POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))',
+                drawToolType: DrawToolType.Freeform,
+                polygonAreaInAcres: 10,
+                averageYearlyTotalEtInInches: 12,
+                averageYearlyTotalEtInAcreFeet: 1,
+                averageYearlyNetEtInInches: null,
+                averageYearlyNetEtInAcreFeet: null,
+                waterMeasurements: [],
+              },
+              {
+                id: 'polygon-2',
+                additionalDetails: 'field 2 details',
+                polygonWkt: 'POLYGON ((0 0, 2 0, 2 2, 0 2, 0 0))',
+                drawToolType: DrawToolType.Freeform,
+                polygonAreaInAcres: 20,
+                averageYearlyTotalEtInInches: 12,
+                averageYearlyTotalEtInAcreFeet: 1,
+                averageYearlyNetEtInInches: null,
+                averageYearlyNetEtInAcreFeet: null,
+                waterMeasurements: [],
+              },
+              {
+                id: 'polygon-3',
+                additionalDetails: 'field 3 details',
+                polygonWkt: 'POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0))',
+                drawToolType: DrawToolType.Freeform,
+                polygonAreaInAcres: 30,
+                averageYearlyTotalEtInInches: 12,
+                averageYearlyTotalEtInAcreFeet: 1,
+                averageYearlyNetEtInInches: null,
+                averageYearlyNetEtInAcreFeet: null,
+                waterMeasurements: [],
+              },
+            ],
+            // control location comes from mock
+          },
+        },
+        notes: [],
+        reviewPipeline: {
+          reviewSteps: [],
+        },
+      },
+    };
+
+    let newState = reducer(state, applicationLoadedAction);
+
+    // sanity check - polygons should exist in conservation application state;
+    // application submission form should have an entry for each polygon
+    expect(newState.conservationApplication.estimateLocations.length).toEqual(3);
+    expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toEqual(3);
+
+    // Act / Assert
+    // user deletes polygon 2
+    const updateMapDataAction: ReviewerMapDataUpdatedAction = {
+      type: 'REVIEWER_MAP_DATA_UPDATED',
+      payload: {
+        polygons: [
+          // preserve polygons 1 and 3; polygon 2 not included
+          {
+            waterConservationApplicationEstimateLocationId: 'polygon-1',
+            polygonWkt: 'POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))',
+            drawToolType: DrawToolType.Freeform,
+            acreage: 10,
+          },
+          {
+            waterConservationApplicationEstimateLocationId: 'polygon-3',
+            polygonWkt: 'POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0))',
+            drawToolType: DrawToolType.Freeform,
+            acreage: 30,
+          },
+        ],
+        doPolygonsOverlap: false,
+        // no change to control location
+        controlLocation: {
+          pointWkt: newState.conservationApplication.controlLocation!.pointWkt!,
+        },
+        doesControlLocationOverlapWithPolygons: false,
+      },
+    };
+    newState = reducer(newState, updateMapDataAction);
+
+    // verify submission form was updated
+    const fieldDetails = () => newState.conservationApplication.applicationSubmissionForm.fieldDetails;
+
+    expect(fieldDetails().length).toEqual(2);
+
+    expect(fieldDetails()[0].waterConservationApplicationEstimateLocationId).toEqual('polygon-1');
+    expect(fieldDetails()[0].additionalDetails).toEqual('field 1 details');
+    expect(fieldDetails()[1].waterConservationApplicationEstimateLocationId).toEqual('polygon-3');
+    expect(fieldDetails()[1].additionalDetails).toEqual('field 3 details');
+
+    // user adds new polygon
+    const updateMapDataAction2: ReviewerMapDataUpdatedAction = {
+      type: 'REVIEWER_MAP_DATA_UPDATED',
+      payload: {
+        ...updateMapDataAction.payload,
+        polygons: [
+          // preserve polygons 1 and 3
+          ...updateMapDataAction.payload.polygons,
+          // add new polygon
+          {
+            waterConservationApplicationEstimateLocationId: undefined,
+            polygonWkt: 'POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0))',
+            drawToolType: DrawToolType.Rectangle,
+            acreage: 40,
+          },
+        ],
+      },
+    };
+    newState = reducer(newState, updateMapDataAction2);
+
+    // verify submission form was *not* updated
+    expect(fieldDetails().length).toEqual(2);
+
+    expect(fieldDetails()[0].waterConservationApplicationEstimateLocationId).toEqual('polygon-1');
+    expect(fieldDetails()[0].additionalDetails).toEqual('field 1 details');
+    expect(fieldDetails()[1].waterConservationApplicationEstimateLocationId).toEqual('polygon-3');
+    expect(fieldDetails()[1].additionalDetails).toEqual('field 3 details');
+    // no new entry for new polygon:
+    // it isn't saved yet / it has no id,
+    // therefore the reviewer shouldn't be able to enter the Additional Details for it yet
+
+    const consumptiveUseEstimatedAction: ReviewerConsumptiveUseEstimatedAction = {
+      type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
+      payload: {
+        cumulativeTotalEtInAcreFeet: 200,
+        cumulativeNetEtInAcreFeet: 100,
+        conservationPayment: 50_000,
+        // polygons in response should match what's already in state
+        dataCollections: newState.conservationApplication.estimateLocations.map(
+          (location): PolygonEtDataCollection => ({
+            waterConservationApplicationEstimateLocationId:
+              location.waterConservationApplicationEstimateLocationId ?? null,
+            polygonWkt: location.polygonWkt!,
+            averageYearlyTotalEtInInches: 12,
+            averageYearlyTotalEtInAcreFeet: 120,
+            averageYearlyNetEtInInches: 10,
+            averageYearlyNetEtInAcreFeet: 100,
+            datapoints: [],
+          }),
+        ),
+        controlDataCollection: {
+          waterConservationApplicationEstimateControlLocationId: 'control-location-guid',
+          pointWkt: newState.conservationApplication.controlLocation!.pointWkt!,
+          averageYearlyTotalEtInInches: 2,
+          datapoints: [],
+        },
+        estimateWasSaved: true,
+      },
+    };
+    newState = reducer(newState, consumptiveUseEstimatedAction);
+
+    // changes were saved to backend - field names should be updated
+    const locations = newState.conservationApplication.estimateLocations;
+    expect(locations.length).toEqual(3);
+    expect(locations[0].fieldName).toEqual('Field 1');
+    expect(locations[1].fieldName).toEqual('Field 3');
+    expect(locations[2].fieldName).toEqual('Field 4');
+
+    // notably, the submission form won't be updated until the user returns to the form page and the updated form is generated
+    expect(fieldDetails().length).toEqual(2);
+  });
+
   describe('Additional Use Cases', () => {
-    it("should reset the Application Submission form's polygons' AdditionalDetails fields if the user updates their polygon selections.", () => {
+    it("should reset the Application Submission form's polygons' AdditionalDetails fields if the applicant updates their polygon selections.", () => {
       // user selects map polygons
       const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
       let newState = reducer(state, {

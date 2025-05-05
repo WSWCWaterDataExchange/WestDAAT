@@ -21,6 +21,7 @@ export const mapLayerNames = {
   timeSeriesPointsLayer: 'timeSeriesPoints',
   timeSeriesPolygonsLayer: 'timeSeriesPolygons',
   userDrawnPolygonLabelsLayer: 'user-drawn-polygon-labels',
+  userDrawnPointLabelsLayer: 'user-drawn-point-labels',
 };
 
 export const mapSourceNames = {
@@ -31,6 +32,7 @@ export const mapSourceNames = {
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
   userDrawnPolygonLabelsGeoJson: 'user-drawn-polygon-labels-geojson',
+  userDrawnPointLabelsGeoJson: 'user-drawn-point-labels-geojson',
 };
 
 export const defaultPointCircleRadius: DataDrivenPropertyValueSpecification<number> = [
@@ -141,6 +143,19 @@ const mapsJson: {
         type: 'FeatureCollection',
         features: [],
       },
+    },
+    {
+      id: mapSourceNames.userDrawnPointLabelsGeoJson,
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    },
+    {
+      id: 'selected-feature',
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
     },
   ],
   layers: [
@@ -300,7 +315,7 @@ const mapsJson: {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
-      {
+    {
       id: mapLayerNames.timeSeriesPolygonsLayer,
       friendlyName: 'Time Series Polygons',
       'source-layer': 'polygons',
@@ -340,13 +355,59 @@ const mapsJson: {
       },
     },
     {
+      id: 'selected-feature-outline',
+      type: 'line',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+      paint: {
+        'line-color': '#000000',
+        'line-width': 2,
+      },
+    },
+    {
+      id: 'selected-feature-point-outline',
+      type: 'circle',
+      source: 'selected-feature',
+      layout: { visibility: 'visible' },
+      filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
+      paint: {
+        'circle-color': 'rgba(0,0,0,0)',
+        'circle-stroke-color': '#000000',
+        'circle-stroke-width': 2,
+        'circle-radius': defaultPointCircleRadius,
+      },
+    },
+    {
       id: mapLayerNames.userDrawnPolygonLabelsLayer,
       type: 'symbol',
       source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       layout: {
-        'text-field': ['get', 'title'],
+        'text-field': ['get', 'title'], // displays the `title` property
         'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
-        'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-size': 20,
+        'text-justify': 'center',
+        'text-letter-spacing': 0.05, // default is 0
+        'icon-image': ['get', 'icon'],
+      },
+      paint: {
+        'text-halo-color': '#fff',
+        'text-halo-width': 0.75,
+      },
+    },
+    {
+      id: mapLayerNames.userDrawnPointLabelsLayer,
+      type: 'symbol',
+      source: mapSourceNames.userDrawnPointLabelsGeoJson,
+      layout: {
+        'text-field': ['get', 'title'], // displays the `title` property
+        'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
+        'text-variable-anchor': [
+          // locations where the text can be placed
+          'top',
+          'bottom',
+        ],
+        'text-radial-offset': 0.5, // how far outward from the center the text is placed
         'text-size': 20,
         'text-justify': 'center',
         'text-letter-spacing': 0.05, // default is 0

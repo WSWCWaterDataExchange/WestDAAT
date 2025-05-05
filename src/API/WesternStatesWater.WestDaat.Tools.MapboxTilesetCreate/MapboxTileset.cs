@@ -339,7 +339,7 @@ public static class MapboxTileset
             var properties = new Dictionary<string, object>
             {
                 { "uuid", overlay.ReportingUnitUUID },
-                { "oType", PipeDelimiterToDistinctList(overlay.RegulatoryOverlayTypeWaDEName) },
+                { "oType", PipeDelimiterToDistinctList(overlay.OverlayTypeWaDEName) },
                 { "state", overlay.State },
                 { "wsType", PipeDelimiterToDistinctList(overlay.WaterSourceTypeWaDEName) }
             };
@@ -449,11 +449,17 @@ public static class MapboxTileset
 
     private static Feature CreateSiteTimeSeriesFeature(List<TimeSeries> siteTimeSeries)
     {
+        if (siteTimeSeries.Count == 0)
+        {
+            throw new InvalidOperationException("siteTimeSeries must not be empty.");
+        }
+
+        var first = siteTimeSeries[0];
         var properties = new Dictionary<string, object>
         {
-            { "uuid", siteTimeSeries.First().SiteUuid },
-            { "state", siteTimeSeries.First().State },
-            { "siteType", siteTimeSeries.First().SiteType },
+            { "uuid", first.SiteUuid },
+            { "state", first.State },
+            { "siteType", first.SiteType },
             { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))! },
             { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))! },
             { "primaryUseCategory", siteTimeSeries.Select(x => x.PrimaryUseCagtegory).Distinct().ToArray() },

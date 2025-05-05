@@ -22,6 +22,7 @@ import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 import { conservationApplicationMaxPolygonAcreage, conservationApplicationMaxPolygonCount } from '../config/constants';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -46,6 +47,7 @@ export interface ConservationApplicationState {
     controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
     doesControlLocationOverlapWithPolygons: boolean;
+    polygonsAddedByFileUpload: PartialPolygonData[];
     // derived/computed state
     isDirty: boolean;
     isApplicationSubmissionFormValid: boolean;
@@ -54,6 +56,7 @@ export interface ConservationApplicationState {
     reviewerNotes: ApplicationReviewNote[];
     reviewPipeline: ReviewPipeline;
     status: ConservationApplicationStatus;
+    mapImageUrl: string | undefined;
   };
   displayDataTable: boolean;
   isCreatingApplication: boolean;
@@ -61,6 +64,7 @@ export interface ConservationApplicationState {
   isLoadingApplication: boolean;
   loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
+  isGeneratingMapImage: boolean;
   loadFundingOrganizationErrored: boolean;
   isLoadingReviewerConsumptiveUseEstimate: boolean;
   reviewerConsumptiveUseEstimateHasErrored: boolean;
@@ -100,6 +104,7 @@ export const defaultState = (): ConservationApplicationState => ({
     controlLocation: undefined,
     doPolygonsOverlap: false,
     doesControlLocationOverlapWithPolygons: false,
+    polygonsAddedByFileUpload: [],
     isDirty: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
@@ -109,6 +114,7 @@ export const defaultState = (): ConservationApplicationState => ({
       reviewSteps: [],
     },
     status: ConservationApplicationStatus.Unknown,
+    mapImageUrl: undefined,
   },
   displayDataTable: false,
   isCreatingApplication: false,
@@ -116,6 +122,7 @@ export const defaultState = (): ConservationApplicationState => ({
   isLoadingApplication: false,
   loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
+  isGeneratingMapImage: false,
   loadFundingOrganizationErrored: false,
   isLoadingReviewerConsumptiveUseEstimate: false,
   reviewerConsumptiveUseEstimateHasErrored: false,
@@ -132,6 +139,8 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
+  | GISFilePolygonsUploadedAction
+  | GISFilePolygonsProcessedAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
@@ -150,6 +159,9 @@ export type ApplicationAction =
   | ApplicationLoadedAction
   | ApplicationLoadErroredAction
   | ApplicationReviewerNoteAddedAction
+  | ApplicationMapStaticImageAddedAction
+  | ApplicationMapStaticImageGenerateStartedAction
+  | ApplicationMapStaticImageGenerateCompletedAction
   | DataTableToggledAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -191,6 +203,17 @@ export interface FundingOrganizationLoadedAction {
 
 export interface FundingOrganizationLoadErrored {
   type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
+}
+
+export interface GISFilePolygonsUploadedAction {
+  type: 'GIS_FILE_POLYGONS_UPLOADED';
+  payload: {
+    polygons: MapSelectionPolygonData[];
+  };
+}
+
+export interface GISFilePolygonsProcessedAction {
+  type: 'GIS_FILE_POLYGONS_PROCESSED';
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -319,6 +342,21 @@ export interface ApplicationReviewerNoteAddedAction {
   };
 }
 
+export interface ApplicationMapStaticImageAddedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED';
+  payload: {
+    mapImageUrl: string;
+  };
+}
+
+export interface ApplicationMapStaticImageGenerateStartedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED';
+}
+
+export interface ApplicationMapStaticImageGenerateCompletedAction {
+  type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED';
+}
+
 export interface DataTableToggledAction {
   type: 'DATA_TABLE_TOGGLED';
 }
@@ -355,6 +393,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
+    case 'GIS_FILE_POLYGONS_UPLOADED':
+      return onGISFilePolygonsUploaded(draftState, action);
+    case 'GIS_FILE_POLYGONS_PROCESSED':
+      return onGISFilePolygonsProcessed(draftState);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
@@ -385,6 +427,12 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationLoadErrored(draftState);
     case 'APPLICATION_NOTE_ADDED':
       return onApplicationReviewerNoteAdded(draftState, action);
+    case 'APPLICATION_MAP_STATIC_IMAGE_ADDED':
+      return onApplicationMapStaticImageAdded(draftState, action);
+    case 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED':
+      return onApplicationMapStaticImageGenerateStarted(draftState);
+    case 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED':
+      return onApplicationMapStaticImageGenerateCompleted(draftState);
     case 'DATA_TABLE_TOGGLED':
       return onDataTableToggled(draftState);
   }
@@ -437,6 +485,7 @@ function calculateApplicationStatistics(applications: ApplicationDashboardListIt
     totalObligationDollars: totalObligation,
   };
 }
+
 const onEstimationToolPageLoaded = (
   draftState: ConservationApplicationState,
   { payload }: EstimationToolPageLoadedAction,
@@ -561,6 +610,16 @@ const onReviewerMapPolygonsUpdated = (
           draftState.conservationApplication.estimateLocations.filter(
             (p) => p.polygonWkt !== removedPolygon.polygonWkt,
           );
+
+        // important - may also need to update the ApplicationSubmission form
+        if (removedPolygon.waterConservationApplicationEstimateLocationId) {
+          draftState.conservationApplication.applicationSubmissionForm.fieldDetails =
+            draftState.conservationApplication.applicationSubmissionForm.fieldDetails.filter(
+              (location) =>
+                location.waterConservationApplicationEstimateLocationId !==
+                removedPolygon.waterConservationApplicationEstimateLocationId,
+            );
+        }
       }
     } else {
       // polygon modified
@@ -625,6 +684,38 @@ const onReviewerMapPolygonsUpdated = (
   return draftState;
 };
 
+const onGISFilePolygonsUploaded = (
+  draftState: ConservationApplicationState,
+  { payload }: GISFilePolygonsUploadedAction,
+): ConservationApplicationState => {
+  // push new polygons to a separate queue to be processed
+  const newPolygons = payload.polygons.map(
+    (polygon): PartialPolygonData => ({
+      waterConservationApplicationEstimateLocationId: undefined,
+      polygonWkt: polygon.polygonWkt,
+      acreage: polygon.acreage,
+      drawToolType: DrawToolType.Freeform,
+      fieldName: undefined,
+      additionalDetails: undefined,
+      centerPoint: truncate(center(convertWktToGeometry(polygon.polygonWkt)), { precision: 6 }).geometry,
+      datapoints: [],
+      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyNetEtInAcreFeet: undefined,
+      averageYearlyNetEtInInches: undefined,
+    }),
+  );
+
+  draftState.conservationApplication.polygonsAddedByFileUpload.push(...newPolygons);
+
+  return draftState;
+};
+
+const onGISFilePolygonsProcessed = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.polygonsAddedByFileUpload = [];
+  return draftState;
+};
+
 const onEstimationFormUpdated = (
   draftState: ConservationApplicationState,
   { payload }: EstimationFormUpdatedAction,
@@ -654,7 +745,7 @@ const onApplicantConsumptiveUseEstimated = (
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    polygon.fieldName = `Field ${i + 1}`;
+    polygon.fieldName = generateFieldName(i + 1);
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ?? undefined;
     polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
@@ -694,7 +785,7 @@ const onReviewerConsumptiveUseEstimated = (
   draftState.isLoadingReviewerConsumptiveUseEstimate = false;
   draftState.reviewerConsumptiveUseEstimateHasErrored = false;
 
-  // if an estimated has already been saved, we don't want to overwrite that flag
+  // if an estimate has already been saved, we don't want to overwrite that flag
   if (!draftState.controlPointLocationHasBeenSaved) {
     draftState.controlPointLocationHasBeenSaved = payload.estimateWasSaved;
   }
@@ -705,21 +796,39 @@ const onReviewerConsumptiveUseEstimated = (
   application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
-  // combine polygon data
+  // combine polygon data and update field names
+  // start with the highest field name index + 1
+  // ie if "Field 3" exists, start with "Field 4"
+  const existingFieldNameIndices = application.estimateLocations
+    .filter((location) => !!location.fieldName)
+    .map((location): number => {
+      // validate field name was generated in expected format
+      if (!location.fieldName!.startsWith('Field ')) {
+        console.error(`Field name ${location.fieldName} is not in expected format`);
+      }
+
+      // handle field number being in unexpected format
+      let fieldNumber: number = Number(location.fieldName!.split(' ')[1]);
+      if (isNaN(fieldNumber)) {
+        fieldNumber = conservationApplicationMaxPolygonCount;
+      }
+      return fieldNumber;
+    });
+  const maxFieldNameIndex = existingFieldNameIndices.reduce((prev, curr) => Math.max(prev, curr), 0);
+
+  let assignedFieldNameIndex = maxFieldNameIndex + 1;
   for (let i = 0; i < application.estimateLocations.length; i++) {
+    // update polygon entry
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    application.estimateLocations[i] = {
-      // preserve existing entry's data
-      ...application.estimateLocations[i],
-      // merge consumptive use data into entry
-      ...matchingConsumptiveUseData,
-      // ensure that the Id is preserved, assuming it exists
-      waterConservationApplicationEstimateLocationId:
-        matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ??
-        application.estimateLocations[i].waterConservationApplicationEstimateLocationId,
-    };
+    Object.assign(application.estimateLocations[i], matchingConsumptiveUseData);
+
+    // update field name
+    if (!polygon.fieldName) {
+      polygon.fieldName = generateFieldName(assignedFieldNameIndex);
+      assignedFieldNameIndex++;
+    }
   }
 
   // update control location
@@ -862,12 +971,13 @@ const onApplicationLoaded = (
       drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
-      fieldName: `Field ${index + 1}`,
+      fieldName: generateFieldName(index + 1),
       datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
-      // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
-      averageYearlyTotalEtInAcreFeet: undefined,
-      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInInches: location.averageYearlyTotalEtInInches,
+      averageYearlyTotalEtInAcreFeet: location.averageYearlyTotalEtInAcreFeet,
+      averageYearlyNetEtInInches: location.averageYearlyNetEtInInches,
+      averageYearlyNetEtInAcreFeet: location.averageYearlyNetEtInAcreFeet,
     }),
   );
   draftApplication.doPolygonsOverlap = false;
@@ -877,7 +987,7 @@ const onApplicationLoaded = (
     draftApplication.controlLocation = {
       waterConservationApplicationEstimateControlLocationId: controlLocation.id,
       pointWkt: controlLocation.pointWkt,
-      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+      datapoints: controlLocation.waterMeasurements.map(
         (measurement): GeometryEtDatapoint => ({
           year: measurement.year,
           totalEtInInches: measurement.totalEtInInches,
@@ -887,6 +997,9 @@ const onApplicationLoaded = (
       ),
     };
     draftState.controlPointLocationHasBeenSaved = true;
+  } else {
+    draftApplication.controlLocation = undefined;
+    draftState.controlPointLocationHasBeenSaved = false;
   }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 
@@ -906,10 +1019,12 @@ const onApplicationLoaded = (
 
   draftApplication.reviewPipeline = payload.reviewPipeline;
   draftApplication.status = application.status;
+  draftApplication.mapImageUrl = application.mapImageUrl;
 
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
   draftState.conservationApplication.isDirty = false;
+  draftState.displayDataTable = false;
 
   return draftState;
 };
@@ -1086,7 +1201,33 @@ const onApplicationReviewerNoteAdded = (
   return draftState;
 };
 
+const onApplicationMapStaticImageAdded = (
+  draftState: ConservationApplicationState,
+  action: ApplicationMapStaticImageAddedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.mapImageUrl = action.payload.mapImageUrl;
+  return draftState;
+};
+
+const onApplicationMapStaticImageGenerateStarted = (
+  draftState: ConservationApplicationState,
+): ConservationApplicationState => {
+  draftState.isGeneratingMapImage = true;
+  return draftState;
+};
+
+const onApplicationMapStaticImageGenerateCompleted = (
+  draftState: ConservationApplicationState,
+): ConservationApplicationState => {
+  draftState.isGeneratingMapImage = false;
+  return draftState;
+};
+
 const onDataTableToggled = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.displayDataTable = !draftState.displayDataTable;
   return draftState;
+};
+
+const generateFieldName = (index: number): string => {
+  return `Field ${index}`;
 };

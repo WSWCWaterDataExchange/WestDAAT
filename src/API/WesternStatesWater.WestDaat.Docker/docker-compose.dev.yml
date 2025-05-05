@@ -25,7 +25,7 @@ services:
     container_name: azurite
     restart: no
     image: mcr.microsoft.com/azure-storage/azurite:3.34.0
-    command: "azurite --blobHost 0.0.0.0 --loose"
+    command: "azurite --blobHost 0.0.0.0 --loose --debug ./debug.log"
     ports:
       - "10000:10000"
       - "10001:10001"
@@ -42,6 +42,7 @@ services:
       - -c
       - |
         az storage container create --name application-documents
+        az storage container create --name application-map-images
         az storage cors add --origins '*' --services 'b' --methods GET POST PUT OPTIONS HEAD --allowed-headers '*'
     depends_on:
       azurite:

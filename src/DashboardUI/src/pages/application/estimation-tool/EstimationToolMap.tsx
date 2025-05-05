@@ -31,8 +31,15 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
-    useMapContext();
+  const {
+    isMapLoaded,
+    setMapBoundSettings,
+    setMapStyle,
+    setVisibleLayers,
+    setGeoJsonData,
+    setUserDrawnPolygonData,
+    addGeometriesToMap,
+  } = useMapContext();
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -78,7 +85,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-      padding: 25,
+      padding: 50,
       maxZoom: 16,
     });
   }, [
@@ -106,6 +113,38 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     });
     return labelFeatures;
   }, [state.conservationApplication.estimateLocations]);
+
+  useEffect(() => {
+    const data = state.conservationApplication.polygonsAddedByFileUpload;
+    if (!isMapLoaded || data.length === 0) {
+      return;
+    }
+
+    // put new polygons onto map
+    const newFeatures = data.map(fromPartialPolygonDataToPolygonFeature);
+    addGeometriesToMap.current!(newFeatures);
+
+    const existingFeatures: Feature<Polygon, GeoJsonProperties>[] = state.conservationApplication.estimateLocations.map(
+      fromPartialPolygonDataToPolygonFeature,
+    );
+
+    // zoom to fit all data
+    const allFeatures = [...existingFeatures, ...newFeatures];
+    const allFeaturesFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: allFeatures,
+    };
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(allFeaturesFeatureCollection),
+      padding: 50,
+      maxZoom: 16,
+      duration: 5000,
+    });
+
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_PROCESSED',
+    });
+  }, [isMapLoaded, state.conservationApplication.polygonsAddedByFileUpload]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > conservationApplicationMaxPolygonCount) {
@@ -154,9 +193,10 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        polygonLabelFeatures={polygonLabelFeatures}
+        conservationApplicationPolygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
+        showLoading={state.isGeneratingMapImage}
       />
       <EstimationToolTableView perspective="applicant" />
     </div>

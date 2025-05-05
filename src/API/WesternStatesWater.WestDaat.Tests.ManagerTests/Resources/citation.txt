@@ -76,7 +76,7 @@ WaterSourceTypeCV / nvarchar(100) / The high level description of the water sour
 Sites table
 SiteID / bigint / Internal unique identifier integer
 SiteUUID / nvarchar(200) / Foreign key unique identifier to Sites_dim table.
-RegulatoryOverlayUUIDs / nvarchar(200) / Foreign key unique identifier to RegulaotryOverlay_dim table.
+OverlayUUIDs / nvarchar(200) / Foreign key unique identifier to Overlay_dim table.
 WaterSourceUUID / nvarchar(200) / Foreign key unique identifier to WaterSource_dim table.
 CoordinateAccuracy / nvarchar(255) / Description of the data accuracy.  The data are accurate to +/- x of a second of a degree (using a differentially corrected GPS).
 CoordinateMethodCV / nvarchar(100) / Description of the coordinate method used to generate the GIS location portion of the data.
@@ -105,8 +105,6 @@ OrganizationUUID / nvarchar(200) / Foreign key unique identifier to Organization
 SiteUUID / nvarchar(200) / Foreign key unique identifier to Sites_dim table.
 VariableSpecificUUID / nvarchar(200) / Foreign key unique identifier to Variables_dim table.
 AllocationApplicationDateID / bigint / Foreign key unique identifier to Dates_dim table. Date of the original filing on the water right record.
-AllocationAssociatedConsumptiveUseSiteIDs / nvarchar(500) / List of other sites if this water right has one or more associate consumptive use sites. Add the consumptive use UUIDs as comma separated list here.
-AllocationAssociatedWithdrawalSiteIDs / nvarchar(500) / List of other sites if this water right has one or more associate diversion sites. Add the diversion UUIDs as comma separated list
 AllocationBasisCV / nvarchar(250) / Description of whether this water right is based on water withdrawals/diversion or consumptive use/depletion amount.
 AllocationChangeApplicationIndicator / nvarchar(100) / Indicate if this water right was the result of a change application.
 AllocationCommunityWaterSupplySystem / nvarchar(250) / If the use is municipal, the data provider can add the SDWIS identifier for the CWS. Only for site specific data. Leave it null for aggregate data

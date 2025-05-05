@@ -159,8 +159,9 @@ public class AllocationTests : MapboxTilesetTestBase
         features.Should().HaveCount(1);
 
         // Verify properties...
-        var siteWithOneAllocation = features.First(f => f.properties.uuid == "utah_site_one_allocation");
-        siteWithOneAllocation.properties.o.Should().Be("Tom TapWater");
+        var siteWithOneAllocation = features?.First(f => f.properties.uuid == "utah_site_one_allocation");
+        siteWithOneAllocation.Should().NotBeNull();
+        siteWithOneAllocation!.properties.o.Should().Be("Tom TapWater");
         siteWithOneAllocation.properties.oClass.Should().BeEquivalentTo("Military");
         siteWithOneAllocation.properties.bu.Should().BeEquivalentTo("Tap Water");
         siteWithOneAllocation.properties.podPou.Should().Be("POU");
@@ -342,8 +343,9 @@ public class AllocationTests : MapboxTilesetTestBase
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(1);
 
-        var siteWithManyAllocations = features.First(f => f.properties.uuid == "utah_site_many_allocations");
-        siteWithManyAllocations.properties.o.Should().Contain("Tom TapWater");
+        var siteWithManyAllocations = features?.FirstOrDefault(f => f.properties.uuid == "utah_site_many_allocations");
+        siteWithManyAllocations.Should().NotBeNull();
+        siteWithManyAllocations!.properties.o.Should().Contain("Tom TapWater");
         siteWithManyAllocations.properties.o.Should().Contain("Alice McAlister");
         siteWithManyAllocations.properties.oClass.Should().BeEquivalentTo("Military", "Private"); // add other oclass
         siteWithManyAllocations.properties.bu.Should().BeEquivalentTo("Livestock", "Tap Water");
@@ -456,9 +458,10 @@ public class AllocationTests : MapboxTilesetTestBase
         var json = await File.ReadAllTextAsync(Path.Combine("geojson", "Allocations.Points.geojson"));
         var features = JsonSerializer.Deserialize<List<Feature>>(json);
 
-        features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(1);
-        features[0].Properties.ContainsKey("minFlow").Should().BeFalse();
+        features.Should().NotBeNullOrEmpty();
+        features![0].Properties.ContainsKey("minFlow").Should().BeFalse();
+        features[0].Properties.ContainsKey("maxFlow").Should().BeFalse();
         features[0].Properties.ContainsKey("maxFlow").Should().BeFalse();
         features[0].Properties.ContainsKey("minVol").Should().BeFalse();
         features[0].Properties.ContainsKey("maxVol").Should().BeFalse();

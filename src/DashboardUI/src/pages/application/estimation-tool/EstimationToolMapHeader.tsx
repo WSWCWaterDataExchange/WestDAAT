@@ -1,10 +1,64 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
+import { parseGISFileToGeoJSON } from '../../../utilities/gisFileParser';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import { toast } from 'react-toastify';
+import { fromGeometryFeatureToMapSelectionPolygonData } from '../../../utilities/mapUtility';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Modal from 'react-bootstrap/esm/Modal';
 import { EstimationToolHelpVideo } from './EstimationToolHelpVideo';
 
 export function EstimationToolMapHeader() {
+  const { dispatch } = useConservationApplicationContext();
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const resetFileInput = () => {
+    // resetting the file input allows the user to upload more files
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const parseFile = async (file: File): Promise<FeatureCollection> => {
+    let data: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [],
+    };
+
+    try {
+      data = await parseGISFileToGeoJSON(file);
+    } catch (error: any) {
+      toast.error(`Error parsing file: "${error.message}"`);
+    }
+
+    return data;
+  };
+
+  const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      resetFileInput();
+      return;
+    }
+
+    // combine files' data into a single collection
+    const uploadedFileFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+    for (const file of files) {
+      const fileData = await parseFile(file);
+      uploadedFileFeatures.push(...fileData.features);
+    }
+
+    dispatch({
+      type: 'GIS_FILE_POLYGONS_UPLOADED',
+      payload: {
+        polygons: uploadedFileFeatures.map(fromGeometryFeatureToMapSelectionPolygonData),
+      },
+    });
+
+    resetFileInput();
+  };
 
   return (
     <div className="p-3 d-flex flex-column gap-2 d-print-none">
@@ -25,12 +79,18 @@ export function EstimationToolMapHeader() {
       <div>
         <span className="me-2">Or, you can upload a file from your device.</span>
 
-        <Button
-          variant="outline-primary"
-          onClick={() => alert('This feature will be implemented in a future release.')}
-        >
+        <Button variant="outline-primary" onClick={() => fileInputRef.current?.click()}>
           Upload File
         </Button>
+
+        <input
+          type="file"
+          accept=".json, .geojson, .zip, .shp"
+          multiple
+          className="d-none"
+          ref={fileInputRef}
+          onChange={handleFilesSelected}
+        />
       </div>
 
       <Modal dialogClassName="modal-75w" centered show={showVideoPlayer} onHide={() => setShowVideoPlayer(false)}>

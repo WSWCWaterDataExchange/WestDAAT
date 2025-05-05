@@ -43,7 +43,7 @@ public class FileIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(-1, DisplayName = "Should not allow a negative file count")]
     [DataRow(11, DisplayName = "Should not allow a negative file count")]
-    public async Task GenerateUploadFileSasToken_InvalidFileCount_ShouldThrow(int fileCount)
+    public async Task GenerateUploadFileSasToken_ApplicationDocumentUploadSasTokenRequest_InvalidFileCount_ShouldThrow(int fileCount)
     {
         // Arrange
         var request = new ApplicationDocumentUploadSasTokenRequest
@@ -61,7 +61,7 @@ public class FileIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task GenerateUploadFileSasToken_ShouldReturnSasToken()
+    public async Task GenerateUploadFileSasToken_ApplicationDocumentUploadSasTokenRequest_ShouldReturnSasToken()
     {
         // Arrange
         UseUserContext(new UserContext
@@ -90,7 +90,7 @@ public class FileIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task GenerateDownloadFileSasToken_ShouldReturnSasUrl()
+    public async Task GenerateDownloadFileSasToken_ApplicationDocumentDownloadSasTokenRequest_ShouldReturnSasUrl()
     {
         // Arrange
         UseUserContext(new UserContext()
@@ -128,7 +128,7 @@ public class FileIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(false, DisplayName = "Should not allow an applicant to download a document that belongs to an application that isn't theirs")]
     [DataRow(true, DisplayName = "Should not allow an organization's application reviewer to download a document that belongs to an application that isn't for their organization")]
-    public async Task GenerateDownloadFileSasToken_InvalidPermissions_ShouldThrow(bool isOrgReviewer)
+    public async Task GenerateDownloadFileSasToken_ApplicationDocumentDownloadSasTokenRequest_InvalidPermissions_ShouldThrow(bool isOrgReviewer)
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -141,13 +141,13 @@ public class FileIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationDocuments.AddAsync(document);
         await _dbContext.SaveChangesAsync();
-        
+
         var differentOrgAdmin = new OrganizationRole
         {
             OrganizationId = Guid.NewGuid(),
             RoleNames = [Roles.OrganizationAdmin]
         };
-        
+
         UseUserContext(new UserContext
         {
             UserId = Guid.NewGuid(),
@@ -170,7 +170,7 @@ public class FileIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task GenerateDownloadFileSasToken_DocumentNotFound_ShouldThrow()
+    public async Task GenerateDownloadFileSasToken_ApplicationDocumentDownloadSasTokenRequest_DocumentNotFound_ShouldThrow()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -183,7 +183,7 @@ public class FileIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationDocuments.AddAsync(document);
         await _dbContext.SaveChangesAsync();
-        
+
         UseUserContext(new UserContext
         {
             UserId = Guid.NewGuid(),
@@ -202,6 +202,149 @@ public class FileIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<NotFoundError>();  
+        response.Error.Should().BeOfType<NotFoundError>();
+    }
+
+    [TestMethod]
+    public async Task GenerateUploadFileSasToken_ApplicationMapImageUploadSasTokenRequest_UnrelatedUser_ShouldThrow()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        await _dbContext.AddRangeAsync(application);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new ApplicationMapImageUploadSasTokenRequest
+        {
+            WaterConservationApplicationId = application.Id,
+        };
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationMapImageUploadSasTokenRequest, ApplicationMapImageUploadSasTokenResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+    }
+
+    [TestMethod]
+    public async Task GenerateUploadFileSasToken_ApplicationMapImageUploadSasTokenRequest_AdminForOtherOrganization_ShouldThrow()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var otherOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        await _dbContext.AddRangeAsync(application);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new ApplicationMapImageUploadSasTokenRequest
+        {
+            WaterConservationApplicationId = application.Id,
+        };
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = otherOrganization.Id,
+                    RoleNames = [Roles.OrganizationAdmin]
+                }
+            ],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationMapImageUploadSasTokenRequest, ApplicationMapImageUploadSasTokenResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+    }
+
+    [TestMethod]
+    public async Task GenerateUploadFileSasToken_ApplicationMapImageUploadSasTokenRequest_Applicant_ShouldSucceed()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        await _dbContext.AddRangeAsync(application);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new ApplicationMapImageUploadSasTokenRequest
+        {
+            WaterConservationApplicationId = application.Id,
+        };
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationMapImageUploadSasTokenRequest, ApplicationMapImageUploadSasTokenResponse>(request);
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.SasToken.Blobname.Should().Be(application.Id.ToString());
+        response.SasToken.SasToken.Should().NotBeNullOrEmpty();
+        response.SasToken.Hostname.Should().NotBeNullOrEmpty();
+    }
+
+    [TestMethod]
+    public async Task GenerateUploadFileSasToken_ApplicationMapImageUploadSasTokenRequest_TechnicalReviewer_ShouldSucceed()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        await _dbContext.AddRangeAsync(application);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new ApplicationMapImageUploadSasTokenRequest
+        {
+            WaterConservationApplicationId = application.Id,
+        };
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer]
+                }
+            ],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationMapImageUploadSasTokenRequest, ApplicationMapImageUploadSasTokenResponse>(request);
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.SasToken.Blobname.Should().Be(application.Id.ToString());
+        response.SasToken.SasToken.Should().NotBeNullOrEmpty();
+        response.SasToken.Hostname.Should().NotBeNullOrEmpty();
     }
 }

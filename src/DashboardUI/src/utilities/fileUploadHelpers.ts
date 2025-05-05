@@ -3,13 +3,14 @@ import { BlobUpload } from '../data-contracts/BlobUpload';
 
 export enum ContainerName {
   ApplicationDocuments = 'application-documents',
+  ApplicationMapImages = 'application-map-images',
 }
 
 export const uploadFilesToBlobStorage = async (
   containerName: ContainerName,
   uploadDetails: BlobUpload[],
 ): Promise<BlockBlobUploadResponse[]> => {
-  let uploadPromises: Promise<BlockBlobUploadResponse>[] = [];
+  const uploadPromises: Promise<BlockBlobUploadResponse>[] = [];
 
   uploadDetails.forEach(async (upload) => {
     const sasQueryParam = upload.sasToken.split('?')[1];
@@ -32,4 +33,14 @@ export const downloadFilesFromBlobStorage = async (sasToken: string, fileName: s
   }
   document.body.appendChild(link);
   link.click();
+};
+
+export const blobToBase64 = (blob: Blob): Promise<string> => {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise((resolve) => {
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+  });
 };
