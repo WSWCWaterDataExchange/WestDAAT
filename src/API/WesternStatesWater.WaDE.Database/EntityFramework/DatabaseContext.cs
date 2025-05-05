@@ -111,8 +111,6 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public virtual DbSet<WaterSourceBridgeSitesFact> WaterSourceBridgeSitesFact { get; set; }
         public virtual DbSet<WaterSourceType> WaterSourceType { get; set; }
         public virtual DbSet<WaterSourcesDim> WaterSourcesDim { get; set; }
-        public virtual DbSet<FilterEntry> Filters { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
@@ -2276,22 +2274,6 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_WaterSources_dim_WaterSourceType");
             });
-            
-            modelBuilder.Entity<FilterEntry>(entity =>
-            {
-                entity.ToTable("Filters", "dbo");
-
-                entity.HasKey(e => new { e.FilterType, e.WaDeName });
-
-                entity.Property(e => e.FilterType)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.WaDeName)
-                    .IsRequired()
-                    .HasMaxLength(200);
-            });
-
 
             modelBuilder.Entity<PODSiteToPOUSiteFact>(entity =>
             {
