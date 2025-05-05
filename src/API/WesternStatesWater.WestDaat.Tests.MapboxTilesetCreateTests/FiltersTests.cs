@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
 
 namespace WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests;
@@ -12,26 +13,11 @@ public class FiltersTests : MapboxTilesetTestBase
     public async Task WriteFiltersToDatabase_PopulatesFiltersTable()
     {
         // Arrange
-        var dict = (ConcurrentDictionary<string, byte>)typeof(MapboxTileset)
-            .GetField("WaterRightBeneficialUses", BindingFlags.NonPublic | BindingFlags.Static)!
-            .GetValue(null)!;
+        await Db.Filters.ExecuteDeleteAsync();
 
-        dict.Clear();
-        dict.TryAdd("Agriculture Irrigation", 0);
-
-        var overlayStates = (ConcurrentDictionary<string, byte>)typeof(MapboxTileset)
-            .GetField("OverlayStates", BindingFlags.NonPublic | BindingFlags.Static)!
-            .GetValue(null)!;
-
-        overlayStates.Clear();
-        overlayStates.TryAdd("UT", 0);
-
-        var tsVars = (ConcurrentDictionary<string, byte>)typeof(MapboxTileset)
-            .GetField("TimeSeriesVariableTypes", BindingFlags.NonPublic | BindingFlags.Static)!
-            .GetValue(null)!;
-
-        tsVars.Clear();
-        tsVars.TryAdd("Discharge Flow", 0);
+        SetStaticConcurrentDictionary("WaterRightBeneficialUses", "Agriculture Irrigation");
+        SetStaticConcurrentDictionary("OverlayStates", "UT");
+        SetStaticConcurrentDictionary("TimeSeriesVariableTypes", "Discharge Flow");
 
         // Act
         await (Task)typeof(MapboxTileset)
@@ -43,5 +29,15 @@ public class FiltersTests : MapboxTilesetTestBase
         filters.Should().ContainSingle(f => f.FilterType == "WaterRightBeneficialUses" && f.WaDeName == "Agriculture Irrigation");
         filters.Should().ContainSingle(f => f.FilterType == "OverlayStates" && f.WaDeName == "UT");
         filters.Should().ContainSingle(f => f.FilterType == "TimeSeriesVariableTypes" && f.WaDeName == "Discharge Flow");
+    }
+
+    private void SetStaticConcurrentDictionary(string fieldName, string value)
+    {
+        var dict = (ConcurrentDictionary<string, byte>)typeof(MapboxTileset)
+            .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static)!
+            .GetValue(null)!;
+
+        dict.Clear();
+        dict.TryAdd(value, 0);
     }
 }
