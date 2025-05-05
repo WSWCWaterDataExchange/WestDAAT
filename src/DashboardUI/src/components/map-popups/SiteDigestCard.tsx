@@ -79,16 +79,7 @@ function SiteDigestCard({
                 <div className="mb-2">(no water right data)</div>
               ) : (
                 <div className="mb-2 border-b pb-2">
-                  <div>
-                    <a
-                      href={`/details/right/${currentRight.allocationUuid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {currentRight.nativeId}{' '}
-                      <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon inline" />
-                    </a>
-                  </div>
+                  <div>{currentRight.nativeId}</div>
                   <div className="mt-1">
                     <a
                       href={`/details/right/${currentRight.allocationUuid}`}
