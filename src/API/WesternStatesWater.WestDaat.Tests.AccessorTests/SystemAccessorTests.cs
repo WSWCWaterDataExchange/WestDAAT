@@ -78,7 +78,7 @@ public class SystemAccessorTests : AccessorTestBase
         db.AllocationAmountsFact.Add(allocation);
 
         var bridge = new AllocationBridgeBeneficialUsesFactFaker()
-            .RuleFor(x => x.AllocationAmountId, allocation.AllocationAmountId)
+            .RuleFor(x => x.AllocationAmount, _ => allocation) 
             .RuleFor(x => x.BeneficialUseCV, uses[0].Name)
             .Generate();
 
