@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import MapPopupCard from './MapPopupCard';
-import { mdiChevronLeft, mdiChevronRight, mdiOpenInNew } from '@mdi/js';
+import {
+  mdiChevronLeft,
+  mdiChevronRight,
+  mdiOpenInNew,
+  mdiChevronLeftBox,
+  mdiChevronRightBox
+} from '@mdi/js';
 import Icon from '@mdi/react';
 import SiteDigest from '../../data-contracts/SiteDigest';
 import { FormattedDate } from '../FormattedDate';
@@ -22,7 +28,19 @@ function SiteDigestCard({
                           goToNext,
                           goToPrevious,
                         }: SiteDigestCardProps) {
-  const { siteType, siteUuid, hasTimeSeriesData, timeSeriesVariableTypes, waterRightsDigests } = site;
+  const {
+    siteType,
+    siteUuid,
+    hasTimeSeriesData,
+    timeSeriesVariableTypes,
+    waterRightsDigests,
+  } = site;
+
+  const [selectedRightIndex, setSelectedRightIndex] = useState(0);
+  const currentRight = useMemo(
+    () => waterRightsDigests[selectedRightIndex],
+    [waterRightsDigests, selectedRightIndex]
+  );
 
   const showNavigation = total && total > 1;
 
@@ -46,38 +64,55 @@ function SiteDigestCard({
               <strong>Site Type:</strong>
               <div>{siteType}</div>
             </div>
+
             <div className="mb-2">
-              <strong>Water Right Digests:</strong>
-              {waterRightsDigests.length === 0 ? (
-                <div>(no water right data)</div>
+              <div className="map-popup-card-water-rights-native-id-row">
+                <strong>Water Right Native ID:</strong>{' '}
+                <WaterRightsMapPopupToggle
+                  count={waterRightsDigests.length}
+                  currentIndex={selectedRightIndex}
+                  setCurrentIndex={setSelectedRightIndex}
+                />
+              </div>
+
+              {!currentRight ? (
+                <div className="mb-2">(no water right data)</div>
               ) : (
-                waterRightsDigests.map((right, i) => (
-                  <div key={i} className="mb-2 border-b pb-2">
-                    <div>{right.nativeId}</div>
-                    <div>
-                      <a
-                        href={`/details/right/${right.allocationUuid}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View Water Right Landing Page{' '}
-                        <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
-                      </a>
-                    </div>
-                    <div>
-                      <strong>Beneficial Uses:</strong>
-                      {right.beneficialUses.map((use) => (
-                        <div key={use}>{use}</div>
-                      ))}
-                    </div>
-                    <div>
-                      <strong>Priority Date:</strong>{' '}
-                      <FormattedDate>{right.priorityDate}</FormattedDate>
-                    </div>
+                <div className="mb-2 border-b pb-2">
+                  <div>
+                    <a
+                      href={`/details/right/${currentRight.allocationUuid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {currentRight.nativeId}{' '}
+                      <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon inline" />
+                    </a>
                   </div>
-                ))
+                  <div className="mt-1">
+                    <a
+                      href={`/details/right/${currentRight.allocationUuid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Water Right Landing Page{' '}
+                      <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                    </a>
+                  </div>
+                  <div className="mt-1">
+                    <strong>Beneficial Uses:</strong>
+                    {currentRight.beneficialUses.map((use) => (
+                      <div key={use}>{use}</div>
+                    ))}
+                  </div>
+                  <div className="mt-1">
+                    <strong>Priority Date:</strong>{' '}
+                    <FormattedDate>{currentRight.priorityDate}</FormattedDate>
+                  </div>
+                </div>
               )}
             </div>
+
             <div className="mb-2">
               <strong>Has Time Series Data:</strong>
               <div>
@@ -95,6 +130,7 @@ function SiteDigestCard({
                 )}
               </div>
             </div>
+
             <div className="mb-0">
               <strong>Time Series Variable Types:</strong>
               <div>
@@ -128,6 +164,48 @@ function SiteDigestCard({
         ),
       }}
     </MapPopupCard>
+  );
+}
+
+interface WaterRightsMapPopupToggleProps {
+  count: number;
+  currentIndex: number;
+  setCurrentIndex: (index: number) => void;
+}
+
+function WaterRightsMapPopupToggle({
+                                     count,
+                                     currentIndex,
+                                     setCurrentIndex,
+                                   }: WaterRightsMapPopupToggleProps) {
+  if (count <= 1) return null;
+
+  const handlePrev = () => {
+    setCurrentIndex((currentIndex - 1 + count) % count);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((currentIndex + 1) % count);
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setCurrentIndex((currentIndex - 1 + count) % count)}
+        className="nav-prev-water-right"
+      >
+        <Icon path={mdiChevronLeftBox} />
+      </button>
+      <span>
+        {currentIndex + 1} of {count}
+      </span>
+      <button
+        onClick={() => setCurrentIndex((currentIndex + 1) % count)}
+        className="nav-next-water-right"
+      >
+        <Icon path={mdiChevronRightBox} />
+      </button>
+    </>
   );
 }
 
