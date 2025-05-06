@@ -51,15 +51,6 @@ function AddUserModal(props: AddUserModalProps) {
           theme: 'colored',
           autoClose: 3000,
         });
-      } else if (error.errors['emailDomain']) {
-        toast.error(
-          `User must have an ${props.organization!.emailDomain} email address to be added to this organization.`,
-          {
-            position: 'top-center',
-            theme: 'colored',
-            autoClose: 3000,
-          },
-        );
       } else {
         toast.error('Error adding user to organization', {
           position: 'top-center',
