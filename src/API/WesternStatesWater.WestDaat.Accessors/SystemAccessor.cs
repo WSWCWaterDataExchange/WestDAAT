@@ -26,7 +26,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return Array.Empty<string>();
         }
 
-        public async Task<DashboardFilters> LoadFilters()
+        async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
             await using var db = _databaseContextFactory.Create();
             var lookup = await db.Filters
@@ -39,27 +39,26 @@ namespace WesternStatesWater.WestDaat.Accessors
                           .OrderBy(name => name)
                           .ToArray()
                 );
-
+        
             var overlayTypes = Get(FilterTypeConstants.OverlayTypes, lookup);
             var overlayWaterSources = Get(FilterTypeConstants.OverlayWaterSources, lookup);
             var overlayStates = Get(FilterTypeConstants.OverlayStates, lookup);
-
+        
             var ownerClassifications = Get(FilterTypeConstants.WaterRightOwnerClassifications, lookup);
             var allocationTypes = Get(FilterTypeConstants.WaterRightAllocationTypes, lookup);
             var legalStatuses = Get(FilterTypeConstants.WaterRightLegalStatuses, lookup);
             var siteTypes = Get(FilterTypeConstants.WaterRightSiteTypes, lookup);
             var waterSources = Get(FilterTypeConstants.WaterRightWaterSources, lookup);
             var wrStates = Get(FilterTypeConstants.WaterRightStates, lookup);
-
+        
             var tsSiteTypes = Get(FilterTypeConstants.TimeSeriesSiteTypes, lookup);
             var tsPrimaryUses = Get(FilterTypeConstants.TimeSeriesPrimaryUses, lookup);
             var tsVariableTypes = Get(FilterTypeConstants.TimeSeriesVariableTypes, lookup);
             var tsWaterSources = Get(FilterTypeConstants.TimeSeriesWaterSources, lookup);
             var tsStates = Get(FilterTypeConstants.TimeSeriesStates, lookup);
-
-
+        
             var beneficialUses = await GetBeneficialUses();
-
+        
             return new DashboardFilters
             {
                 Overlays = new OverlayFilterSet
@@ -89,7 +88,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 }
             };
         }
-
         private async Task<BeneficialUseItem[]> GetBeneficialUses()
         {
             await using var db = _databaseContextFactory.Create();
