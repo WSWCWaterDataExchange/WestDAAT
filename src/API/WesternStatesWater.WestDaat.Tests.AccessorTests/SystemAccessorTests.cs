@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 
@@ -14,25 +15,26 @@ public class SystemAccessorTests : AccessorTestBase
     {
         // Arrange
         var db = CreateDatabaseContextFactory().Create();
+
         var filters = new[]
         {
-            new FilterEntry { FilterType = "WaterRightAllocationTypes", WaDeName = "Claim" },
-            new FilterEntry { FilterType = "WaterRightAllocationTypes", WaDeName = "Permit" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = "Claim" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = "Permit" },
 
-            new FilterEntry { FilterType = "WaterRightLegalStatuses", WaDeName = "Active" },
-            new FilterEntry { FilterType = "WaterRightLegalStatuses", WaDeName = "Pending" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = "Active" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = "Pending" },
 
-            new FilterEntry { FilterType = "WaterRightOwnerClassifications", WaDeName = "Private" },
-            new FilterEntry { FilterType = "WaterRightOwnerClassifications", WaDeName = "Military" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = "Private" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = "Military" },
 
-            new FilterEntry { FilterType = "WaterRightSiteTypes", WaDeName = "Well" },
-            new FilterEntry { FilterType = "WaterRightSiteTypes", WaDeName = "Canal" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = "Well" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = "Canal" },
 
-            new FilterEntry { FilterType = "WaterRightStates", WaDeName = "UT" },
-            new FilterEntry { FilterType = "WaterRightStates", WaDeName = "CO" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = "UT" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = "CO" },
 
-            new FilterEntry { FilterType = "WaterRightWaterSources", WaDeName = "Surface Water" },
-            new FilterEntry { FilterType = "WaterRightWaterSources", WaDeName = "Groundwater" }
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = "Surface Water" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = "Groundwater" }
         };
 
         db.Filters.AddRange(filters);

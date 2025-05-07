@@ -4,6 +4,7 @@ using System.Text.Json;
 using GeoJSON.Text.Feature;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
@@ -476,23 +477,23 @@ public static class MapboxTileset
         Console.WriteLine("Rewriting Filters table...");
 
         var entries =
-            WaterRightBeneficialUses.Keys.Select(v => new FilterEntry { FilterType = "WaterRightBeneficialUses", WaDeName = v })
-            .Concat(WaterRightOwnerClassifications.Keys.Select(v => new FilterEntry { FilterType = "WaterRightOwnerClassifications", WaDeName = v }))
-            .Concat(WaterRightAllocationTypes.Keys.Select(v => new FilterEntry { FilterType = "WaterRightAllocationTypes", WaDeName = v }))
-            .Concat(WaterRightLegalStatuses.Keys.Select(v => new FilterEntry { FilterType = "WaterRightLegalStatuses", WaDeName = v }))
-            .Concat(WaterRightSiteTypes.Keys.Select(v => new FilterEntry { FilterType = "WaterRightSiteTypes", WaDeName = v }))
-            .Concat(WaterRightWaterSources.Keys.Select(v => new FilterEntry { FilterType = "WaterRightWaterSources", WaDeName = v }))
-            .Concat(WaterRightStates.Keys.Select(v => new FilterEntry { FilterType = "WaterRightStates", WaDeName = v }))
+            WaterRightBeneficialUses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightBeneficialUses, WaDeName = v })
+            .Concat(WaterRightOwnerClassifications.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = v }))
+            .Concat(WaterRightAllocationTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = v }))
+            .Concat(WaterRightLegalStatuses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = v }))
+            .Concat(WaterRightSiteTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = v }))
+            .Concat(WaterRightWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = v }))
+            .Concat(WaterRightStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = v }))
 
-            .Concat(OverlayTypes.Keys.Select(v => new FilterEntry { FilterType = "OverlayTypes", WaDeName = v }))
-            .Concat(OverlayWaterSources.Keys.Select(v => new FilterEntry { FilterType = "OverlayWaterSources", WaDeName = v }))
-            .Concat(OverlayStates.Keys.Select(v => new FilterEntry { FilterType = "OverlayStates", WaDeName = v }))
+            .Concat(OverlayTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayTypes, WaDeName = v }))
+            .Concat(OverlayWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayWaterSources, WaDeName = v }))
+            .Concat(OverlayStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayStates, WaDeName = v }))
 
-            .Concat(TimeSeriesSiteTypes.Keys.Select(v => new FilterEntry { FilterType = "TimeSeriesSiteTypes", WaDeName = v }))
-            .Concat(TimeSeriesPrimaryUses.Keys.Select(v => new FilterEntry { FilterType = "TimeSeriesPrimaryUses", WaDeName = v }))
-            .Concat(TimeSeriesVariableTypes.Keys.Select(v => new FilterEntry { FilterType = "TimeSeriesVariableTypes", WaDeName = v }))
-            .Concat(TimeSeriesWaterSources.Keys.Select(v => new FilterEntry { FilterType = "TimeSeriesWaterSources", WaDeName = v }))
-            .Concat(TimeSeriesStates.Keys.Select(v => new FilterEntry { FilterType = "TimeSeriesStates", WaDeName = v }))
+            .Concat(TimeSeriesSiteTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesSiteTypes, WaDeName = v }))
+            .Concat(TimeSeriesPrimaryUses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesPrimaryUses, WaDeName = v }))
+            .Concat(TimeSeriesVariableTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesVariableTypes, WaDeName = v }))
+            .Concat(TimeSeriesWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesWaterSources, WaDeName = v }))
+            .Concat(TimeSeriesStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesStates, WaDeName = v }))
             .ToArray();
 
         await db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE dbo.Filters"); // Clear existing records

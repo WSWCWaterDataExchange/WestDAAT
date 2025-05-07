@@ -5,6 +5,7 @@ public static class FilterTypeConstants
     public const string OverlayTypes = "OverlayTypes";
     public const string OverlayWaterSources = "OverlayWaterSources";
     public const string OverlayStates = "OverlayStates";
+    public const string WaterRightBeneficialUses = "WaterRightBeneficialUses";
     public const string WaterRightOwnerClassifications = "WaterRightOwnerClassifications";
     public const string WaterRightAllocationTypes = "WaterRightAllocationTypes";
     public const string WaterRightLegalStatuses = "WaterRightLegalStatuses";

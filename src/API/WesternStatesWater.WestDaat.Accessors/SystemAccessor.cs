@@ -16,69 +16,46 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             _databaseContextFactory = databaseContextFactory;
         }
+        
+        private static string[] Get(string key, Dictionary<string, string[]> lookup)
+        {
+            if (lookup.TryGetValue(key, out var arr))
+            {
+                return arr;
+            }
+            return Array.Empty<string>();
+        }
 
         public async Task<DashboardFilters> LoadFilters()
         {
-            var filterTypes = new[]
-            {
-                FilterTypeConstants.OverlayTypes,
-                FilterTypeConstants.OverlayWaterSources,
-                FilterTypeConstants.OverlayStates,
-                FilterTypeConstants.WaterRightOwnerClassifications,
-                FilterTypeConstants.WaterRightAllocationTypes,
-                FilterTypeConstants.WaterRightLegalStatuses,
-                FilterTypeConstants.WaterRightSiteTypes,
-                FilterTypeConstants.WaterRightWaterSources,
-                FilterTypeConstants.WaterRightStates,
-                FilterTypeConstants.TimeSeriesSiteTypes,
-                FilterTypeConstants.TimeSeriesPrimaryUses,
-                FilterTypeConstants.TimeSeriesVariableTypes,
-                FilterTypeConstants.TimeSeriesWaterSources,
-                FilterTypeConstants.TimeSeriesStates
-            };
-
             await using var db = _databaseContextFactory.Create();
-            var rawFilters = await db.Filters
+            var lookup = await db.Filters
                 .AsNoTracking()
-                .Where(f => filterTypes.Contains(f.FilterType)
-                            && !string.IsNullOrWhiteSpace(f.WaDeName))
-                .Select(f => new
-                {
-                    f.FilterType,
-                    Name = f.WaDeName.Trim()
-                })
-                .Distinct()
-                .ToListAsync();
-
-            var lookup = rawFilters
-                .GroupBy(x => x.FilterType)
-                .ToDictionary(
+                .GroupBy(f => f.FilterType)
+                .ToDictionaryAsync(
                     g => g.Key,
-                    g => g.Select(x => x.Name)
-                          .OrderBy(n => n)
-                          .ToArray());
+                    g => g.Select(f => f.WaDeName.Trim())
+                          .Distinct()
+                          .OrderBy(name => name)
+                          .ToArray()
+                );
 
-            string[] Get(string key) =>
-                lookup.TryGetValue(key, out var arr)
-                    ? arr
-                    : Array.Empty<string>();
+            var overlayTypes = Get(FilterTypeConstants.OverlayTypes, lookup);
+            var overlayWaterSources = Get(FilterTypeConstants.OverlayWaterSources, lookup);
+            var overlayStates = Get(FilterTypeConstants.OverlayStates, lookup);
 
-            var overlayTypes = Get(FilterTypeConstants.OverlayTypes);
-            var overlayWaterSources = Get(FilterTypeConstants.OverlayWaterSources);
-            var overlayStates = Get(FilterTypeConstants.OverlayStates);
+            var ownerClassifications = Get(FilterTypeConstants.WaterRightOwnerClassifications, lookup);
+            var allocationTypes = Get(FilterTypeConstants.WaterRightAllocationTypes, lookup);
+            var legalStatuses = Get(FilterTypeConstants.WaterRightLegalStatuses, lookup);
+            var siteTypes = Get(FilterTypeConstants.WaterRightSiteTypes, lookup);
+            var waterSources = Get(FilterTypeConstants.WaterRightWaterSources, lookup);
+            var wrStates = Get(FilterTypeConstants.WaterRightStates, lookup);
 
-            var ownerClassifications = Get(FilterTypeConstants.WaterRightOwnerClassifications);
-            var allocationTypes = Get(FilterTypeConstants.WaterRightAllocationTypes);
-            var legalStatuses = Get(FilterTypeConstants.WaterRightLegalStatuses);
-            var siteTypes = Get(FilterTypeConstants.WaterRightSiteTypes);
-            var waterSources = Get(FilterTypeConstants.WaterRightWaterSources);
-            var wrStates = Get(FilterTypeConstants.WaterRightStates);
-
-            var tsSiteTypes = Get(FilterTypeConstants.TimeSeriesSiteTypes);
-            var tsPrimaryUses = Get(FilterTypeConstants.TimeSeriesPrimaryUses);
-            var tsVariableTypes = Get(FilterTypeConstants.TimeSeriesVariableTypes);
-            var tsWaterSources = Get(FilterTypeConstants.TimeSeriesWaterSources);
-            var tsStates = Get(FilterTypeConstants.TimeSeriesStates);
+            var tsSiteTypes = Get(FilterTypeConstants.TimeSeriesSiteTypes, lookup);
+            var tsPrimaryUses = Get(FilterTypeConstants.TimeSeriesPrimaryUses, lookup);
+            var tsVariableTypes = Get(FilterTypeConstants.TimeSeriesVariableTypes, lookup);
+            var tsWaterSources = Get(FilterTypeConstants.TimeSeriesWaterSources, lookup);
+            var tsStates = Get(FilterTypeConstants.TimeSeriesStates, lookup);
 
 
             var beneficialUses = await GetBeneficialUses();
