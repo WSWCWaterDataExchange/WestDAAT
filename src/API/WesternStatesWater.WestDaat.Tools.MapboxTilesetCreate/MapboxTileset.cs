@@ -496,9 +496,9 @@ public static class MapboxTileset
             .Concat(TimeSeriesStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesStates, WaDeName = v }))
             .ToArray();
 
-        await db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE dbo.Filters"); // Clear existing records
-        await db.Filters.AddRangeAsync(entries); // Insert new ones
-        await db.SaveChangesAsync(); // Save changes
+        await db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE dbo.Filters");
+        await db.Filters.AddRangeAsync(entries);
+        await db.SaveChangesAsync();
 
         Console.WriteLine("Filters table updated.");
     }
