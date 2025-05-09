@@ -558,25 +558,6 @@ internal class ValidationEngine : IValidationEngine
             return CreateConflictError(request, context, nameof(UserOrganization), request.UserId, request.OrganizationId);
         }
 
-        // Verify the user's email domain matches the organization's
-        var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
-            { UserId = request.UserId });
-        var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
-            { OrganizationId = request.OrganizationId });
-
-        // There is validation to ensure the user email includes an '@'.
-        // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
-        var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1];
-        var organizationEmailDomain = organizationEmailDomainResponse.Organization.EmailDomain.Contains('@')
-            ? organizationEmailDomainResponse.Organization.EmailDomain.Split("@")[1]
-            : organizationEmailDomainResponse.Organization.EmailDomain;
-
-        if (userEmailDomain.ToLower() != organizationEmailDomain.ToLower())
-        {
-            var errorMessage = "User's email domain does not match the organization's email domain.";
-            return CreateValidationError(request, "emailDomain", errorMessage);
-        }
-
         return null;
     }
 

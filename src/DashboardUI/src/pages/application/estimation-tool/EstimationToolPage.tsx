@@ -81,31 +81,34 @@ export function EstimationToolPage() {
             type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_STARTED',
           });
 
-          mapContext.exportToPngFn!({
-            height: 400,
-            width: 600,
-          })
-            .then((blob) => {
-              const applicationId = state.conservationApplication.waterConservationApplicationId;
-              if (blob && applicationId) {
-                const file = new File([blob], `${applicationId}.png`, { type: blob.type });
-                uploadApplicationStaticMap(context, file, applicationId);
-
-                blobToBase64(blob).then((base64) => {
-                  dispatch({
-                    type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
-                    payload: {
-                      mapImageUrl: base64,
-                    },
-                  });
-                });
-              }
+          // artificial delay to allow the field labels to render
+          setTimeout(() => {
+            mapContext.exportToPngFn!({
+              height: 400,
+              width: 600,
             })
-            .finally(() => {
-              dispatch({
-                type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED',
+              .then((blob) => {
+                const applicationId = state.conservationApplication.waterConservationApplicationId;
+                if (blob && applicationId) {
+                  const file = new File([blob], `${applicationId}.png`, { type: blob.type });
+                  uploadApplicationStaticMap(context, file, applicationId);
+
+                  blobToBase64(blob).then((base64) => {
+                    dispatch({
+                      type: 'APPLICATION_MAP_STATIC_IMAGE_ADDED',
+                      payload: {
+                        mapImageUrl: base64,
+                      },
+                    });
+                  });
+                }
+              })
+              .finally(() => {
+                dispatch({
+                  type: 'APPLICATION_MAP_STATIC_IMAGE_GENERATE_COMPLETED',
+                });
               });
-            });
+          }, 1500);
         }
       }
     },

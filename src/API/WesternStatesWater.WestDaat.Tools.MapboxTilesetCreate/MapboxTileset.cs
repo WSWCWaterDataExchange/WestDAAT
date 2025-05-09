@@ -4,12 +4,30 @@ using System.Text.Json;
 using GeoJSON.Text.Feature;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
 
 public static class MapboxTileset
 {
+    private static readonly ConcurrentDictionary<string, byte> WaterRightBeneficialUses = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightOwnerClassifications = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightAllocationTypes = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightLegalStatuses = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightSiteTypes = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightWaterSources = new();
+    private static readonly ConcurrentDictionary<string, byte> WaterRightStates = new();
+
+    private static readonly ConcurrentDictionary<string, byte> OverlayTypes = new();
+    private static readonly ConcurrentDictionary<string, byte> OverlayWaterSources = new();
+    private static readonly ConcurrentDictionary<string, byte> OverlayStates = new();
+
+    private static readonly ConcurrentDictionary<string, byte> TimeSeriesSiteTypes = new();
+    private static readonly ConcurrentDictionary<string, byte> TimeSeriesPrimaryUses = new();
+    private static readonly ConcurrentDictionary<string, byte> TimeSeriesVariableTypes = new();
+    private static readonly ConcurrentDictionary<string, byte> TimeSeriesWaterSources = new();
+    private static readonly ConcurrentDictionary<string, byte> TimeSeriesStates = new();
     public static async Task CreateTilesetFiles(DatabaseContext db)
     {
         Console.WriteLine("Starting...");
@@ -26,6 +44,8 @@ public static class MapboxTileset
             await CreateAllocations(db, dir);
             await CreateTimeSeries(db, dir);
             await CreateOverlays(db, dir);
+            
+            await WriteFiltersToDatabase(db);
         }
         catch (Exception ex)
         {
@@ -45,7 +65,7 @@ public static class MapboxTileset
         var tempPointsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Points"));
         var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Polygons"));
         var tempUnknownDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Unknown"));
-
+        
         try
         {
             bool end = false;
@@ -54,6 +74,7 @@ public static class MapboxTileset
             long lastSiteId = 0;
             while (!end)
             {
+                
                 ConcurrentBag<Feature> pointFeatures = [];
                 ConcurrentBag<Feature> polygonFeatures = [];
                 ConcurrentBag<Feature> unknownFeatures = [];
@@ -68,6 +89,13 @@ public static class MapboxTileset
 
                 Parallel.ForEach(sites, site =>
                 {
+                    foreach (var bu in PipeDelimiterToDistinctList(site.BeneficalUses)) SafeTryAdd(WaterRightBeneficialUses, bu);
+                    foreach (var oc in PipeDelimiterToDistinctList(site.OwnerClassifications)) SafeTryAdd(WaterRightOwnerClassifications, oc);
+                    foreach (var at in PipeDelimiterToDistinctList(site.AllocationType)) SafeTryAdd(WaterRightAllocationTypes, at);
+                    foreach (var ls in PipeDelimiterToDistinctList(site.LegalStatus)) SafeTryAdd(WaterRightLegalStatuses, ls);
+                    foreach (var st in PipeDelimiterToDistinctList(site.SiteType)) SafeTryAdd(WaterRightSiteTypes, st);
+                    foreach (var ws in PipeDelimiterToDistinctList(site.WaterSources)) SafeTryAdd(WaterRightWaterSources, ws);
+                    foreach (var state in PipeDelimiterToDistinctList(site.States)) SafeTryAdd(WaterRightStates, state);
                     var properties = new Dictionary<string, object>
                     {
                         { "o", PipeDelimiterToString(site.Owners) },
@@ -176,6 +204,7 @@ public static class MapboxTileset
         ConcurrentBag<Feature> polygonFeatures = [];
         ConcurrentBag<Feature> unknownFeatures = [];
         List<TimeSeries> featureSites = [];
+
         try
         {
             bool end = false; // Used to determine when to stop querying the database.
@@ -217,6 +246,11 @@ public static class MapboxTileset
 
                 foreach (var timeSeriesSite in timeSeries)
                 {
+                    SafeTryAdd(TimeSeriesPrimaryUses, timeSeriesSite.PrimaryUseCagtegory);
+                    SafeTryAdd(TimeSeriesVariableTypes, timeSeriesSite.VariableType);
+                    SafeTryAdd(TimeSeriesSiteTypes, timeSeriesSite.SiteType);
+                    SafeTryAdd(TimeSeriesWaterSources, timeSeriesSite.WaterSourceType);
+                    SafeTryAdd(TimeSeriesStates, timeSeriesSite.State);
                     // Check if the SitEID has changed from the previous record.
                     if (previousSiteId != null && timeSeriesSite.SiteId != previousSiteId)
                     {
@@ -343,7 +377,11 @@ public static class MapboxTileset
                 { "state", overlay.State },
                 { "wsType", PipeDelimiterToDistinctList(overlay.WaterSourceTypeWaDEName) }
             };
-
+            
+            foreach (var ot in PipeDelimiterToDistinctList(overlay.OverlayTypeWaDEName)) SafeTryAdd(OverlayTypes, ot);
+            foreach (var ws in PipeDelimiterToDistinctList(overlay.WaterSourceTypeWaDEName)) SafeTryAdd(OverlayWaterSources, ws);
+            SafeTryAdd(OverlayStates, overlay.State?.Trim());
+            
 
             var geometry = overlay.Geometry.AsGeoJsonGeometry();
 
@@ -433,6 +471,46 @@ public static class MapboxTileset
             }
         }
     }
+    
+    private static async Task WriteFiltersToDatabase(DatabaseContext db)
+    {
+        Console.WriteLine("Rewriting Filters table...");
+
+        var entries =
+            WaterRightBeneficialUses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightBeneficialUses, WaDeName = v })
+            .Concat(WaterRightOwnerClassifications.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = v }))
+            .Concat(WaterRightAllocationTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = v }))
+            .Concat(WaterRightLegalStatuses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = v }))
+            .Concat(WaterRightSiteTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = v }))
+            .Concat(WaterRightWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = v }))
+            .Concat(WaterRightStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = v }))
+
+            .Concat(OverlayTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayTypes, WaDeName = v }))
+            .Concat(OverlayWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayWaterSources, WaDeName = v }))
+            .Concat(OverlayStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.OverlayStates, WaDeName = v }))
+
+            .Concat(TimeSeriesSiteTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesSiteTypes, WaDeName = v }))
+            .Concat(TimeSeriesPrimaryUses.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesPrimaryUses, WaDeName = v }))
+            .Concat(TimeSeriesVariableTypes.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesVariableTypes, WaDeName = v }))
+            .Concat(TimeSeriesWaterSources.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesWaterSources, WaDeName = v }))
+            .Concat(TimeSeriesStates.Keys.Select(v => new FilterEntry { FilterType = FilterTypeConstants.TimeSeriesStates, WaDeName = v }))
+            .ToArray();
+
+        await db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE dbo.Filters");
+        await db.Filters.AddRangeAsync(entries);
+        await db.SaveChangesAsync();
+
+        Console.WriteLine("Filters table updated.");
+    }
+    
+    private static void SafeTryAdd(ConcurrentDictionary<string, byte> dict, string? key)
+    {
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            dict.TryAdd(key.Trim(), 0);
+        }
+    }
+
 
     private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
     {

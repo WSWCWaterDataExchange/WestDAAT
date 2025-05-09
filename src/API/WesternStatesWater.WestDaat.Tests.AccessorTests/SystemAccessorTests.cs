@@ -1,76 +1,109 @@
-﻿using WesternStatesWater.WaDE.Database.EntityFramework;
+﻿using FluentAssertions;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 
-namespace WesternStatesWater.WestDaat.Tests.AccessorTests
+namespace WesternStatesWater.WestDaat.Tests.AccessorTests;
+
+[TestClass]
+public class SystemAccessorTests : AccessorTestBase
 {
-    [TestClass]
-    public class SystemAccessorTests : AccessorTestBase
+    [TestMethod]
+    public async Task LoadFilters_WaterRightsControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
     {
-        [TestMethod]
-        public async Task LoadFilters_WaterRightsControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
+        // Arrange
+        var db = CreateDatabaseContextFactory().Create();
+
+        var filters = new[]
         {
-            // Arrange
-            await using var db = CreateDatabaseContextFactory().Create();
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = "Claim" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightAllocationTypes, WaDeName = "Permit" },
 
-            var waterAllocationTypes = new WaterAllocationTypeCVFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .Generate(3);
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = "Active" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightLegalStatuses, WaDeName = "Pending" },
 
-            var beneficialUses = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .RuleFor(a => a.ConsumptionCategoryType, _ => Common.ConsumptionCategory.Consumptive)
-                .Generate(2);
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = "Private" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightOwnerClassifications, WaDeName = "Military" },
 
-            var legalStatuses = new LegalStatusCVFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .Generate(2);
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = "Well" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightSiteTypes, WaDeName = "Canal" },
 
-            var ownerClassifications = new OwnerClassificationCvFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .Generate(2);
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = "UT" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightStates, WaDeName = "CO" },
 
-            var siteTypes = new SiteTypeFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .Generate(2);
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = "Surface Water" },
+            new FilterEntry { FilterType = FilterTypeConstants.WaterRightWaterSources, WaDeName = "Groundwater" }
+        };
 
-            var states = new StateFaker()
-                .RuleFor(a => a.WaDEName, f => f.Address.StateAbbr())
-                .Generate(2);
+        db.Filters.AddRange(filters);
+        await db.SaveChangesAsync();
 
-            var waterSourceTypes = new WaterSourceTypeFaker()
-                .RuleFor(a => a.WaDEName, f => f.Random.Word())
-                .Generate(2);
+        var accessor = CreateSystemAccessor();
 
-            db.WaterAllocationType.AddRange(waterAllocationTypes);
-            db.BeneficialUsesCV.AddRange(beneficialUses);
-            db.LegalStatus.AddRange(legalStatuses);
-            db.OwnerClassificationCv.AddRange(ownerClassifications);
-            db.SiteType.AddRange(siteTypes);
-            db.State.AddRange(states);
-            db.WaterSourceType.AddRange(waterSourceTypes);
+        // Act
+        var result = await accessor.LoadFilters();
+        var waterRights = result.WaterRights;
 
-            await db.SaveChangesAsync();
+        // Assert
+        waterRights.AllocationTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        waterRights.LegalStatuses.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        waterRights.OwnerClassifications.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        waterRights.SiteTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        waterRights.States.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        waterRights.WaterSourceTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+    }
 
-            var accessor = CreateSystemAccessor();
+    [TestMethod]
+    public async Task LoadFilters_BeneficialUses_ShouldBeSortedAndDistinct()
+    {
+        // Arrange
+        var db = CreateDatabaseContextFactory().Create();
 
-            // Act
-            var result = await accessor.LoadFilters();
-            var waterRights = result.WaterRights;
-
-            // Assert
-            waterRights.AllocationTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.BeneficialUses.Should().BeInAscendingOrder(b => b.BeneficialUseName).And.OnlyHaveUniqueItems(b => b.BeneficialUseName);
-            waterRights.LegalStatuses.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.OwnerClassifications.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.SiteTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.States.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-            waterRights.WaterSourceTypes.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-        }
-
-        private ISystemAccessor CreateSystemAccessor()
+        var uses = new[]
         {
-            return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateDatabaseContextFactory());
-        }
+            new BeneficialUsesCVFaker()
+                .RuleFor(x => x.Name, "AgricultureIrrigation")
+                .RuleFor(x => x.WaDEName, "Agriculture Irrigation")
+                .RuleFor(x => x.ConsumptionCategoryType, Common.ConsumptionCategory.Consumptive)
+                .Generate(),
+
+            new BeneficialUsesCVFaker()
+                .RuleFor(x => x.Name, "Livestock")
+                .RuleFor(x => x.WaDEName, "Livestock")
+                .RuleFor(x => x.ConsumptionCategoryType, Common.ConsumptionCategory.Consumptive)
+                .Generate()
+        };
+
+        var allocation = new AllocationAmountFactFaker().Generate();
+        db.AllocationAmountsFact.Add(allocation);
+
+        var bridge = new AllocationBridgeBeneficialUsesFactFaker()
+            .RuleFor(x => x.AllocationAmount, _ => allocation) 
+            .RuleFor(x => x.BeneficialUseCV, uses[0].Name)
+            .Generate();
+
+
+        db.BeneficialUsesCV.AddRange(uses);
+        db.AllocationBridgeBeneficialUsesFact.Add(bridge);
+
+        await db.SaveChangesAsync();
+
+        var accessor = CreateSystemAccessor();
+
+        // Act
+        var result = await accessor.LoadFilters();
+        var buItems = result.WaterRights.BeneficialUses;
+
+        // Assert
+        buItems.Should().ContainSingle(x => x.BeneficialUseName == "Agriculture Irrigation");
+        buItems.Should().OnlyHaveUniqueItems(b => b.BeneficialUseName);
+        buItems.Select(x => x.BeneficialUseName).Should().BeInAscendingOrder();
+    }
+
+    private ISystemAccessor CreateSystemAccessor()
+    {
+        return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateDatabaseContextFactory());
     }
 }
