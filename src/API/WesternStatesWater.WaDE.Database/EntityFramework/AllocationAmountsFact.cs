@@ -135,7 +135,10 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
     {
         var predicate = PredicateBuilder.New<AllocationAmountsFact>();
         
-        predicate = predicate.Or(f => allocationTypes.Contains(f.AllocationTypeCv));
+        predicate = predicate.Or(f => allocationTypes.Contains(
+            f.AllocationTypeCvNavigation.WaDEName.Length > 0 ? 
+                f.AllocationTypeCvNavigation.WaDEName : 
+                f.AllocationTypeCvNavigation.Name));
         
         return predicate;
     }
@@ -144,7 +147,10 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
     {
         var predicate = PredicateBuilder.New<AllocationAmountsFact>();
         
-        predicate = predicate.Or(f => legalStatuses.Contains(f.AllocationLegalStatusCv));
+        predicate = predicate.Or(f => legalStatuses.Contains(
+            f.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? 
+                f.AllocationLegalStatusCvNavigation.WaDEName : 
+                f.AllocationLegalStatusCvNavigation.Name));
         
         return predicate;
     }
@@ -154,11 +160,13 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         var predicate = PredicateBuilder.New<AllocationAmountsFact>();
         
         predicate = predicate.Or(f => f.AllocationBridgeSitesFact.Any(absf =>
-            siteTypes.Contains(absf.Site.SiteTypeCv)));
+            siteTypes.Contains(
+                absf.Site.SiteTypeCvNavigation.WaDEName.Length > 0 ? 
+                    absf.Site.SiteTypeCvNavigation.WaDEName : 
+                    absf.Site.SiteTypeCvNavigation.Name)));
         
         return predicate;
     }
-
         public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool isExempt)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
