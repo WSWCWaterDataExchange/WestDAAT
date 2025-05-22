@@ -26,6 +26,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
     public class TimeSeriesFilterSet
     {
         public string[] SiteTypes { get; set; }
+        public string[] PrimaryUseCategories { get; set; }
         public string[] VariableTypes { get; set; }
         public string[] WaterSourceTypes { get; set; }
         public string[] States { get; set; }
