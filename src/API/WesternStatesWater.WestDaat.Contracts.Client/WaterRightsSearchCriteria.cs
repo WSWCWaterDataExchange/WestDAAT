@@ -7,7 +7,10 @@
         public string[] WaterSourceTypes { get; set; }
         public string[] RiverBasinNames { get; set; }
         public string[] WadeSitesUuids { get; set; }
-
+        
+        public string[] AllocationTypes { get; set; }
+        public string[] LegalStatuses { get; set; }
+        public string[] SiteTypes { get; set; }
         // Geojson string
         public string[] FilterGeometry { get; set; }
 

@@ -352,3 +352,4 @@ function SeriesChart(props: {
       <div className="d-flex justify-content-center align-items-center h-100">No {props.name} data found</div>
     );
 }
+

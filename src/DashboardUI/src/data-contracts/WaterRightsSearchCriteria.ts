@@ -16,6 +16,9 @@ export interface WaterRightsSearchCriteria {
   minimumPriorityDate?: Date;
   maximumPriorityDate?: Date;
   isWaterRightsFilterActive: boolean;
+  legalStatuses?: string[];
+  allocationTypes?: string[];
+  siteTypes?: string[];
 }
 
 export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCriteria {
@@ -29,3 +32,4 @@ export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearc
 export interface WaterRightsSearchCriteriaWithGrouping extends WaterRightsSearchCriteria {
   groupValue?: number;
 }
+

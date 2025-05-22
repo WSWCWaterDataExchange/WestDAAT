@@ -30,6 +30,9 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
     waterSourceTypes,
     riverBasinNames,
     allocationOwner,
+    legalStatuses,
+    allocationTypes,
+    siteTypes,
     states,
     isWaterRightsFilterActive,
   } = filters;
@@ -53,6 +56,9 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
       states: states,
       wadeSitesUuids: nldiIds,
       isWaterRightsFilterActive: isWaterRightsFilterActive,
+      legalStatuses: legalStatuses,
+      allocationTypes: allocationTypes,
+      siteTypes: siteTypes,
     };
   }, [
     beneficialUseNames,
@@ -71,8 +77,12 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
     allocationOwner,
     states,
     nldiIds,
-    isWaterRightsFilterActive
+    isWaterRightsFilterActive,
+    legalStatuses,
+    allocationTypes,
+    siteTypes
   ]);
 
   return { searchCriteria };
 }
+

@@ -130,6 +130,34 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
 
             return predicate;
         }
+        
+    public static ExpressionStarter<AllocationAmountsFact> HasAllocationTypes(List<string> allocationTypes)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => allocationTypes.Contains(f.AllocationTypeCv));
+        
+        return predicate;
+    }
+
+    public static ExpressionStarter<AllocationAmountsFact> HasLegalStatuses(List<string> legalStatuses)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => legalStatuses.Contains(f.AllocationLegalStatusCv));
+        
+        return predicate;
+    }
+
+    public static ExpressionStarter<AllocationAmountsFact> HasSiteTypes(List<string> siteTypes)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => f.AllocationBridgeSitesFact.Any(absf =>
+            siteTypes.Contains(absf.Site.SiteTypeCv)));
+        
+        return predicate;
+    }
 
         public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool isExempt)
         {
