@@ -2,18 +2,20 @@ import { useMemo } from 'react';
 import { WaterRightsFilters, useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { WaterRightsSearchCriteria } from '../../../../../data-contracts/WaterRightsSearchCriteria';
 import moment from 'moment';
+import { DropdownOption } from '../../../../../data-contracts/DropdownOption';
 
 export function useWaterRightsSearchCriteria() {
-  const { filters, nldiIds } = useWaterRightsContext();
+  const { filters, nldiIds, analyticsGroupingOption } = useWaterRightsContext();
 
-  return useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds });
+  return useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds, analyticsGroupingOption });
 }
 
 interface SearchCriteriaProps {
   filters: WaterRightsFilters;
   nldiIds: string[];
+  analyticsGroupingOption?: DropdownOption | null;
 }
-export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }: SearchCriteriaProps) {
+export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds, analyticsGroupingOption }: SearchCriteriaProps) {
   //pulling only the fields we need out of the filters to avoid more updates than we need to do to the search criteria
   const {
     beneficialUseNames,
@@ -59,6 +61,7 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
       legalStatuses: legalStatuses,
       allocationTypes: allocationTypes,
       siteTypes: siteTypes,
+      groupValue: analyticsGroupingOption ? Number(analyticsGroupingOption.value) : undefined,
     };
   }, [
     beneficialUseNames,
@@ -80,9 +83,9 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
     isWaterRightsFilterActive,
     legalStatuses,
     allocationTypes,
-    siteTypes
+    siteTypes,
+    analyticsGroupingOption
   ]);
 
   return { searchCriteria };
 }
-

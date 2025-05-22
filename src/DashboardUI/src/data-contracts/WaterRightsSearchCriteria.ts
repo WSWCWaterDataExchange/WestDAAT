@@ -19,6 +19,7 @@ export interface WaterRightsSearchCriteria {
   legalStatuses?: string[];
   allocationTypes?: string[];
   siteTypes?: string[];
+  groupValue?: number;
 }
 
 export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCriteria {
@@ -32,4 +33,3 @@ export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearc
 export interface WaterRightsSearchCriteriaWithGrouping extends WaterRightsSearchCriteria {
   groupValue?: number;
 }
-

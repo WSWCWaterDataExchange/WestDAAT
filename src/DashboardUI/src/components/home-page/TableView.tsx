@@ -3,14 +3,12 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import { DropdownOption } from '../../data-contracts/DropdownOption';
 import AnalyticsDataTable from './water-rights-tab/map-options/components/AnalyticsDataTable';
 import Charts from './water-rights-tab/map-options/components/Charts';
 
 function TableView() {
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState('charts');
-  const [selectedDropdownValue, setSelectedDropdownValue] = useState<DropdownOption | null>(null);
 
   const toggleShow = () => setShow(!show);
 
@@ -33,12 +31,7 @@ function TableView() {
             </Nav>
             <Tab.Content>
               <Tab.Pane eventKey="charts">
-                {show && activeTab === 'charts' && (
-                  <Charts
-                    selectedDropdownOption={selectedDropdownValue}
-                    setSelectedDropdownOption={setSelectedDropdownValue}
-                  />
-                )}
+                {show && activeTab === 'charts' && <Charts />}
               </Tab.Pane>
               <Tab.Pane eventKey="dataTable">{show && activeTab === 'dataTable' && <AnalyticsDataTable />}</Tab.Pane>
             </Tab.Content>
