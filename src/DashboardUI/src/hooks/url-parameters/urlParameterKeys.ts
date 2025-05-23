@@ -4,6 +4,7 @@ const urlParameterKeys = {
     waterRightsFilters: 'wr',
     map: 'map',
     mapStyle: 'ms',
+    analyticsGrouping: 'ag',
   },
 };
 

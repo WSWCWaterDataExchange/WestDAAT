@@ -15,6 +15,8 @@ import {
 } from '../map-options/components/DisplayOptions';
 import { useFiltersUrlParameters } from '../map-options/hooks/useFiltersUrlParameters';
 import { UseQueryResult } from 'react-query';
+import { DropdownOption } from '../../../../data-contracts/DropdownOption';
+import { useAnalyticsGroupingUrlParameter } from '../map-options/hooks/useAnalyticsGroupingUrlParameter';
 
 export interface WaterRightsFilters {
   beneficialUseNames?: string[];
@@ -75,6 +77,8 @@ export interface WaterRightsContextState {
   setDisplayOptions: React.Dispatch<React.SetStateAction<DisplayOptions>>;
   resetWaterRightsOptions: () => void;
   hostData: HostData;
+  analyticsGroupingOption: DropdownOption | null;
+  setAnalyticsGroupingOption: React.Dispatch<React.SetStateAction<DropdownOption | null>>;
 }
 
 export const defaultWaterRightsFilters: WaterRightsFilters = {
@@ -131,6 +135,8 @@ export const defaultState: WaterRightsContextState = {
     legalStatusesQuery: defaultQuery,
     siteTypesQuery: defaultQuery,
   },
+  analyticsGroupingOption: null,
+  setAnalyticsGroupingOption: () => {},
 };
 
 const WaterRightsContext = createContext<WaterRightsContextState>(
@@ -154,6 +160,10 @@ export const WaterRightsProvider = ({
     getParameter: getFiltersParameter,
     setParameter: setFiltersParameter,
   } = useFiltersUrlParameters();
+  const {
+    getParameter: getAnalyticsGroupingParameter,
+    setParameter: setAnalyticsGroupingParameter,
+  } = useAnalyticsGroupingUrlParameter();
 
   const [filters, setFilters] = useState<WaterRightsFilters>(
     getFiltersParameter() ?? defaultWaterRightsFilters
@@ -162,6 +172,9 @@ export const WaterRightsProvider = ({
     DisplayOptions
   >(getDisplayOptionsParameter() ?? defaultDisplayOptions);
   const [nldiIds, setNldiIds] = useState<string[]>([]);
+  const [analyticsGroupingOption, setAnalyticsGroupingOption] = useState<DropdownOption | null>(
+    getAnalyticsGroupingParameter() ?? null
+  );
 
   const dashboardFiltersQuery = useDashboardFilters();
   const { isLoading, isError, data } = dashboardFiltersQuery;
@@ -174,11 +187,16 @@ export const WaterRightsProvider = ({
     setFiltersParameter(filters);
   }, [filters, setFiltersParameter]);
 
+  useEffect(() => {
+    setAnalyticsGroupingParameter(analyticsGroupingOption);
+  }, [analyticsGroupingOption, setAnalyticsGroupingParameter]);
+
   const resetWaterRightsOptions = useCallback(() => {
     setFilters(defaultWaterRightsFilters);
     setDisplayOptions(defaultDisplayOptions);
     setNldiIds([]);
-  }, [setFilters, setDisplayOptions]);
+    setAnalyticsGroupingOption(null);
+  }, [setFilters, setDisplayOptions, setAnalyticsGroupingOption]);
 
   const filterContextProviderValue: WaterRightsContextState = {
     filters,
@@ -230,6 +248,8 @@ export const WaterRightsProvider = ({
         isError,
       },
     },
+    analyticsGroupingOption,
+    setAnalyticsGroupingOption,
   };
 
   return (

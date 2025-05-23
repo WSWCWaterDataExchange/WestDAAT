@@ -10,6 +10,9 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string[] WadeSitesUuids { get; set; }
         public Geometry[] FilterGeometry { get; set; }
         public string[] States { get; set; }
+        public string[] AllocationTypes { get; set; }
+        public string[] LegalStatuses { get; set; }
+        public string[] SiteTypes { get; set; }
         public string AllocationOwner { get; set; }
         public bool? ExemptOfVolumeFlowPriority { get; set; }
         public double? MinimumFlow { get; set; }
