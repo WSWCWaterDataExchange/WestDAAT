@@ -130,7 +130,43 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
 
             return predicate;
         }
+        
+    public static ExpressionStarter<AllocationAmountsFact> HasAllocationTypes(List<string> allocationTypes)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => allocationTypes.Contains(
+            f.AllocationTypeCvNavigation.WaDEName.Length > 0 ? 
+                f.AllocationTypeCvNavigation.WaDEName : 
+                f.AllocationTypeCvNavigation.Name));
+        
+        return predicate;
+    }
 
+    public static ExpressionStarter<AllocationAmountsFact> HasLegalStatuses(List<string> legalStatuses)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => legalStatuses.Contains(
+            f.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? 
+                f.AllocationLegalStatusCvNavigation.WaDEName : 
+                f.AllocationLegalStatusCvNavigation.Name));
+        
+        return predicate;
+    }
+
+    public static ExpressionStarter<AllocationAmountsFact> HasSiteTypes(List<string> siteTypes)
+    {
+        var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+        
+        predicate = predicate.Or(f => f.AllocationBridgeSitesFact.Any(absf =>
+            siteTypes.Contains(
+                absf.Site.SiteTypeCvNavigation.WaDEName.Length > 0 ? 
+                    absf.Site.SiteTypeCvNavigation.WaDEName : 
+                    absf.Site.SiteTypeCvNavigation.Name)));
+        
+        return predicate;
+    }
         public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool isExempt)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
