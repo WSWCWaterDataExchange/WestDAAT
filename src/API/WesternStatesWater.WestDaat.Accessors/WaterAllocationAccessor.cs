@@ -249,6 +249,12 @@ namespace WesternStatesWater.WestDaat.Accessors
             predicate.And(BuildGeometrySearchPredicate(searchCriteria));
 
             predicate.And(BuildFromSiteUuids(searchCriteria, db));
+            
+            predicate.And(BuildAllocationTypesPredicate(searchCriteria));
+            
+            predicate.And(BuildLegalStatusesPredicate(searchCriteria));
+            
+            predicate.And(BuildSiteTypesPredicate(searchCriteria));
 
             return predicate;
         }
@@ -332,6 +338,42 @@ namespace WesternStatesWater.WestDaat.Accessors
                 predicate.And(EF.AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
             }
 
+            return predicate;
+        }
+        
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildAllocationTypesPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
+        
+            if (searchCriteria?.AllocationTypes != null && searchCriteria.AllocationTypes.Any())
+            {
+                predicate.And(EF.AllocationAmountsFact.HasAllocationTypes(searchCriteria.AllocationTypes.ToList()));
+            }
+        
+            return predicate;
+        }
+        
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildLegalStatusesPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
+        
+            if (searchCriteria?.LegalStatuses != null && searchCriteria.LegalStatuses.Any())
+            {
+                predicate.And(EF.AllocationAmountsFact.HasLegalStatuses(searchCriteria.LegalStatuses.ToList()));
+            }
+        
+            return predicate;
+        }
+        
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildSiteTypesPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
+        
+            if (searchCriteria?.SiteTypes != null && searchCriteria.SiteTypes.Any())
+            {
+                predicate.And(EF.AllocationAmountsFact.HasSiteTypes(searchCriteria.SiteTypes.ToList()));
+            }
+        
             return predicate;
         }
 

@@ -10,8 +10,7 @@ import { useGetAnalyticsSummaryInfo } from '../../../../../hooks/queries';
 import { useColorMappings } from '../hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from '../hooks/useWaterRightsSearchCriteria';
 import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
-import { DropdownOption } from '../../../../../data-contracts/DropdownOption';
-import { WaterRightsSearchCriteriaWithGrouping } from '../../../../../data-contracts/WaterRightsSearchCriteria';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -131,21 +130,12 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-interface ChartsProps {
-  selectedDropdownOption: DropdownOption | null;
-  setSelectedDropdownOption: (option: DropdownOption) => void;
-}
-
-function Charts(props: ChartsProps) {
+function Charts() {
   const { searchCriteria } = useWaterRightsSearchCriteria();
-
-  const request: WaterRightsSearchCriteriaWithGrouping = {
-    ...searchCriteria,
-    groupValue: Number(props.selectedDropdownOption?.value),
-  };
-  const { data: chartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
+  const { analyticsGroupingOption, setAnalyticsGroupingOption } = useWaterRightsContext();
   const [chartType, setChartType] = useState<SupportedSeriesChartTypes>('pieChart');
 
+  const { data: chartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
   const { getBeneficialUseColor } = useColorMappings();
 
   const [flowData, volumeData, pointData] = useMemo(() => {
@@ -227,8 +217,8 @@ function Charts(props: ChartsProps) {
                 <AnalyticsInfoGroupingDropdown
                   isFetching={isFetching}
                   analyticsSummaryInformationResponse={chartSearchResults}
-                  selectedDropdownOption={props.selectedDropdownOption}
-                  setSelectedDropdownOption={props.setSelectedDropdownOption}
+                  selectedDropdownOption={analyticsGroupingOption}
+                  setSelectedDropdownOption={setAnalyticsGroupingOption}
                 />
               </div>
             </div>
@@ -352,3 +342,4 @@ function SeriesChart(props: {
       <div className="d-flex justify-content-center align-items-center h-100">No {props.name} data found</div>
     );
 }
+

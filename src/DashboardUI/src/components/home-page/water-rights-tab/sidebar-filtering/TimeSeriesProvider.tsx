@@ -58,12 +58,11 @@ export const TimeSeriesContext = createContext<TimeSeriesContextValue>({
 export function TimeSeriesProvider({ children }: { children: React.ReactNode }) {
   const dashboardFiltersQuery = useDashboardFilters();
 
-  const siteTypes = dashboardFiltersQuery.data?.waterRights.siteTypes ?? [];
-  const primaryUseCategories =
-    dashboardFiltersQuery.data?.waterRights.beneficialUses.map(u => u.beneficialUseName) ?? [];
+  const siteTypes = dashboardFiltersQuery.data?.timeSeries.siteTypes ?? [];
+  const primaryUseCategories = dashboardFiltersQuery.data?.timeSeries.primaryUseCategories ?? [];
   const variableTypes = dashboardFiltersQuery.data?.timeSeries.variableTypes ?? [];
-  const waterSourceTypes = dashboardFiltersQuery.data?.waterRights.waterSourceTypes ?? [];
-  const states = dashboardFiltersQuery.data?.waterRights.states ?? [];
+  const waterSourceTypes = dashboardFiltersQuery.data?.timeSeries.waterSourceTypes ?? [];
+  const states = dashboardFiltersQuery.data?.timeSeries.states ?? [];
 
 
   const [timeSeries, setTimeSeries] = useState<string[]>([]);
