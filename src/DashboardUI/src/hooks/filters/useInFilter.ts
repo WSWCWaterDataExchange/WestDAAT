@@ -11,8 +11,14 @@ export function useInFilter<T>(vals: T[] | undefined, allValuesCount: number | u
 
   const mapFilters = useMemo((): any[] | undefined => {
     if (values.length > 0 && !areAllItemsSelected) {
-      return ['any', ...values.map((a) => ['in', a, ['get', mapField]])];
-    }
+return [
+        'any',
+        ...values.map((a) => [
+          'in',
+          JSON.stringify(a), // Ensures value is quoted to match stringified arrays in vector tiles, tileset limitation. Acts like a contains string match if we don't
+          ['get', mapField]
+        ])
+      ];    }
   }, [values, mapField, areAllItemsSelected]);
 
   return { values, mapFilters };
